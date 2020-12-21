@@ -21,27 +21,27 @@ public class DifficultActivity extends AppCompatActivity {
         ButtonDifficultChild.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DifficultActivity.this, QuestionActivity.class);
-                intent.putExtra("theme",1);
-                startActivity(intent);
+                Intent intentChild = new Intent(DifficultActivity.this, QuestionActivity.class);
+                intentChild.putExtra("theme",1);
+                startActivity(intentChild);
                 finish();
             }
         });
         ButtonDifficultAdult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DifficultActivity.this, QuestionActivity.class);
-                intent.putExtra("theme",2);
-                startActivity(intent);
+                Intent intentAdult = new Intent(DifficultActivity.this, QuestionActivity.class);
+                intentAdult.putExtra("theme",2);
+                startActivity(intentAdult);
                 finish();
             }
         });
         ButtonDifficultBible.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DifficultActivity.this, QuestionActivity.class);
-                intent.putExtra("theme",3);
-                startActivity(intent);
+                Intent intentBible = new Intent(DifficultActivity.this, QuestionActivity.class);
+                intentBible.putExtra("theme",3);
+                startActivity(intentBible);
                 finish();
             }
         });

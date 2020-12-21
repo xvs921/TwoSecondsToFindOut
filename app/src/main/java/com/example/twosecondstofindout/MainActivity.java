@@ -10,6 +10,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     private Button ButtonStart;
+    private Database database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,8 +20,8 @@ public class MainActivity extends AppCompatActivity {
         ButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DifficultActivity.class);
-                startActivity(intent);
+                Intent intentStart = new Intent(MainActivity.this, DifficultActivity.class);
+                startActivity(intentStart);
                 finish();
             }
         });
@@ -28,5 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         ButtonStart = findViewById(R.id.ButtonStart);
+        database = new Database(this);
     }
 }

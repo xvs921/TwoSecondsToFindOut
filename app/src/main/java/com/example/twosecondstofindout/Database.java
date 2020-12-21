@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class Database extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "twoseconds.db";
-    public static final String TABLE_NAME = "kerdesek";
+    public static final String TABLE_KERDESEK = "kerdesek";
 
     public static final String COL_1 = "id";
     public static final String COL_2 = "temakor_id";
@@ -22,21 +22,22 @@ public class Database extends SQLiteOpenHelper
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, temakor INTEGER NOT NULL, kerdes VARCHAR(350) NOT NULL, valasz VARCHAR(200) NOT NULL)");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(temakor, kerdes, valasz) VALUES (1,'asd','1')");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(temakor, kerdes, valasz) VALUES (1,'asd','2')");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(temakor, kerdes, valasz) VALUES (1,'asd','3')");
+        db.execSQL("CREATE TABLE " + TABLE_KERDESEK + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, temakor_id INTEGER NOT NULL, kerdes VARCHAR(350) NOT NULL, valasz VARCHAR(200) NOT NULL)");
+        db.execSQL("INSERT INTO " + TABLE_KERDESEK + "(temakor_id, kerdes, valasz) VALUES (1,'asd','1')");
+        db.execSQL("INSERT INTO " + TABLE_KERDESEK + "(temakor_id, kerdes, valasz) VALUES (1,'asd','2')");
+        db.execSQL("INSERT INTO " + TABLE_KERDESEK + "(temakor_id, kerdes, valasz) VALUES (1,'asd','3')");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_KERDESEK);
     }
 
-    public Cursor selectTeljesNev(int temakor)
+    public Cursor selectQuestionId(int topic)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor eredmeny = db.rawQuery("SELECT id FROM " + TABLE_NAME + " WHERE temakor_id = '" + temakor + "' ORDER BY RAND() LIMIT 1", null);
+        Cursor eredmeny = db.rawQuery("SELECT id FROM kerdesek WHERE temakor_id=1 LIMIT 1",null);
+        //Cursor eredmeny = db.rawQuery("SELECT id FROM " + TABLE_KERDESEK + " WHERE temakor_id = " + topic + " LIMIT 1", null);
         return eredmeny;
     }
 
