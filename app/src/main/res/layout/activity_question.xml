@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".QuestionActivity">
+
+    <View
+        android:id="@+id/questionView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/holo_blue_bright"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Question"
+        android:text="Kérdés"
+        android:textSize="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Answer"
+        android:text="Válasz"
+        android:textSize="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/Question"
+        android:layout_marginBottom="10dp"/>
+
+    <ImageButton
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:id="@+id/ImageButton"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/Answer"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/nyelvkep" />
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonNotOk"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@id/questionView"
+        android:layout_alignParentLeft="true"
+        android:text="Késő"
+        android:textSize="30dp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_red_dark"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonOk"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@id/questionView"
+        android:layout_alignParentRight="true"
+        android:text="Siker"
+        android:textSize="30dp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_green_dark"/>
+
+</RelativeLayout>
