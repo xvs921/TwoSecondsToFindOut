@@ -14,6 +14,7 @@ public class Database extends SQLiteOpenHelper
     public static final String COL_2 = "temakor_id";
     public static final String COL_3 = "kerdes";
     public static final String COL_4 = "valasz";
+    public static final String COL_5 = "used";
 
     public Database(Context context)
     {
@@ -22,7 +23,7 @@ public class Database extends SQLiteOpenHelper
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_KERDESEK + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, temakor_id INTEGER NOT NULL, kerdes VARCHAR(350) NOT NULL, valasz VARCHAR(200) NOT NULL)");
+        db.execSQL("CREATE TABLE " + TABLE_KERDESEK + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, temakor_id INTEGER NOT NULL, kerdes VARCHAR(350) NOT NULL, valasz VARCHAR(200) NOT NULL, used INTEGER DEFAULT 0)");
         db.execSQL("INSERT INTO " + TABLE_KERDESEK + "(temakor_id, kerdes, valasz) VALUES (1,'asd?','1azért')");
         db.execSQL("INSERT INTO " + TABLE_KERDESEK + "(temakor_id, kerdes, valasz) VALUES (1,'asd1?','2ezrt')");
         db.execSQL("INSERT INTO " + TABLE_KERDESEK + "(temakor_id, kerdes, valasz) VALUES (1,'asd2?','3mert')");

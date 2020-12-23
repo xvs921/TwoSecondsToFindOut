@@ -7,11 +7,29 @@
     android:layout_height="match_parent"
     tools:context=".DifficultActivity">
 
+    <View
+        android:id="@+id/difficultView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonBack"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@id/difficultView"
+        android:layout_alignParentLeft="true"
+        android:text="Vissza"
+        android:textSize="30dp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_orange_dark"/>
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/ButtonDifficultChild"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="80dp"
         android:text="Gyerek"
         android:textSize="30dp"/>
 
