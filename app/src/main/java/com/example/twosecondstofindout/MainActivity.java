@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         ButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intentStart = new Intent(MainActivity.this, DifficultActivity.class);
+                Intent intentStart = new Intent(MainActivity.this, PlayersActivity.class);
                 startActivity(intentStart);
                 finish();
             }

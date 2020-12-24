@@ -12,11 +12,12 @@ public class DifficultActivity extends AppCompatActivity {
     private Button ButtonDifficultChild;
     private Button ButtonDifficultAdult;
     private Button ButtonDifficultBible;
+    private Button ButtonBackDifficult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.difficult_activity);
+        setContentView(R.layout.activity_difficult);
         init();
         ButtonDifficultChild.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,11 +46,20 @@ public class DifficultActivity extends AppCompatActivity {
                 finish();
             }
         });
+        ButtonBackDifficult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(DifficultActivity.this, RoundActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void init() {
         ButtonDifficultChild = findViewById(R.id.ButtonDifficultChild);
         ButtonDifficultAdult = findViewById(R.id.ButtonDifficultAdult);
         ButtonDifficultBible = findViewById(R.id.ButtonDifficultBible);
+        ButtonBackDifficult = findViewById(R.id.ButtonBackDifficult);
     }
 }

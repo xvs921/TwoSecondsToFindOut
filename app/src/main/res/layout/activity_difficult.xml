@@ -16,7 +16,7 @@
     <Button
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/ButtonBack"
+        android:id="@+id/ButtonBackDifficult"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@id/difficultView"
         android:layout_alignParentLeft="true"

@@ -7,7 +7,7 @@
     tools:context=".PlayersActivity">
 
     <View
-        android:id="@+id/difficultView"
+        android:id="@+id/playersView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_centerHorizontal="true"/>
@@ -15,9 +15,9 @@
     <Button
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/ButtonBack"
+        android:id="@+id/ButtonBackPlayers"
         android:layout_alignParentTop="true"
-        android:layout_alignRight="@id/difficultView"
+        android:layout_alignRight="@id/playersView"
         android:layout_alignParentLeft="true"
         android:text="Vissza"
         android:textSize="30dp"
@@ -40,7 +40,8 @@
         android:text=""
         android:textSize="30dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/Player1" />
+        android:layout_below="@+id/Player1"
+        android:layout_marginTop="20dp"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -85,7 +86,18 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/ButtonNext"
+        android:id="@+id/ButtonNewPlayer"
+        android:layout_alignLeft="@id/playersView"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/ButtonNextPlayers"
+        android:layout_marginBottom="30dp"
+        android:text="+"
+        android:textSize="30dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonNextPlayers"
         android:layout_alignParentBottom="true"
         android:text="TOVÁBB"
         android:textSize="30dp"/>
