@@ -82,4 +82,12 @@
         android:layout_below="@+id/Player5"
         android:layout_marginTop="20dp"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonNext"
+        android:layout_alignParentBottom="true"
+        android:text="TOVÁBB"
+        android:textSize="30dp"/>
+
 </RelativeLayout>
