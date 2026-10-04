@@ -32,7 +32,6 @@ public class QuestionActivity extends AppCompatActivity {
     private double time = 0.0;
     private int defaultTimerColor;
 
-    private int topic;
     private int rounds;
     private int currentPlayerId;
 
@@ -43,7 +42,6 @@ public class QuestionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_question);
         init();
         Intent intent = getIntent();
-        topic = intent.getIntExtra("theme",1);
         rounds = intent.getIntExtra("rounds",1);
         timer = new Timer();
         nextTurn();
@@ -104,6 +102,7 @@ public class QuestionActivity extends AppCompatActivity {
         }
         currentPlayerId = player.getInt(0);
         CurrentPlayer.setText(player.getString(1) + " (" + (player.getInt(2) + 1) + ". kör / " + rounds + ")");
+        int topic = player.getInt(3);
         player.close();
         kerdes(topic);
     }
