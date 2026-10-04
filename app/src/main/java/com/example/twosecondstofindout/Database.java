@@ -6,6 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
 public class Database extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "twoSecondsGame";
@@ -24,27 +29,52 @@ public class Database extends SQLiteOpenHelper
     public static final String COL_8 = "points";
 
 
+    private final Context context;
+
     public Database(Context context)
     {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 2);
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_QUESTIONS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, topic INTEGER NOT NULL, question VARCHAR(350) NOT NULL, answer VARCHAR(200) NOT NULL, used INTEGER DEFAULT 0)");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (1,'Mi Magyarország fővárosa?','Budapest')");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (1,'Mi Spanyolország fővárosa?','Madrid')");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (1,'Mi Anglia fővárosa?','London')");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (1,'Hány éves kortól számít felnőttnek valaki Magyarországon?','18')");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (1,'Mi Magyarország leghosszabb folyója?','Duna')");
-
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (2,'Mikor kezdődött az első világháború?','1914')");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (2,'Hány állmból áll az USA?','50')");
-
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (3,'Mi Isten neve?','Jehova')");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (3,'Ki volt Dávid hűséges barátja, Saul fia?','Jonatán')");
-        db.execSQL("INSERT INTO " + TABLE_QUESTIONS + "(topic, question, answer) VALUES (3,'Ki volt az első ember?','Ádám')");
         db.execSQL("CREATE TABLE IF NOT EXISTS "+ TABLE_PLAYERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0)");
+        insertQuestions(db);
+    }
+
+    // Loads the questions from res/raw/questions.txt, one per line: topic<TAB>question<TAB>answer
+    private void insertQuestions(SQLiteDatabase db)
+    {
+        db.beginTransaction();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                context.getResources().openRawResource(R.raw.questions), StandardCharsets.UTF_8)))
+        {
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                String[] parts = line.split("\t");
+                if (parts.length != 3)
+                {
+                    continue;
+                }
+                ContentValues values = new ContentValues();
+                values.put(COL_2, Integer.parseInt(parts[0].trim()));
+                values.put(COL_3, parts[1].trim());
+                values.put(COL_4, parts[2].trim());
+                db.insert(TABLE_QUESTIONS, null, values);
+            }
+            db.setTransactionSuccessful();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Could not load questions", e);
+        }
+        finally
+        {
+            db.endTransaction();
+        }
     }
 
     @Override

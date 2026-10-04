@@ -1,0 +1,300 @@
+1	Mi Magyarország fővárosa?	Budapest
+1	Mi Spanyolország fővárosa?	Madrid
+1	Mi Anglia fővárosa?	London
+1	Hány éves kortól számít felnőttnek valaki Magyarországon?	18
+1	Mi Magyarország leghosszabb folyója?	Tisza
+1	Hány lába van a póknak?	8
+1	Hány lába van a rovaroknak?	6
+1	Hány nap van egy héten?	7
+1	Hány hónap van egy évben?	12
+1	Melyik a legnagyobb bolygó a Naprendszerben?	Jupiter
+1	Melyik bolygón élünk?	Föld
+1	Melyik állatot nevezik az állatok királyának?	Oroszlán
+1	Melyik állat mondja azt, hogy „mú”?	Tehén
+1	Hány perc van egy órában?	60
+1	Hány másodperc van egy percben?	60
+1	Mennyi 7 x 8?	56
+1	Mennyi 9 x 9?	81
+1	Mennyi 12 + 15?	27
+1	Mennyi 100 - 37?	63
+1	Milyen színt kapunk, ha összekeverjük a kéket és a sárgát?	Zöld
+1	Milyen színt kapunk, ha összekeverjük a pirosat és a fehéret?	Rózsaszín
+1	Melyik évszak jön a tél után?	Tavasz
+1	Hány évszak van egy évben?	4
+1	Hogy hívják a megfagyott vizet?	Jég
+1	Hány Celsius-fokon fagy meg a víz?	0
+1	Hány Celsius-fokon forr a víz?	100
+1	Melyik a legnagyobb szárazföldi állat?	Elefánt
+1	Melyik a legmagasabb állat?	Zsiráf
+1	Melyik madár nem tud repülni, és az Antarktiszon él?	Pingvin
+1	Hogy hívják a béka kicsinyét?	Ebihal
+1	Hogy hívják a ló kicsinyét?	Csikó
+1	Hogy hívják a tehén kicsinyét?	Borjú
+1	Hogy hívják a juh kicsinyét?	Bárány
+1	Hány színe van a szivárványnak?	7
+1	Milyen színű a magyar zászló középső sávja?	Fehér
+1	Milyen színek vannak a magyar zászlón?	Piros, fehér, zöld
+1	Ki írta A Pál utcai fiúkat?	Molnár Ferenc
+1	Ki írta a Toldit?	Arany János
+1	Ki írta a János vitézt?	Petőfi Sándor
+1	Hogy hívják Micimackó szamár barátját?	Füles
+1	Hány törpe szerepel a Hófehérke meséjében?	7
+1	Milyen állat Némó a Némó nyomában című filmben?	Bohóchal
+1	Hogy hívják Mickey egér kutyáját?	Plútó
+1	Mit veszít el Hamupipőke a bálban?	Üvegcipő
+1	Hogy hívják a Jégvarázs hóemberét?	Olaf
+1	Hogy hívják Shrek feleségét?	Fiona
+1	Milyen gyümölcsbe harapott bele Hófehérke?	Alma
+1	Melyik gyümölcs sárga és görbe?	Banán
+1	Melyik a legnagyobb óceán?	Csendes-óceán
+1	Melyik földrészen van Magyarország?	Európa
+1	Melyik a legnagyobb földrész?	Ázsia
+1	Melyik országban vannak a gízai piramisok?	Egyiptom
+1	Melyik városban van az Eiffel-torony?	Párizs
+1	Mi Magyarország legnagyobb tava?	Balaton
+1	Mi Magyarország legmagasabb pontja?	Kékes
+1	Hány oldala van a háromszögnek?	3
+1	Hány oldala van a négyzetnek?	4
+1	Hány oldala van a hatszögnek?	6
+1	Hány perc egy negyedóra?	15
+1	Hány napos a február szökőévben?	29
+1	Csillag vagy bolygó a Nap?	Csillag
+1	Melyik bolygót nevezik vörös bolygónak?	Mars
+1	Melyik bolygó van legközelebb a Naphoz?	Merkúr
+1	Melyik bolygónak vannak a leglátványosabb gyűrűi?	Szaturnusz
+1	Mit készítenek a méhek?	Méz
+1	Miből lesz a pillangó?	Hernyó
+1	Melyik állat hordja a házát a hátán?	Csiga
+1	Melyik állat alszik téli álmot és szereti a mézet?	Medve
+1	Hány foga van egy felnőtt embernek a bölcsességfogakkal együtt?	32
+1	Melyik szervünkkel lélegzünk?	Tüdő
+1	Melyik szervünk pumpálja a vért?	Szív
+1	Hány ujj van a két kezünkön összesen?	10
+1	Milyen színű a citrom?	Sárga
+1	Ki hozza a karácsonyi ajándékot a magyar hagyomány szerint?	Jézuska
+1	Melyik napon jön a Mikulás?	December 6.
+1	Mi az ábécé első betűje?	A
+1	Melyik állat hangja a „röf-röf”?	Disznó
+1	Melyik állat hangja a „kukurikú”?	Kakas
+1	Melyik a leggyorsabb szárazföldi állat?	Gepárd
+1	Melyik a legnagyobb állat a Földön?	Kék bálna
+1	Hány kereke van egy biciklinek?	2
+1	Hány kereke van egy triciklinek?	3
+1	Milyen színű lámpánál szabad átmenni az úttesten?	Zöld
+1	Mi a mentők telefonszáma Magyarországon?	104
+1	Mi az egységes európai segélyhívó szám?	112
+1	Hány játékos van egy focicsapatból egyszerre a pályán?	11
+1	Mennyi 5 x 5?	25
+1	Mennyi 6 x 7?	42
+1	Mennyi a 100 fele?	50
+1	Hogy hívják a fa földben lévő részét?	Gyökér
+1	Mit eszik főleg a panda?	Bambusz
+1	Milyen állat Garfield?	Macska
+1	Milyen állat Bambi?	Őz
+1	Milyen állat Dumbó?	Elefánt
+1	Hány húrja van egy hagyományos gitárnak?	6
+1	Melyik évszakban hullanak le a falevelek?	Ősz
+1	Hány lába van a polipnak?	8
+1	Melyik állat ugrál és erszényben hordja a kicsinyét?	Kenguru
+1	Hogy hívják Pinokkió apját?	Geppetto
+1	Melyik mesehős orra nő meg, ha hazudik?	Pinokkió
+2	Mikor kezdődött az első világháború?	1914
+2	Hány államból áll az USA?	50
+2	Mikor ért véget a második világháború?	1945
+2	Melyik évben ünnepelték a magyar millenniumot?	1896
+2	Melyik napon tört ki az 1848-as forradalom?	Március 15.
+2	Melyik napon tört ki az 1956-os forradalom?	Október 23.
+2	Ki volt Magyarország első királya?	Szent István
+2	Melyik évben volt a mohácsi csata?	1526
+2	Ki írta a Himnuszt?	Kölcsey Ferenc
+2	Ki zenésítette meg a Himnuszt?	Erkel Ferenc
+2	Ki írta a Szózatot?	Vörösmarty Mihály
+2	Ki írta Az ember tragédiáját?	Madách Imre
+2	Ki írta az Egri csillagokat?	Gárdonyi Géza
+2	Ki írta A kőszívű ember fiait?	Jókai Mór
+2	Ki festette a Mona Lisát?	Leonardo da Vinci
+2	Ki írta a Rómeó és Júliát?	William Shakespeare
+2	Ki érte el Amerikát 1492-ben?	Kolumbusz Kristóf
+2	Ki volt az első ember a Holdon?	Neil Armstrong
+2	Melyik évben szállt le először ember a Holdon?	1969
+2	Mi a víz kémiai képlete?	H2O
+2	Mi az arany vegyjele?	Au
+2	Mi a vas vegyjele?	Fe
+2	Mi az ezüst vegyjele?	Ag
+2	Mi a nátrium vegyjele?	Na
+2	Hány csontja van egy felnőtt embernek?	206
+2	Melyik az emberi test legnagyobb szerve?	Bőr
+2	Ki alkotta meg a relativitáselméletet?	Albert Einstein
+2	Ki találta fel a bűvös kockát?	Rubik Ernő
+2	Melyik magyar tudós kapott Nobel-díjat a C-vitaminnal kapcsolatos kutatásaiért?	Szent-Györgyi Albert
+2	Kb. hány km/s a fény sebessége?	300 000
+2	Mi Japán fővárosa?	Tokió
+2	Mi Ausztrália fővárosa?	Canberra
+2	Mi Kanada fővárosa?	Ottawa
+2	Mi Brazília fővárosa?	Brazíliaváros
+2	Mi Törökország fővárosa?	Ankara
+2	Mi Svájc fővárosa?	Bern
+2	Mi Lengyelország fővárosa?	Varsó
+2	Mi Ausztria fővárosa?	Bécs
+2	Mi Horvátország fővárosa?	Zágráb
+2	Mi Románia fővárosa?	Bukarest
+2	Mi Szlovákia fővárosa?	Pozsony
+2	Mi Norvégia fővárosa?	Oslo
+2	Mi Portugália fővárosa?	Lisszabon
+2	Mi Egyiptom fővárosa?	Kairó
+2	Melyik a világ legmagasabb hegye?	Mount Everest
+2	Melyik a világ legnagyobb forró sivataga?	Szahara
+2	Melyik a világ legnépesebb országa?	India
+2	Hány vármegyéje van Magyarországnak?	19
+2	Melyik Magyarország második legnépesebb városa?	Debrecen
+2	Melyik évben vezették be a forintot?	1946
+2	Melyik évben csatlakozott Magyarország az Európai Unióhoz?	2004
+2	Melyik évben lett Magyarország a NATO tagja?	1999
+2	Melyik évben omlott le a berlini fal?	1989
+2	Ki volt a Szovjetunió utolsó vezetője?	Mihail Gorbacsov
+2	Melyik évben süllyedt el a Titanic?	1912
+2	Ki írta A kis herceget?	Antoine de Saint-Exupéry
+2	Ki írta az 1984 című regényt?	George Orwell
+2	Ki komponálta a Magyar rapszódiákat?	Liszt Ferenc
+2	Ki komponálta A kékszakállú herceg vára című operát?	Bartók Béla
+2	Ki komponálta a Háry János című daljátékot?	Kodály Zoltán
+2	Ki volt Mátyás király apja?	Hunyadi János
+2	Hány perc egy focimeccs rendes játékideje?	90
+2	Hány karika van az olimpiai zászlón?	5
+2	Hány évente rendeznek nyári olimpiát?	4
+2	Ki a legtöbb aranyérmet nyert magyar olimpikon?	Gerevich Aladár
+2	Melyik sportág legendája Puskás Ferenc?	Labdarúgás
+2	Melyik évben győzött 6:3-ra Anglia ellen a magyar válogatott a Wembley-ben?	1953
+2	Hány játékos van egy kosárlabdacsapatból egyszerre a pályán?	5
+2	Hány mezőből áll a sakktábla?	64
+2	Melyik sakkfigura lép L alakban?	Huszár
+2	Mennyi 15 x 15?	225
+2	Mennyi 2 a tizediken?	1024
+2	Hány fokos a derékszög?	90
+2	Mennyi a háromszög belső szögeinek összege?	180 fok
+2	Mennyi a pí értéke két tizedesjegyre?	3,14
+2	Hány nulla van egy millióban?	6
+2	Melyik a Naprendszer legforróbb bolygója?	Vénusz
+2	Hány bolygó van a Naprendszerben?	8
+2	Melyik gázból van a legtöbb a levegőben?	Nitrogén
+2	Melyik gázt lélegezzük ki?	Szén-dioxid
+2	Melyik vércsoport az általános vérdonor?	0 Rh negatív
+2	Melyik vitamin termelődik a bőrben napfény hatására?	D-vitamin
+2	Melyik szervben termelődik az inzulin?	Hasnyálmirigy
+2	Ki alapította a Microsoftot Paul Allennel?	Bill Gates
+2	Ki alapította az Apple-t Steve Wozniakkal?	Steve Jobs
+2	Minek a rövidítése a WWW?	World Wide Web
+2	Melyik évben indult a Facebook?	2004
+2	Ki találta fel a golyóstollat?	Bíró László
+2	Ki tervezte az Országház épületét?	Steindl Imre
+2	Melyik volt Budapest első állandó Duna-hídja?	Lánchíd
+2	Melyik a legnagyobb magyarországi Duna-sziget?	Csepel-sziget
+2	Ki volt Magyarország kormányzója 1920 és 1944 között?	Horthy Miklós
+2	Melyik évben írták alá a trianoni békeszerződést?	1920
+2	Melyik évben végezték ki az aradi vértanúkat?	1849
+2	Ki festette A magányos cédrust?	Csontváry Kosztka Tivadar
+2	Melyik nyelvnek van a legtöbb anyanyelvi beszélője?	Kínai (mandarin)
+2	Ki írta a Nemzeti dalt?	Petőfi Sándor
+2	Melyik évben kezdődött a második világháború?	1939
+2	Ki írta a Hamletet?	William Shakespeare
+2	Ki festette a Napraforgókat?	Vincent van Gogh
+3	Mi Isten neve?	Jehova
+3	Ki volt Dávid hűséges barátja, Saul fia?	Jonatán
+3	Ki volt az első ember?	Ádám
+3	Ki volt az első nő?	Éva
+3	Ki építette a bárkát?	Noé
+3	Hány napig esett az eső az özönvíz idején?	40
+3	Ki ölte meg Ábelt?	Kain
+3	Ki volt Ádám és Éva harmadik fia, akit a Biblia név szerint említ?	Sét
+3	Ki volt Ábrahám felesége?	Sára
+3	Ki volt Ábrahám és Sára fia?	Izsák
+3	Ki volt Izsák felesége?	Rebeka
+3	Ki volt Jákob ikertestvére?	Ézsau
+3	Milyen új nevet kapott Jákob?	Izrael
+3	Hány fia volt Jákobnak?	12
+3	Melyik fiát adták el a testvérei rabszolgának?	József
+3	Melyik országba került József rabszolgaként?	Egyiptom
+3	Ki vezette ki az izraelitákat Egyiptomból?	Mózes
+3	Ki volt Mózes bátyja?	Áron
+3	Ki volt Mózes nővére?	Mirjám
+3	Hány csapás sújtotta Egyiptomot?	10
+3	Melyik tengert választotta ketté Jehova?	Vörös-tenger
+3	Melyik hegyen kapta meg Mózes a Tízparancsolatot?	Sínai-hegy
+3	Mit evett Izrael népe a pusztában?	Manna
+3	Hány évig vándoroltak az izraeliták a pusztában?	40
+3	Ki vezette be az izraelitákat az Ígéret földjére?	Józsué
+3	Melyik város falai omlottak le, miután az izraeliták körbejárták?	Jerikó
+3	Ki rejtette el a kémeket Jerikóban?	Ráháb
+3	Melyik bírónak volt rendkívüli ereje?	Sámson
+3	Ki csalta ki Sámson titkát?	Delila
+3	Ki volt Ruth anyósa?	Naomi (Noémi)
+3	Ki lett Ruth férje?	Boáz
+3	Ki volt Sámuel anyja?	Hanna (Anna)
+3	Ki volt Izrael első királya?	Saul
+3	Kit győzött le Dávid parittyával?	Góliát
+3	Milyen hangszeren játszott Dávid Saul előtt?	Hárfa
+3	Melyik királyt ismerték a bölcsességéről?	Salamon
+3	Ki építette fel a templomot Jeruzsálemben?	Salamon
+3	Melyik királynő látogatta meg Salamont?	Sába királynője
+3	Melyik prófétát ragadta el egy forgószél, miután megjelent egy tüzes szekér?	Illés
+3	Ki volt Illés utódja?	Elizeus
+3	Melyik prófétát nyelte el egy nagy hal?	Jónás
+3	Melyik városba küldte Jehova Jónást?	Ninive
+3	Kit vetettek az oroszlánok vermébe?	Dániel
+3	Melyik babiloni király álmát fejtette meg Dániel?	Nebukadnezár
+3	Hány fiatalt dobtak a tüzes kemencébe Babilonban?	3
+3	Melyik zsidó lány lett perzsa királyné?	Eszter
+3	Ki volt Eszter unokatestvére és nevelője?	Márdokeus
+3	Ki akarta kiirtani a zsidókat Eszter idejében?	Hámán
+3	Ki volt az a hűséges férfi, aki mindenét elvesztette, mégis kitartott?	Jób
+3	Melyik a Biblia leghosszabb könyve?	Zsoltárok
+3	Hány könyvből áll a Biblia?	66
+3	Mi a Biblia első könyve?	1Mózes
+3	Mi a Biblia utolsó könyve?	Jelenések
+3	Hol éltek kezdetben Ádám és Éva?	Éden kertjében
+3	Milyen állaton keresztül szólt a Sátán Évához?	Kígyó
+3	Hány évet élt Matuzsálem?	969
+3	Melyik városban született Jézus?	Betlehem
+3	Ki volt Jézus anyja?	Mária
+3	Ki volt Jézus nevelőapja?	József
+3	Melyik városban nőtt fel Jézus?	Názáret
+3	Ki keresztelte meg Jézust?	Keresztelő János
+3	Melyik folyóban keresztelték meg Jézust?	Jordán
+3	Hány apostolt választott Jézus?	12
+3	Ki árulta el Jézust?	Júdás Iskáriót
+3	Hány ezüstpénzt kapott Júdás az árulásért?	30
+3	Ki tagadta meg Jézust háromszor?	Péter
+3	Mi volt Jézus első csodája?	A vizet borrá változtatta
+3	Melyik városban volt az a lakodalom, ahol Jézus a vizet borrá változtatta?	Kána
+3	Kit támasztott fel Jézus Betániában?	Lázár
+3	Kik voltak Lázár nővérei?	Márta és Mária
+3	Melyik vámszedő mászott fel egy fára, hogy lássa Jézust?	Zákeus
+3	Hány kenyérrel etetett meg Jézus 5000 férfit?	5
+3	Hány hallal etetett meg Jézus 5000 férfit?	2
+3	Melyik római helytartó ítélte halálra Jézust?	Poncius Pilátus
+3	Hányadik napon támasztották fel Jézust?	A harmadik napon
+3	Mi volt Pál apostol korábbi neve?	Saul
+3	Melyik város felé tartott Saul, amikor megtért?	Damaszkusz
+3	Ki volt az első keresztény mártír?	István
+3	Ki írta a Jelenések könyvét?	János apostol
+3	Melyik evangéliumíró volt orvos?	Lukács
+3	Melyik apostol volt vámszedő, mielőtt követte Jézust?	Máté
+3	Hány evangélium van a Bibliában?	4
+3	Melyik fiatal munkatársának írt Pál két levelet?	Timóteus
+3	Mi volt Pál mestersége?	Sátorkészítő
+3	Melyik házaspár volt sátorkészítő, mint Pál?	Akvila és Priszcilla
+3	Kit támasztott fel Péter Joppéban?	Tábita (Dorkász)
+3	Melyik imát tanította Jézus a tanítványainak?	Miatyánk (mintaima)
+3	Melyik bibliai könyvben szerepel először a Tízparancsolat?	2Mózes
+3	Ki volt Mózes apósa?	Jetró
+3	Ki volt Mózes felesége?	Cippóra
+3	Mit adott Isten Noénak a szövetség jeléül?	Szivárvány
+3	Melyik madár hozott olajfalevelet Noénak?	Galamb
+3	Melyik város építésekor zavarta össze Isten az emberek nyelvét?	Bábel
+3	Melyik két várost pusztította el Isten Lót idejében?	Szodoma és Gomora
+3	Mivé változott Lót felesége?	Sóoszlop
+3	Ki volt Jákob legfiatalabb fia?	Benjámin
+3	Ki volt Dávid apja?	Isai (Jessé)
+3	Melyik próféta kente fel Dávidot királlyá?	Sámuel
+3	Hány napig böjtölt Jézus a pusztában?	40
+3	Ki volt Keresztelő János anyja?	Erzsébet
