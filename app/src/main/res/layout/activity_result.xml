@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ResultTitle"
-        android:layout_above="@+id/ButtonNewGame"
+        android:layout_above="@+id/ButtonUndoResult"
         android:layout_marginTop="30dp">
 
         <TextView
@@ -29,6 +29,16 @@
             android:paddingEnd="30dp"
             android:textSize="28sp"/>
     </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonUndoResult"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/ButtonNewGame"
+        android:layout_marginBottom="20dp"
+        android:text="Utolsó döntés visszavonása"
+        android:textSize="20sp"/>
 
     <Button
         android:layout_width="match_parent"

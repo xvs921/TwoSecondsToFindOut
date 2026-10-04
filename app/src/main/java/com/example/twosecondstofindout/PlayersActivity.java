@@ -3,6 +3,7 @@ package com.example.twosecondstofindout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -86,14 +87,23 @@ public class PlayersActivity extends AppCompatActivity {
             level.setAdapter(levelAdapter);
             level.setSelection(1);
         }
-        for (int i = 2; i < PlayerRows.length; i++) {
+        database = new Database(this);
+
+        // the players of the last game are filled in, at least two rows are shown
+        Cursor lastPlayers = database.selectPlayers();
+        int row = 0;
+        while (lastPlayers.moveToNext() && row < Players.length) {
+            Players[row].setText(lastPlayers.getString(0));
+            PlayerLevels[row].setSelection(lastPlayers.getInt(1) - 1);
+            row++;
+        }
+        lastPlayers.close();
+        for (int i = Math.max(2, row); i < PlayerRows.length; i++) {
             PlayerRows[i].setVisibility(View.INVISIBLE);
         }
 
         ButtonNewPlayer = findViewById(R.id.ButtonNewPlayer);
         ButtonBackPlayers = findViewById(R.id.ButtonBackPlayers);
         ButtonNextPlayers = findViewById(R.id.ButtonNextPlayers);
-
-        database = new Database(this);
     }
 }

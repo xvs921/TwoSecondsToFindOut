@@ -1,5 +1,6 @@
 package com.example.twosecondstofindout;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -29,6 +30,7 @@ public class QuestionActivity extends AppCompatActivity {
     private Button ButtonOk;
     private Button ButtonNotOk;
     private Button ButtonSkip;
+    private Button ButtonUndo;
     private ToneGenerator toneGenerator;
 
     private java.util.Timer timer;
@@ -36,9 +38,11 @@ public class QuestionActivity extends AppCompatActivity {
     private double time = 0.0;
     private int defaultTimerColor;
 
+    private GameState gameState;
     private int rounds;
     private int currentPlayerId;
     private int currentTopic;
+    private int currentQuestionId;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -46,18 +50,31 @@ public class QuestionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
         init();
-        Intent intent = getIntent();
-        rounds = intent.getIntExtra("rounds",1);
+        rounds = gameState.getRounds();
         timer = new Timer();
-        nextTurn();
+        // after an undo on the results screen the undone question comes back
+        int undoneQuestionId = getIntent().getIntExtra("questionId", -1);
+        if (undoneQuestionId >= 0) {
+            showTurn(undoneQuestionId);
+        } else {
+            nextTurn();
+        }
         ButtonStartStop.setOnClickListener(view -> {
             startTimer();
         });
         ButtonOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
-                database.savePlayerAnswer(currentPlayerId, true);
+                database.savePlayerAnswer(currentPlayerId, currentQuestionId, true);
                 nextTurn();
+            }
+        });
+        // takes back the last Siker / Késő, the player gets the same question again
+        ButtonUndo.setOnClickListener(view -> {
+            stopTimer();
+            int questionId = database.undoLastAnswer();
+            if (questionId >= 0) {
+                showTurn(questionId);
             }
         });
         // a new question for the same player, without scoring
@@ -68,10 +85,18 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonNotOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
-                database.savePlayerAnswer(currentPlayerId, false);
+                database.savePlayerAnswer(currentPlayerId, currentQuestionId, false);
                 nextTurn();
             }
         });
+    }
+
+    // the game is saved, it can be continued from the main menu
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(QuestionActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -91,6 +116,8 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonOk = findViewById(R.id.ButtonOk);
         ButtonNotOk = findViewById(R.id.ButtonNotOk);
         ButtonSkip = findViewById(R.id.ButtonSkip);
+        ButtonUndo = findViewById(R.id.ButtonUndo);
+        gameState = new GameState(this);
         toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
         database = new Database(this);
         ButtonStartStop.setText("Start");
@@ -98,33 +125,93 @@ public class QuestionActivity extends AppCompatActivity {
         timerStarted = false;
     }
 
-    // The player with the fewest answers is next. When everyone answered
-    // in every round, the game is over and the results are shown.
-    @SuppressLint("SetTextI18n")
+    // Called after every Siker / Késő. When every active player answered the same number
+    // of questions a round is over: the standings are shown, and after the last round the
+    // players with the most points play tie-break rounds until there is one winner.
     private void nextTurn()
     {
-        Cursor player = database.selectNextPlayer();
-        if (player == null || !player.moveToFirst() || player.getInt(2) >= rounds)
+        int[] answeredRange = database.selectActiveAnsweredRange();
+        boolean roundOver = answeredRange[0] == answeredRange[1] && answeredRange[0] > 0;
+        if (!roundOver)
         {
-            if (player != null)
-            {
-                player.close();
-            }
-            showResults();
+            showTurn(-1);
+            return;
+        }
+        if (answeredRange[0] < rounds)
+        {
+            showRoundDialog(answeredRange[0] + ". kör vége", database.selectScoreboardText());
+            return;
+        }
+        if (database.keepLeadersActive() <= 1)
+        {
+            finishGame();
+            return;
+        }
+        showRoundDialog("Holtverseny!", "Szétszavazó kör: " + database.selectActivePlayerNames() + "\n\n" + database.selectScoreboardText());
+    }
+
+    private void showRoundDialog(String title, String message)
+    {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("Tovább", (dialog, which) -> showTurn(-1))
+                .show();
+    }
+
+    // Shows the next player with a new question, or with the given one after an undo
+    @SuppressLint("SetTextI18n")
+    private void showTurn(int questionId)
+    {
+        Cursor player = database.selectNextPlayer();
+        if (!player.moveToFirst())
+        {
+            player.close();
+            finishGame();
             return;
         }
         currentPlayerId = player.getInt(0);
-        CurrentPlayer.setText(player.getString(1) + " (" + (player.getInt(2) + 1) + ". kör / " + rounds + ")");
+        int answered = player.getInt(2);
+        if (answered >= rounds)
+        {
+            CurrentPlayer.setText(player.getString(1) + " (szétszavazó)");
+        }
+        else
+        {
+            CurrentPlayer.setText(player.getString(1) + " (" + (answered + 1) + ". kör / " + rounds + ")");
+        }
         currentTopic = player.getInt(3);
         player.close();
-        kerdes(currentTopic);
+        if (questionId >= 0)
+        {
+            showQuestion(questionId);
+        }
+        else
+        {
+            kerdes(currentTopic);
+        }
+        ButtonUndo.setEnabled(database.hasAnswers());
     }
 
-    private void showResults()
+    private void finishGame()
     {
+        gameState.setInProgress(false);
         Intent intent = new Intent(QuestionActivity.this, ResultActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void showQuestion(int questionId)
+    {
+        Cursor question = database.selectQuestion(questionId);
+        if (question.moveToFirst())
+        {
+            currentQuestionId = questionId;
+            Question.setText(question.getString(0));
+            Answer.setText(question.getString(1));
+        }
+        question.close();
     }
 
     @SuppressLint("SetTextI18n")
@@ -142,7 +229,8 @@ public class QuestionActivity extends AppCompatActivity {
             ButtonStartStop.setVisibility(View.INVISIBLE);
             return;
         }
-        database.markQuestionUsed(question.getInt(0));
+        currentQuestionId = question.getInt(0);
+        database.markQuestionUsed(currentQuestionId);
         Question.setText(question.getString(1));
         Answer.setText(question.getString(2));
         question.close();

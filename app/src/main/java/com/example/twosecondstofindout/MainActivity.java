@@ -10,6 +10,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     private Button ButtonStart;
+    private Button ButtonContinue;
     private Database database;
 
     @Override
@@ -17,6 +18,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+        ButtonContinue.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, QuestionActivity.class);
+            startActivity(intent);
+            finish();
+        });
         ButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -29,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         ButtonStart = findViewById(R.id.ButtonStart);
+        ButtonContinue = findViewById(R.id.ButtonContinue);
         database = new Database(this);
+        // a game that was left before the end can be continued
+        boolean canContinue = new GameState(this).isInProgress() && database.countPlayers() > 0;
+        ButtonContinue.setVisibility(canContinue ? View.VISIBLE : View.GONE);
     }
 }

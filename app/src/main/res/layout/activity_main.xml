@@ -29,6 +29,15 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/ButtonContinue"
+        android:layout_above="@+id/ButtonStart"
+        android:layout_marginBottom="20dp"
+        android:text="FOLYTATÁS"
+        android:textSize="30dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/ButtonStart"
         android:layout_alignParentBottom="true"
         android:text="START"
