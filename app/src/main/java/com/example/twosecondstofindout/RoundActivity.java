@@ -7,12 +7,14 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class RoundActivity extends AppCompatActivity {
     private Button ButtonBackRound;
     private Button ButtonNextRound;
     private TextView FirstPlayer;
+    private EditText RoundNumber;
     private Database database;
 
     @Override
@@ -32,6 +34,7 @@ public class RoundActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intentStart = new Intent(RoundActivity.this, DifficultActivity.class);
+                intentStart.putExtra("rounds", getRoundNumber());
                 startActivity(intentStart);
                 finish();
             }
@@ -41,6 +44,7 @@ public class RoundActivity extends AppCompatActivity {
         ButtonBackRound = findViewById(R.id.ButtonBackRound);
         ButtonNextRound = findViewById(R.id.ButtonNextRound);
         FirstPlayer = findViewById(R.id.FirstPlayer);
+        RoundNumber = findViewById(R.id.RoundNumber);
         database = new Database(this);
         String firstPlayerText = FirstPlayer.getText().toString();
 
@@ -54,6 +58,18 @@ public class RoundActivity extends AppCompatActivity {
             }
             FirstPlayer.setText(firstPlayerText + stringBuffer.toString());
         }
+        if (firstPlayerName != null)
+        {
+            firstPlayerName.close();
+        }
 
+    }
+
+    private int getRoundNumber() {
+        try {
+            return Math.max(1, Integer.parseInt(RoundNumber.getText().toString().trim()));
+        } catch (NumberFormatException e) {
+            return 1;
+        }
     }
 }

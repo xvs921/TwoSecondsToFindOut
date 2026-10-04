@@ -23,6 +23,7 @@ public class DifficultActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intentChild = new Intent(DifficultActivity.this, QuestionActivity.class);
+                intentChild.putExtra("rounds", getIntent().getIntExtra("rounds", 1));
                 intentChild.putExtra("theme",1);
                 startActivity(intentChild);
                 finish();
@@ -32,6 +33,7 @@ public class DifficultActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intentAdult = new Intent(DifficultActivity.this, QuestionActivity.class);
+                intentAdult.putExtra("rounds", getIntent().getIntExtra("rounds", 1));
                 intentAdult.putExtra("theme",2);
                 startActivity(intentAdult);
                 finish();
@@ -41,6 +43,7 @@ public class DifficultActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intentBible = new Intent(DifficultActivity.this, QuestionActivity.class);
+                intentBible.putExtra("rounds", getIntent().getIntExtra("rounds", 1));
                 intentBible.putExtra("theme",3);
                 startActivity(intentBible);
                 finish();

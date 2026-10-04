@@ -16,11 +16,22 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/CurrentPlayer"
+        android:text="Játékos"
+        android:textSize="24sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/Question"
         android:text="Kérdés"
         android:textSize="30sp"
+        android:textAlignment="center"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
+        android:layout_below="@+id/CurrentPlayer"
+        android:layout_marginTop="40dp"
         android:layout_marginBottom="10dp"/>
 
     <TextView
