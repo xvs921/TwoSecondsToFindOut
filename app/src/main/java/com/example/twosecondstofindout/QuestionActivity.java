@@ -29,6 +29,7 @@ public class QuestionActivity extends AppCompatActivity {
     private java.util.Timer timer;
     private TimerTask timerTask;
     private double time = 0.0;
+    private int defaultTimerColor;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -41,13 +42,28 @@ public class QuestionActivity extends AppCompatActivity {
         kerdes(topic);
         timer = new Timer();
         ButtonStartStop.setOnClickListener(view -> {
-            startStop();
+            startTimer();
+        });
+        ButtonOk.setOnClickListener(view -> {
+            if(timerStarted){
+                stopTimer();
+                kerdes(topic);
+            }
         });
         ButtonNotOk.setOnClickListener(view -> {
-            startStop();
-            kerdes(topic);
+            if(timerStarted){
+                stopTimer();
+                kerdes(topic);
+            }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+    }
+
     @SuppressLint("SetTextI18n")
     private void init() {
         Question = findViewById(R.id.Question);
@@ -58,6 +74,7 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonNotOk = findViewById(R.id.ButtonNotOk);
         database = new Database(this);
         ButtonStartStop.setText("Start");
+        defaultTimerColor = TimerText.getCurrentTextColor();
         timerStarted = false;
     }
 
@@ -99,37 +116,23 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     //
-    // BUTTON CLICK EVENTS
-    //
-    private void startStop(){
-        if(timerTask != null){
-            timerTask.cancel();
-            time = 0;
-            if(ButtonOk.getVisibility() == View.INVISIBLE){
-                ButtonOk.setVisibility(View.VISIBLE);
-            }
-        }
-        timerStarted = !timerStarted;
-        if(timerStarted){
-            ButtonStartStop.setVisibility(View.INVISIBLE);
-            startTimer();
-        } else{
-            ButtonStartStop.setVisibility(View.VISIBLE);
-            TimerText.setText("00 : 00 : 00");
-        }
-    }
-
-
-    //
     // TIMER FUNCTIONS
     //
     public void startTimer()
     {
+        if(timerStarted){
+            return;
+        }
+        timerStarted = true;
+        time = 0;
+        ButtonStartStop.setVisibility(View.INVISIBLE);
         timerTask = new TimerTask() {
             @Override
             public void run () {
                 runOnUiThread(() -> {
-                    time++;
+                    if(!timerStarted){
+                        return;
+                    }
                     TimerText.setText(getTimerText());
                     if(time >= 4){
                         TimerText.setTextColor(Color.parseColor("#ff0000"));
@@ -139,10 +142,26 @@ public class QuestionActivity extends AppCompatActivity {
                             ButtonOk.setVisibility(View.INVISIBLE);
                         }
                     }
+                    time++;
                 });
             }
         };
         timer.scheduleAtFixedRate(timerTask, 0, 1000);
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void stopTimer()
+    {
+        if(timerTask != null){
+            timerTask.cancel();
+            timerTask = null;
+        }
+        timerStarted = false;
+        time = 0;
+        TimerText.setText("00 : 00 : 00");
+        TimerText.setTextColor(defaultTimerColor);
+        ButtonOk.setVisibility(View.VISIBLE);
+        ButtonStartStop.setVisibility(View.VISIBLE);
     }
 
     private String getTimerText(){
