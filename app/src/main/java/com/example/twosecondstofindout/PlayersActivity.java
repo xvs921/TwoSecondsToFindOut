@@ -1,14 +1,13 @@
 package com.example.twosecondstofindout;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class PlayersActivity extends AppCompatActivity {
 
@@ -59,6 +58,10 @@ public class PlayersActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 database.insertPlayersForNewGame(Player1.getText().toString(),String.valueOf(Player2.getText()),String.valueOf(Player3.getText()),String.valueOf(Player4.getText()),String.valueOf(Player5.getText()),String.valueOf(Player6.getText()));
+                if(database.countPlayers() == 0){
+                    Toast.makeText(PlayersActivity.this, "Adj meg legalább egy játékost!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Intent intent = new Intent(PlayersActivity.this, RoundActivity.class);
                 startActivity(intent);
                 finish();

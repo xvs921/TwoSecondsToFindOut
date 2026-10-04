@@ -10,6 +10,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".RoundActivity"></activity>
         <activity android:name=".QuestionActivity" />
+        <activity android:name=".ResultActivity" />
         <activity android:name=".DifficultActivity" />
         <activity android:name=".PlayersActivity" />
         <activity android:name=".MainActivity">

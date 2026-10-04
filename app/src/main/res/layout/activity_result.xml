@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ResultActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ResultTitle"
+        android:text="Eredmények"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        android:layout_marginTop="50dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ResultTitle"
+        android:layout_above="@+id/ButtonNewGame"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/Scoreboard"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:textSize="28sp"/>
+    </ScrollView>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonNewGame"
+        android:layout_above="@+id/ButtonMainMenu"
+        android:text="Új játék"
+        android:textSize="30sp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_green_dark"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonMainMenu"
+        android:layout_alignParentBottom="true"
+        android:text="Főmenü"
+        android:textSize="30sp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_orange_dark"/>
+
+</RelativeLayout>

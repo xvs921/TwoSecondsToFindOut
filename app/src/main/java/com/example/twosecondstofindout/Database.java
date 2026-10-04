@@ -1,14 +1,10 @@
 package com.example.twosecondstofindout;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
-import java.util.Optional;
 
 public class Database extends SQLiteOpenHelper
 {
@@ -54,27 +50,36 @@ public class Database extends SQLiteOpenHelper
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYERS);
+        onCreate(db);
     }
 
-    public Cursor selectQuestionId(int topic)
+    // Returns id, question, answer of a random question not used yet. When every
+    // question of the topic was used, the topic starts over. Null if the topic is empty.
+    public Cursor selectRandomQuestion(int topic)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor questionId = db.rawQuery("SELECT id FROM " + TABLE_QUESTIONS + " WHERE topic = " + topic + " ORDER BY RANDOM() LIMIT 1", null);
-        return questionId;
-    }
-
-    public Cursor selectQuestionText(int questionId)
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor question = db.rawQuery("SELECT question FROM " + TABLE_QUESTIONS + " WHERE id = " + questionId, null);
+        String[] args = {String.valueOf(topic)};
+        String query = "SELECT id, question, answer FROM " + TABLE_QUESTIONS + " WHERE topic = ? AND used = 0 ORDER BY RANDOM() LIMIT 1";
+        Cursor question = db.rawQuery(query, args);
+        if (question.getCount() == 0)
+        {
+            question.close();
+            db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET used = 0 WHERE topic = ?", args);
+            question = db.rawQuery(query, args);
+        }
+        if (question.getCount() == 0)
+        {
+            question.close();
+            return null;
+        }
         return question;
     }
 
-    public Cursor selectAnswerText(int questionId)
+    public void markQuestionUsed(int questionId)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor answer = db.rawQuery("SELECT answer FROM " + TABLE_QUESTIONS + " WHERE id = " + questionId, null);
-        return answer;
+        db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET used = 1 WHERE id = ?", new Object[]{questionId});
     }
 
     public Cursor selectFirstPlayerName()
@@ -84,27 +89,53 @@ public class Database extends SQLiteOpenHelper
         return firstName;
     }
 
-    public void insertPlayersForNewGame(String player1, String player2, String player3, String player4, String player5, String player6)
+    // The player with the fewest answered questions is next: id, name, answered
+    public Cursor selectNextPlayer()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT id, name, answered FROM " + TABLE_PLAYERS + " ORDER BY answered, id LIMIT 1", null);
+    }
+
+    public int countPlayers()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor count = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_PLAYERS, null);
+        int result = count.moveToFirst() ? count.getInt(0) : 0;
+        count.close();
+        return result;
+    }
+
+    public void savePlayerAnswer(int playerId, boolean success)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered + 1, points = points + ? WHERE id = ?", new Object[]{success ? 1 : 0, playerId});
+    }
+
+    // name, points ordered by points
+    public Cursor selectScoreboard()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT name, points FROM " + TABLE_PLAYERS + " ORDER BY points DESC, id", null);
+    }
+
+    public void resetScores()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = 0, points = 0");
+    }
+
+    public void insertPlayersForNewGame(String... players)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_PLAYERS);
-        if(player1 != null  && player1 != ""){
-            db.execSQL("INSERT INTO " + TABLE_PLAYERS + "(name) VALUES ('"+ player1 + "');");
-        }
-        if(player2 != null  && player2 != ""){
-            db.execSQL("INSERT INTO " + TABLE_PLAYERS + "(name) VALUES ('"+ player2 + "');");
-        }
-        if(player3 != null  && player3 != ""){
-            db.execSQL("INSERT INTO " + TABLE_PLAYERS + "(name) VALUES ('"+ player3 + "');");
-        }
-        if(player4 != null  && player4 != ""){
-            db.execSQL("INSERT INTO " + TABLE_PLAYERS + "(name) VALUES ('"+ player4 + "');");
-        }
-        if(player5 != null  && player5 != ""){
-            db.execSQL("INSERT INTO " + TABLE_PLAYERS + "(name) VALUES ('"+ player5 + "');");
-        }
-        if(player6 != null  && player6 != ""){
-            db.execSQL("INSERT INTO " + TABLE_PLAYERS + "(name) VALUES ('"+ player6 + "');");
+        for (String player : players)
+        {
+            if (player != null && !player.trim().isEmpty())
+            {
+                ContentValues values = new ContentValues();
+                values.put(COL_7, player.trim());
+                db.insert(TABLE_PLAYERS, null, values);
+            }
         }
     }
 

@@ -16,6 +16,7 @@ import java.util.TimerTask;
 
 public class QuestionActivity extends AppCompatActivity {
 
+    private TextView CurrentPlayer;
     private TextView Question;
     private TextView Answer;
     private TextView TimerText;
@@ -31,6 +32,10 @@ public class QuestionActivity extends AppCompatActivity {
     private double time = 0.0;
     private int defaultTimerColor;
 
+    private int topic;
+    private int rounds;
+    private int currentPlayerId;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,22 +43,25 @@ public class QuestionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_question);
         init();
         Intent intent = getIntent();
-        int topic = intent.getIntExtra("theme",1);
-        kerdes(topic);
+        topic = intent.getIntExtra("theme",1);
+        rounds = intent.getIntExtra("rounds",1);
         timer = new Timer();
+        nextTurn();
         ButtonStartStop.setOnClickListener(view -> {
             startTimer();
         });
         ButtonOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
-                kerdes(topic);
+                database.savePlayerAnswer(currentPlayerId, true);
+                nextTurn();
             }
         });
         ButtonNotOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
-                kerdes(topic);
+                database.savePlayerAnswer(currentPlayerId, false);
+                nextTurn();
             }
         });
     }
@@ -66,6 +74,7 @@ public class QuestionActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void init() {
+        CurrentPlayer = findViewById(R.id.CurrentPlayer);
         Question = findViewById(R.id.Question);
         Answer = findViewById(R.id.Answer);
         TimerText = findViewById(R.id.Timer);
@@ -78,41 +87,53 @@ public class QuestionActivity extends AppCompatActivity {
         timerStarted = false;
     }
 
+    // The player with the fewest answers is next. When everyone answered
+    // in every round, the game is over and the results are shown.
+    @SuppressLint("SetTextI18n")
+    private void nextTurn()
+    {
+        Cursor player = database.selectNextPlayer();
+        if (player == null || !player.moveToFirst() || player.getInt(2) >= rounds)
+        {
+            if (player != null)
+            {
+                player.close();
+            }
+            showResults();
+            return;
+        }
+        currentPlayerId = player.getInt(0);
+        CurrentPlayer.setText(player.getString(1) + " (" + (player.getInt(2) + 1) + ". kör / " + rounds + ")");
+        player.close();
+        kerdes(topic);
+    }
+
+    private void showResults()
+    {
+        Intent intent = new Intent(QuestionActivity.this, ResultActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @SuppressLint("SetTextI18n")
     public void kerdes(int topic)
     {
-        Cursor dbQuestionId = database.selectQuestionId(topic);
-        StringBuilder stringBufferQId=new StringBuilder();
-        if (dbQuestionId != null && dbQuestionId.getCount() > 0)
+        Cursor question = database.selectRandomQuestion(topic);
+        if (question == null || !question.moveToFirst())
         {
-            while (dbQuestionId.moveToNext())
+            if (question != null)
             {
-                stringBufferQId.append(dbQuestionId.getString(0));
+                question.close();
             }
+            Question.setText("Ebben a témában nincs kérdés.");
+            Answer.setText("");
+            ButtonStartStop.setVisibility(View.INVISIBLE);
+            return;
         }
-
-        int questionId = Integer.parseInt(stringBufferQId.toString());
-        //Question.setText(String.valueOf(questionId));  string value of
-        Cursor questionText = database.selectQuestionText(questionId);
-        StringBuilder stringBufferQ=new StringBuilder();
-        if (questionText != null && questionText.getCount() > 0)
-        {
-            while (questionText.moveToNext())
-            {
-                stringBufferQ.append(questionText.getString(0));
-            }
-            Question.setText(stringBufferQ.toString());
-        }
-
-        Cursor answerText = database.selectAnswerText(questionId);
-        StringBuilder stringBufferA=new StringBuilder();
-        if (answerText != null && answerText.getCount() > 0)
-        {
-            while (answerText.moveToNext())
-            {
-                stringBufferA.append(answerText.getString(0));
-            }
-            Answer.setText(stringBufferA.toString());
-        }
+        database.markQuestionUsed(question.getInt(0));
+        Question.setText(question.getString(1));
+        Answer.setText(question.getString(2));
+        question.close();
     }
 
     //
