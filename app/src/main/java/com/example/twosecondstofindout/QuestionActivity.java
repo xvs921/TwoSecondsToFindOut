@@ -154,13 +154,9 @@ public class QuestionActivity extends AppCompatActivity {
                         return;
                     }
                     TimerText.setText(getTimerText());
-                    if(time >= 4){
+                    // the player has 2 seconds to answer, the game master decides Siker / Késő
+                    if(time >= 2){
                         TimerText.setTextColor(Color.parseColor("#ff0000"));
-                    }
-                    if(time >= 6){
-                        if(ButtonOk.getVisibility() == View.VISIBLE){
-                            ButtonOk.setVisibility(View.INVISIBLE);
-                        }
                     }
                     time++;
                 });
@@ -180,7 +176,6 @@ public class QuestionActivity extends AppCompatActivity {
         time = 0;
         TimerText.setText("00 : 00 : 00");
         TimerText.setTextColor(defaultTimerColor);
-        ButtonOk.setVisibility(View.VISIBLE);
         ButtonStartStop.setVisibility(View.VISIBLE);
     }
 
