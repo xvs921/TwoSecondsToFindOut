@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +28,8 @@ public class QuestionActivity extends AppCompatActivity {
 
     private Button ButtonOk;
     private Button ButtonNotOk;
+    private Button ButtonSkip;
+    private ToneGenerator toneGenerator;
 
     private java.util.Timer timer;
     private TimerTask timerTask;
@@ -34,6 +38,7 @@ public class QuestionActivity extends AppCompatActivity {
 
     private int rounds;
     private int currentPlayerId;
+    private int currentTopic;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -55,6 +60,11 @@ public class QuestionActivity extends AppCompatActivity {
                 nextTurn();
             }
         });
+        // a new question for the same player, without scoring
+        ButtonSkip.setOnClickListener(view -> {
+            stopTimer();
+            kerdes(currentTopic);
+        });
         ButtonNotOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
@@ -68,6 +78,7 @@ public class QuestionActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         timer.cancel();
+        toneGenerator.release();
     }
 
     @SuppressLint("SetTextI18n")
@@ -79,6 +90,8 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonStartStop = findViewById(R.id.ButtonStartStop);
         ButtonOk = findViewById(R.id.ButtonOk);
         ButtonNotOk = findViewById(R.id.ButtonNotOk);
+        ButtonSkip = findViewById(R.id.ButtonSkip);
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
         database = new Database(this);
         ButtonStartStop.setText("Start");
         defaultTimerColor = TimerText.getCurrentTextColor();
@@ -102,9 +115,9 @@ public class QuestionActivity extends AppCompatActivity {
         }
         currentPlayerId = player.getInt(0);
         CurrentPlayer.setText(player.getString(1) + " (" + (player.getInt(2) + 1) + ". kör / " + rounds + ")");
-        int topic = player.getInt(3);
+        currentTopic = player.getInt(3);
         player.close();
-        kerdes(topic);
+        kerdes(currentTopic);
     }
 
     private void showResults()
@@ -157,6 +170,10 @@ public class QuestionActivity extends AppCompatActivity {
                     // the player has 2 seconds to answer, the game master decides Siker / Késő
                     if(time >= 2){
                         TimerText.setTextColor(Color.parseColor("#ff0000"));
+                    }
+                    // beep once when the 2 seconds are over, so the game master can watch the player
+                    if(time == 2){
+                        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
                     }
                     time++;
                 });
