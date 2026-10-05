@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -35,8 +36,10 @@ public class QuestionActivity extends AppCompatActivity {
 
     private java.util.Timer timer;
     private TimerTask timerTask;
-    // elapsed time in tenths of a second
-    private int time = 0;
+    // elapsed time in milliseconds, measured from the moment Start was pressed
+    private long time = 0;
+    private long startTime;
+    private boolean beeped;
     private int defaultTimerColor;
 
     private GameState gameState;
@@ -246,6 +249,8 @@ public class QuestionActivity extends AppCompatActivity {
         }
         timerStarted = true;
         time = 0;
+        beeped = false;
+        startTime = SystemClock.elapsedRealtime();
         ButtonStartStop.setVisibility(View.INVISIBLE);
         timerTask = new TimerTask() {
             @Override
@@ -254,20 +259,22 @@ public class QuestionActivity extends AppCompatActivity {
                     if(!timerStarted){
                         return;
                     }
+                    time = SystemClock.elapsedRealtime() - startTime;
                     TimerText.setText(getTimerText());
                     // the player has 2 seconds to answer, the game master decides Siker / Késő
-                    if(time >= 20){
+                    if(time >= 2000){
                         TimerText.setTextColor(ContextCompat.getColor(QuestionActivity.this, R.color.danger));
+                        // beep once, so the game master can watch the player
+                        if(!beeped){
+                            beeped = true;
+                            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
+                        }
                     }
-                    // beep once when the 2 seconds are over, so the game master can watch the player
-                    if(time == 20){
-                        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
-                    }
-                    time++;
                 });
             }
         };
-        timer.scheduleAtFixedRate(timerTask, 0, 100);
+        // refreshed often, so the milliseconds keep running smoothly
+        timer.scheduleAtFixedRate(timerTask, 0, 25);
     }
 
     @SuppressLint("SetTextI18n")
@@ -284,9 +291,9 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonStartStop.setVisibility(View.VISIBLE);
     }
 
-    // seconds and tenths, e.g. 1,4
+    // seconds and milliseconds, e.g. 1,123
     @SuppressLint("DefaultLocale")
     private String getTimerText(){
-        return String.format("%d,%d", time / 10, time % 10);
+        return String.format("%d,%03d", time / 1000, time % 1000);
     }
 }

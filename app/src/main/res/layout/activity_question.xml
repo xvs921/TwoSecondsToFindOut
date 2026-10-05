@@ -67,15 +67,15 @@
         android:layout_weight="1" />
 
     <TextView
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:id="@+id/Timer"
         android:background="@drawable/bg_timer"
         android:fontFamily="monospace"
         android:gravity="center"
-        android:text="0,0"
+        android:text="0,000"
         android:textColor="@color/textPrimary"
-        android:textSize="56sp"
+        android:textSize="42sp"
         android:textStyle="bold" />
 
     <Button
