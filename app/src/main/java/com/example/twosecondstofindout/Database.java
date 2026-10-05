@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +25,7 @@ public class Database extends SQLiteOpenHelper
     public static final String TABLE_ANSWERS = "answers";
     public static final String TABLE_HISTORY = "history";
     public static final String TABLE_GAMES = "games";
+    public static final String TABLE_QUESTION_TOPICS = "question_topics";
 
     public static final String COL_1 = "id";
     public static final String COL_2 = "topic";
@@ -36,27 +39,40 @@ public class Database extends SQLiteOpenHelper
     public static final String COL_8 = "points";
     public static final String COL_9 = "topic";
 
-    // the topic ids are the position + 1: 1: Gyerek, 2: Felnőtt, 3: Bibliai
-    public static final String[] TOPICS = {"Gyerek", "Felnőtt", "Bibliai"};
+    // the time to answer, unless a player gets more or less
+    public static final int DEFAULT_ANSWER_MS = 2000;
+    // a bonus point for every 3rd correct answer in a row, when the streak bonus is on
+    public static final int STREAK_LENGTH = 3;
 
+    // the topic ids are the position + 1: 1: Gyerek, 2: Felnőtt, 3: Bibliai, 4: Sport, ...
+    public static final String[] TOPICS = {"Gyerek", "Felnőtt", "Bibliai", "Sport", "Földrajz", "Történelem", "Tudomány"};
 
     private final Context context;
 
     public Database(Context context)
     {
-        super(context, DATABASE_NAME, null, 5);
+        super(context, DATABASE_NAME, null, 8);
         this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_QUESTIONS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, topic INTEGER NOT NULL, question VARCHAR(350) NOT NULL, answer VARCHAR(200) NOT NULL, used INTEGER DEFAULT 0)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+ TABLE_PLAYERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), topic INTEGER DEFAULT 2, answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0, active INTEGER DEFAULT 1)");
+        db.execSQL("CREATE TABLE " + TABLE_QUESTIONS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, topic INTEGER NOT NULL, question VARCHAR(350) NOT NULL, answer VARCHAR(200) NOT NULL, used INTEGER DEFAULT 0, flagged INTEGER DEFAULT 0)");
+        // in team games a player is a team, members: comma separated names, they answer in turns
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+ TABLE_PLAYERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), topic INTEGER DEFAULT 2, answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0, active INTEGER DEFAULT 1, members TEXT DEFAULT '', answer_ms INTEGER DEFAULT " + DEFAULT_ANSWER_MS + ")");
         // every Siker / Késő decision, so the last ones can be undone. deactivated: comma separated
         // ids of the players who dropped out of the tie-break right after this answer
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_ANSWERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_id INTEGER NOT NULL, question_id INTEGER NOT NULL, points INTEGER NOT NULL, deactivated TEXT DEFAULT '', history_id INTEGER DEFAULT 0)");
         createStatisticsTables(db);
-        insertQuestions(db);
+        createQuestionTopicsTable(db);
+        mergeQuestionsFromFile(db);
+    }
+
+    // A question can belong to more topics, e.g. Felnőtt and Tudomány.
+    // questions.topic is only kept as the first topic of the question.
+    private void createQuestionTopicsTable(SQLiteDatabase db)
+    {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_QUESTION_TOPICS + "(question_id INTEGER NOT NULL, topic INTEGER NOT NULL, PRIMARY KEY (question_id, topic))");
     }
 
     // Kept across games for the statistics: every answer and every winner
@@ -66,8 +82,10 @@ public class Database extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_GAMES + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, winner VARCHAR(200) NOT NULL, played_at INTEGER NOT NULL)");
     }
 
-    // Loads the questions from res/raw/questions.txt, one per line: topic<TAB>question<TAB>answer
-    private void insertQuestions(SQLiteDatabase db)
+    // Loads res/raw/questions.txt, one question per line: topics<TAB>question<TAB>answer,
+    // where topics is a comma separated list, e.g. 2,7. Questions that are already there
+    // (same text) only get the missing topics, so this can run again after an update.
+    private void mergeQuestionsFromFile(SQLiteDatabase db)
     {
         db.beginTransaction();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -81,11 +99,13 @@ public class Database extends SQLiteOpenHelper
                 {
                     continue;
                 }
-                ContentValues values = new ContentValues();
-                values.put(COL_2, Integer.parseInt(parts[0].trim()));
-                values.put(COL_3, parts[1].trim());
-                values.put(COL_4, parts[2].trim());
-                db.insert(TABLE_QUESTIONS, null, values);
+                String[] topicTexts = parts[0].split(",");
+                int[] topics = new int[topicTexts.length];
+                for (int i = 0; i < topicTexts.length; i++)
+                {
+                    topics[i] = Integer.parseInt(topicTexts[i].trim());
+                }
+                addOrLinkQuestion(db, topics, parts[1].trim(), parts[2].trim());
             }
             db.setTransactionSuccessful();
         }
@@ -96,6 +116,45 @@ public class Database extends SQLiteOpenHelper
         finally
         {
             db.endTransaction();
+        }
+    }
+
+    // Adds the question, or only its missing topics if a question with the same text exists.
+    // Returns true if a new question was added.
+    private boolean addOrLinkQuestion(SQLiteDatabase db, int[] topics, String question, String answer)
+    {
+        long questionId = findQuestion(db, question);
+        boolean added = questionId < 0;
+        if (added)
+        {
+            ContentValues values = new ContentValues();
+            values.put(COL_2, topics[0]);
+            values.put(COL_3, question);
+            values.put(COL_4, answer);
+            questionId = db.insertOrThrow(TABLE_QUESTIONS, null, values);
+        }
+        linkTopics(db, questionId, topics);
+        return added;
+    }
+
+    private void renameQuestion(SQLiteDatabase db, String oldText, String newText)
+    {
+        db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET question = ? WHERE question = ?", new Object[]{newText, oldText});
+    }
+
+    private long findQuestion(SQLiteDatabase db, String question)
+    {
+        Cursor cursor = db.rawQuery("SELECT id FROM " + TABLE_QUESTIONS + " WHERE question = ?", new String[]{question});
+        long id = cursor.moveToFirst() ? cursor.getLong(0) : -1;
+        cursor.close();
+        return id;
+    }
+
+    private void linkTopics(SQLiteDatabase db, long questionId, int[] topics)
+    {
+        for (int topic : topics)
+        {
+            db.execSQL("INSERT OR IGNORE INTO " + TABLE_QUESTION_TOPICS + "(question_id, topic) VALUES (?, ?)", new Object[]{questionId, topic});
         }
     }
 
@@ -116,6 +175,28 @@ public class Database extends SQLiteOpenHelper
             createStatisticsTables(db);
             db.execSQL("ALTER TABLE " + TABLE_ANSWERS + " ADD COLUMN history_id INTEGER DEFAULT 0");
         }
+        if (oldVersion < 6)
+        {
+            // more topics per question, and the new questions and topics of the file
+            createQuestionTopicsTable(db);
+            db.execSQL("INSERT OR IGNORE INTO " + TABLE_QUESTION_TOPICS + "(question_id, topic) SELECT id, topic FROM " + TABLE_QUESTIONS);
+            // questions of the old file that were reworded to be unambiguous, so they are not added twice
+            renameQuestion(db, "Mi Magyarország leghosszabb folyója?", "Melyik folyó szakasza a leghosszabb Magyarország területén?");
+            renameQuestion(db, "Ki építette fel a templomot Jeruzsálemben?", "Ki építtette az első templomot Jeruzsálemben?");
+            renameQuestion(db, "Melyik a Biblia leghosszabb könyve?", "Melyik bibliai könyvnek van a legtöbb fejezete?");
+            mergeQuestionsFromFile(db);
+        }
+        if (oldVersion < 7)
+        {
+            // questions marked as wrong during the game, and team members
+            db.execSQL("ALTER TABLE " + TABLE_QUESTIONS + " ADD COLUMN flagged INTEGER DEFAULT 0");
+            db.execSQL("ALTER TABLE " + TABLE_PLAYERS + " ADD COLUMN members TEXT DEFAULT ''");
+        }
+        if (oldVersion < 8)
+        {
+            // every player can have their own time to answer, e.g. more for children
+            db.execSQL("ALTER TABLE " + TABLE_PLAYERS + " ADD COLUMN answer_ms INTEGER DEFAULT " + DEFAULT_ANSWER_MS);
+        }
     }
 
     // Returns id, question, answer of a random question not used yet. When every
@@ -124,12 +205,13 @@ public class Database extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getWritableDatabase();
         String[] args = {String.valueOf(topic)};
-        String query = "SELECT id, question, answer FROM " + TABLE_QUESTIONS + " WHERE topic = ? AND used = 0 ORDER BY RANDOM() LIMIT 1";
+        String query = "SELECT q.id, q.question, q.answer FROM " + TABLE_QUESTIONS + " q JOIN " + TABLE_QUESTION_TOPICS + " t ON t.question_id = q.id "
+                + "WHERE t.topic = ? AND q.used = 0 ORDER BY RANDOM() LIMIT 1";
         Cursor question = db.rawQuery(query, args);
         if (question.getCount() == 0)
         {
             question.close();
-            db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET used = 0 WHERE topic = ?", args);
+            db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET used = 0 WHERE id IN (SELECT question_id FROM " + TABLE_QUESTION_TOPICS + " WHERE topic = ?)", args);
             question = db.rawQuery(query, args);
         }
         if (question.getCount() == 0)
@@ -160,18 +242,36 @@ public class Database extends SQLiteOpenHelper
         return db.rawQuery("SELECT question, answer FROM " + TABLE_QUESTIONS + " WHERE id = ?", new String[]{String.valueOf(questionId)});
     }
 
-    // The players of the last game: name, topic
+    // The players of the last game: name, topic, members, answer_ms
     public Cursor selectPlayers()
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT name, topic FROM " + TABLE_PLAYERS + " ORDER BY id", null);
+        return db.rawQuery("SELECT name, topic, members, answer_ms FROM " + TABLE_PLAYERS + " ORDER BY id", null);
     }
 
-    // The active player with the fewest answered questions is next: id, name, answered, topic
+    // The active player with the fewest answered questions is next: id, name, answered, topic, members, answer_ms
     public Cursor selectNextPlayer()
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT id, name, answered, topic FROM " + TABLE_PLAYERS + " WHERE active = 1 ORDER BY answered, id LIMIT 1", null);
+        return db.rawQuery("SELECT id, name, answered, topic, members, answer_ms FROM " + TABLE_PLAYERS + " WHERE active = 1 ORDER BY answered, id LIMIT 1", null);
+    }
+
+    // The team member whose turn it is: they answer in turns, one question each.
+    // Empty if the player is not a team.
+    public static String memberOnTurn(String members, int answered)
+    {
+        List<String> names = new ArrayList<>();
+        if (members != null)
+        {
+            for (String name : members.split(","))
+            {
+                if (!name.trim().isEmpty())
+                {
+                    names.add(name.trim());
+                }
+            }
+        }
+        return names.isEmpty() ? "" : names.get(answered % names.size());
     }
 
     // {fewest, most} answered questions among the active players. When they are equal, a round is over.
@@ -212,8 +312,19 @@ public class Database extends SQLiteOpenHelper
 
     public void savePlayerAnswer(int playerId, int questionId, boolean success)
     {
+        savePlayerAnswer(playerId, questionId, success, false);
+    }
+
+    // streakBonus: every 3rd correct answer in a row is worth 2 points.
+    // Returns the points given. The undo log keeps them, so an undo takes back the bonus too.
+    public int savePlayerAnswer(int playerId, int questionId, boolean success, boolean streakBonus)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
         int points = success ? 1 : 0;
+        if (success && streakBonus && (correctInARow(db, playerId) + 1) % STREAK_LENGTH == 0)
+        {
+            points = 2;
+        }
         db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered + 1, points = points + ? WHERE id = ?", new Object[]{points, playerId});
 
         long historyId = 0;
@@ -224,7 +335,8 @@ public class Database extends SQLiteOpenHelper
             history.put("player_name", player.getString(0));
             history.put("topic", player.getInt(1));
             history.put("question_id", questionId);
-            history.put("success", points);
+            // a correct answer, whatever bonus it got
+            history.put("success", success ? 1 : 0);
             history.put("played_at", System.currentTimeMillis());
             historyId = db.insert(TABLE_HISTORY, null, history);
         }
@@ -236,6 +348,20 @@ public class Database extends SQLiteOpenHelper
         values.put("points", points);
         values.put("history_id", historyId);
         db.insert(TABLE_ANSWERS, null, values);
+        return points;
+    }
+
+    // the correct answers of the player in this game since their last Késő
+    private int correctInARow(SQLiteDatabase db, int playerId)
+    {
+        Cursor answers = db.rawQuery("SELECT points FROM " + TABLE_ANSWERS + " WHERE player_id = ? ORDER BY id DESC", new String[]{String.valueOf(playerId)});
+        int count = 0;
+        while (answers.moveToNext() && answers.getInt(0) > 0)
+        {
+            count++;
+        }
+        answers.close();
+        return count;
     }
 
     // Only the active players with the most points stay active (tie-break).
@@ -334,6 +460,15 @@ public class Database extends SQLiteOpenHelper
 
     public void insertPlayersForNewGame(String[] players, int[] topics)
     {
+        int[] answerMs = new int[players.length];
+        java.util.Arrays.fill(answerMs, DEFAULT_ANSWER_MS);
+        insertPlayersForNewGame(players, topics, new String[players.length], answerMs);
+    }
+
+    // members: the comma separated team members of each player, null or empty if not a team.
+    // answerMs: the time of each player to answer.
+    public void insertPlayersForNewGame(String[] players, int[] topics, String[] members, int[] answerMs)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_PLAYERS);
         db.execSQL("DELETE FROM " + TABLE_ANSWERS);
@@ -345,6 +480,8 @@ public class Database extends SQLiteOpenHelper
                 ContentValues values = new ContentValues();
                 values.put(COL_7, player.trim());
                 values.put(COL_9, topics[i]);
+                values.put("members", members[i] == null ? "" : members[i].trim());
+                values.put("answer_ms", answerMs[i]);
                 db.insert(TABLE_PLAYERS, null, values);
             }
         }
@@ -354,33 +491,87 @@ public class Database extends SQLiteOpenHelper
     // QUESTION EDITOR
     //
 
-    // _id, question, answer of a topic, for the question list
+    // _id, question, answer, shown of a topic, for the question list.
+    // shown is the question with a flag in front of it if it was marked as wrong.
     public Cursor selectQuestions(int topic)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT id AS _id, question, answer FROM " + TABLE_QUESTIONS + " WHERE topic = ? ORDER BY id DESC", new String[]{String.valueOf(topic)});
+        return db.rawQuery("SELECT q.id AS _id, q.question, q.answer, " + SHOWN_QUESTION + " FROM " + TABLE_QUESTIONS + " q JOIN " + TABLE_QUESTION_TOPICS + " t ON t.question_id = q.id "
+                + "WHERE t.topic = ? ORDER BY q.id DESC", new String[]{String.valueOf(topic)});
     }
 
-    public void saveQuestion(int questionId, int topic, String question, String answer)
+    private static final String SHOWN_QUESTION = "CASE WHEN q.flagged = 1 THEN '⚑ ' || q.question ELSE q.question END AS shown";
+
+    // _id, question, answer, shown of the questions marked as wrong, of every topic
+    public Cursor selectFlaggedQuestions()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT q.id AS _id, q.question, q.answer, " + SHOWN_QUESTION + " FROM " + TABLE_QUESTIONS + " q WHERE q.flagged = 1 ORDER BY q.id DESC", null);
+    }
+
+    // marked during the game when the question or its answer is wrong, to be fixed in the editor
+    public void setQuestionFlagged(int questionId, boolean flagged)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET flagged = ? WHERE id = ?", new Object[]{flagged ? 1 : 0, questionId});
+    }
+
+    public boolean isQuestionFlagged(int questionId)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT flagged FROM " + TABLE_QUESTIONS + " WHERE id = ?", new String[]{String.valueOf(questionId)});
+        boolean flagged = cursor.moveToFirst() && cursor.getInt(0) == 1;
+        cursor.close();
+        return flagged;
+    }
+
+    public int[] selectQuestionTopics(int questionId)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT topic FROM " + TABLE_QUESTION_TOPICS + " WHERE question_id = ? ORDER BY topic", new String[]{String.valueOf(questionId)});
+        int[] topics = new int[cursor.getCount()];
+        for (int i = 0; cursor.moveToNext(); i++)
+        {
+            topics[i] = cursor.getInt(0);
+        }
+        cursor.close();
+        return topics;
+    }
+
+    // questionId -1: new question. topics must not be empty.
+    public void saveQuestion(int questionId, int[] topics, String question, String answer)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COL_2, topic);
+        values.put(COL_2, topics[0]);
         values.put(COL_3, question.trim());
         values.put(COL_4, answer.trim());
-        if (questionId < 0)
+        db.beginTransaction();
+        try
         {
-            db.insert(TABLE_QUESTIONS, null, values);
+            long id = questionId;
+            if (questionId < 0)
+            {
+                id = db.insertOrThrow(TABLE_QUESTIONS, null, values);
+            }
+            else
+            {
+                db.update(TABLE_QUESTIONS, values, "id = ?", new String[]{String.valueOf(questionId)});
+                db.delete(TABLE_QUESTION_TOPICS, "question_id = ?", new String[]{String.valueOf(questionId)});
+            }
+            linkTopics(db, id, topics);
+            db.setTransactionSuccessful();
         }
-        else
+        finally
         {
-            db.update(TABLE_QUESTIONS, values, "id = ?", new String[]{String.valueOf(questionId)});
+            db.endTransaction();
         }
     }
 
     public void deleteQuestion(int questionId)
     {
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_QUESTION_TOPICS, "question_id = ?", new String[]{String.valueOf(questionId)});
         db.delete(TABLE_QUESTIONS, "id = ?", new String[]{String.valueOf(questionId)});
     }
 
@@ -452,7 +643,8 @@ public class Database extends SQLiteOpenHelper
     // BACKUP
     //
 
-    public static final int BACKUP_VERSION = 1;
+    // 1: one topic per question ("topic"), 2: more topics per question ("topics")
+    public static final int BACKUP_VERSION = 2;
 
     // Every question (own ones too) and the statistics as JSON
     public String exportJson() throws JSONException
@@ -462,7 +654,18 @@ public class Database extends SQLiteOpenHelper
         backup.put("app", "TwoSecondsToFindOut");
         backup.put("version", BACKUP_VERSION);
         backup.put("exported_at", System.currentTimeMillis());
-        backup.put("questions", exportTable(db, "SELECT id, topic, question, answer FROM " + TABLE_QUESTIONS + " ORDER BY id"));
+        JSONArray questions = exportTable(db, "SELECT id, question, answer, flagged FROM " + TABLE_QUESTIONS + " ORDER BY id");
+        for (int i = 0; i < questions.length(); i++)
+        {
+            JSONObject question = questions.getJSONObject(i);
+            JSONArray topics = new JSONArray();
+            for (int topic : selectQuestionTopics(question.getInt("id")))
+            {
+                topics.put(topic);
+            }
+            question.put("topics", topics);
+        }
+        backup.put("questions", questions);
         backup.put("history", exportTable(db, "SELECT id, player_name, topic, question_id, success, played_at FROM " + TABLE_HISTORY + " ORDER BY id"));
         backup.put("games", exportTable(db, "SELECT id, winner, played_at FROM " + TABLE_GAMES + " ORDER BY id"));
         return backup.toString(2);
@@ -511,6 +714,7 @@ public class Database extends SQLiteOpenHelper
             if (replace)
             {
                 db.execSQL("DELETE FROM " + TABLE_QUESTIONS);
+                db.execSQL("DELETE FROM " + TABLE_QUESTION_TOPICS);
                 db.execSQL("DELETE FROM " + TABLE_HISTORY);
                 db.execSQL("DELETE FROM " + TABLE_GAMES);
                 // the undo log points to the old questions and statistics
@@ -519,20 +723,27 @@ public class Database extends SQLiteOpenHelper
             for (int i = 0; i < questions.length(); i++)
             {
                 JSONObject question = questions.getJSONObject(i);
-                ContentValues values = new ContentValues();
-                values.put(COL_2, question.getInt("topic"));
-                values.put(COL_3, question.getString("question"));
-                values.put(COL_4, question.getString("answer"));
-                if (replace)
+                int[] topics = readTopics(question);
+                String text = question.getString("question");
+                String answer = question.getString("answer");
+                if (!replace)
                 {
-                    // the statistics refer to the question ids
-                    values.put(COL_1, question.getLong("id"));
-                }
-                else if (questionExists(db, question.getInt("topic"), question.getString("question")))
-                {
+                    // an existing question only gets the missing topics
+                    if (addOrLinkQuestion(db, topics, text, answer))
+                    {
+                        added++;
+                    }
                     continue;
                 }
+                ContentValues values = new ContentValues();
+                // the statistics refer to the question ids
+                values.put(COL_1, question.getLong("id"));
+                values.put(COL_2, topics[0]);
+                values.put(COL_3, text);
+                values.put(COL_4, answer);
+                values.put("flagged", question.optInt("flagged", 0) == 1 ? 1 : 0);
                 db.insertOrThrow(TABLE_QUESTIONS, null, values);
+                linkTopics(db, question.getLong("id"), topics);
                 added++;
             }
             if (replace)
@@ -551,12 +762,24 @@ public class Database extends SQLiteOpenHelper
         return added;
     }
 
-    private boolean questionExists(SQLiteDatabase db, int topic, String question)
+    // version 1 backups have one "topic", version 2 backups a "topics" list
+    private int[] readTopics(JSONObject question) throws JSONException
     {
-        Cursor cursor = db.rawQuery("SELECT 1 FROM " + TABLE_QUESTIONS + " WHERE topic = ? AND question = ?", new String[]{String.valueOf(topic), question});
-        boolean exists = cursor.moveToFirst();
-        cursor.close();
-        return exists;
+        JSONArray list = question.optJSONArray("topics");
+        if (list == null)
+        {
+            return new int[]{question.getInt("topic")};
+        }
+        if (list.length() == 0)
+        {
+            throw new JSONException("Question without topic");
+        }
+        int[] topics = new int[list.length()];
+        for (int i = 0; i < list.length(); i++)
+        {
+            topics[i] = list.getInt(i);
+        }
+        return topics;
     }
 
     // only the given columns are read, so a broken or forged file cannot reach other columns

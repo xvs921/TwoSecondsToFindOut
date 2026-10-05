@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemBars.setUp(this);
         setContentView(R.layout.activity_main);
         init();
         ButtonContinue.setOnClickListener(view -> {
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType("application/json");
-                        intent.putExtra(Intent.EXTRA_TITLE, "itt-van-a-nyelvemen-" + date + ".json");
+                        intent.putExtra(Intent.EXTRA_TITLE, "vagd-ra-" + date + ".json");
                         startActivityForResult(intent, REQUEST_EXPORT);
                     } else if (which == 1) {
                         new AlertDialog.Builder(this)

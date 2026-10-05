@@ -17,16 +17,50 @@
 
         <TextView
             style="@style/ScreenTitle"
+            android:id="@+id/PlayersTitle"
             android:layout_marginStart="16dp"
             android:text="Játékosok" />
+    </LinearLayout>
+
+    <!-- every player for themselves, or teams whose members answer in turns -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/ButtonSecondary"
+            android:id="@+id/ButtonModeSingle"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="👤 Egyéni"
+            android:textSize="18sp" />
+
+        <Button
+            style="@style/ButtonSecondary"
+            android:id="@+id/ButtonModeTeams"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="👥 Csapat"
+            android:textSize="18sp" />
     </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/PlayersHint"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="12dp"
-        android:text="Add meg a neveket, és válassz mindenkinek szintet!"
+        android:text="Add meg a neveket, és válassz mindenkinek szintet és időt!"
         android:textColor="@color/textSecondary"
         android:textSize="16sp" />
 
@@ -40,227 +74,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- the rows of item_player, added in PlayersActivity -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:id="@+id/PlayerRow1"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:text="1."
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:id="@+id/Player1"
-                    android:background="@null"
-                    android:hint="Név"
-                    android:inputType="textPersonName|textCapWords"
-                    android:textColor="@color/textPrimary"
-                    android:textColorHint="@color/textSecondary"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/PlayerLevel1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:id="@+id/PlayerRow2"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:text="2."
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:id="@+id/Player2"
-                    android:background="@null"
-                    android:hint="Név"
-                    android:inputType="textPersonName|textCapWords"
-                    android:textColor="@color/textPrimary"
-                    android:textColorHint="@color/textSecondary"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/PlayerLevel2" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:id="@+id/PlayerRow3"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:text="3."
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:id="@+id/Player3"
-                    android:background="@null"
-                    android:hint="Név"
-                    android:inputType="textPersonName|textCapWords"
-                    android:textColor="@color/textPrimary"
-                    android:textColorHint="@color/textSecondary"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/PlayerLevel3" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:id="@+id/PlayerRow4"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:text="4."
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:id="@+id/Player4"
-                    android:background="@null"
-                    android:hint="Név"
-                    android:inputType="textPersonName|textCapWords"
-                    android:textColor="@color/textPrimary"
-                    android:textColorHint="@color/textSecondary"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/PlayerLevel4" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:id="@+id/PlayerRow5"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:text="5."
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:id="@+id/Player5"
-                    android:background="@null"
-                    android:hint="Név"
-                    android:inputType="textPersonName|textCapWords"
-                    android:textColor="@color/textPrimary"
-                    android:textColorHint="@color/textSecondary"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/PlayerLevel5" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:id="@+id/PlayerRow6"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:text="6."
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:id="@+id/Player6"
-                    android:background="@null"
-                    android:hint="Név"
-                    android:inputType="textPersonName|textCapWords"
-                    android:textColor="@color/textPrimary"
-                    android:textColorHint="@color/textSecondary"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/PlayerLevel6" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:id="@+id/PlayerList"
+                android:orientation="vertical" />
 
             <Button
                 style="@style/ButtonSecondary"
