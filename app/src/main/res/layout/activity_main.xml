@@ -6,6 +6,12 @@
     android:gravity="center_horizontal"
     tools:context=".MainActivity">
 
+    <Button
+        style="@style/ButtonSmall"
+        android:id="@+id/ButtonBackup"
+        android:layout_gravity="end"
+        android:text="💾 Mentés" />
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -15,20 +21,20 @@
         android:layout_width="280dp"
         android:layout_height="280dp"
         android:id="@+id/Image"
-        android:contentDescription="Itt van a nyelvemen"
-        app:srcCompat="@drawable/nyelvkep" />
+        android:contentDescription="@string/app_name"
+        app:srcCompat="@drawable/logo" />
 
     <TextView
         style="@style/ScreenTitle"
         android:id="@+id/Title"
         android:layout_marginTop="24dp"
-        android:text="Itt van a nyelvemen" />
+        android:text="@string/app_name" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Gyorsan! 2 másodperced van!"
+        android:text="Kérdés jön, válaszolj villámgyorsan!"
         android:textColor="@color/colorPrimary"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -37,6 +43,29 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonQuestions"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="📝 Kérdések" />
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonStatistics"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="📊 Statisztika" />
+    </LinearLayout>
 
     <Button
         style="@style/ButtonSecondary"
