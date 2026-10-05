@@ -10,13 +10,13 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
+import android.view.Choreographer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class QuestionActivity extends AppCompatActivity {
 
@@ -41,12 +41,10 @@ public class QuestionActivity extends AppCompatActivity {
     private Button ButtonNextRound;
     private ToneGenerator toneGenerator;
 
-    private java.util.Timer timer;
-    private TimerTask timerTask;
+    private final Handler handler = new Handler(Looper.getMainLooper());
     // elapsed time in milliseconds, measured from the moment Start was pressed
     private long time = 0;
     private long startTime;
-    private boolean beeped;
     private int defaultTimerColor;
 
     private GameState gameState;
@@ -64,7 +62,6 @@ public class QuestionActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, backToMainMenu);
         init();
         rounds = gameState.getRounds();
-        timer = new Timer();
         // after an undo on the results screen the undone question comes back
         int undoneQuestionId = getIntent().getIntExtra("questionId", -1);
         if (undoneQuestionId >= 0) {
@@ -118,7 +115,8 @@ public class QuestionActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        timer.cancel();
+        Choreographer.getInstance().removeFrameCallback(timerFrame);
+        handler.removeCallbacks(timeUp);
         toneGenerator.release();
     }
 
@@ -270,6 +268,23 @@ public class QuestionActivity extends AppCompatActivity {
     //
     // TIMER FUNCTIONS
     //
+    // redraws the timer on every frame of the screen, so the milliseconds keep running smoothly
+    private final Choreographer.FrameCallback timerFrame = new Choreographer.FrameCallback() {
+        @Override
+        public void doFrame(long frameTimeNanos) {
+            time = SystemClock.elapsedRealtime() - startTime;
+            TimerText.setText(getTimerText());
+            Choreographer.getInstance().postFrameCallback(this);
+        }
+    };
+
+    // the player has 2 seconds to answer, the game master decides Siker / Késő
+    private final Runnable timeUp = () -> {
+        TimerText.setTextColor(ContextCompat.getColor(QuestionActivity.this, R.color.danger));
+        // beep once, so the game master can watch the player
+        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
+    };
+
     public void startTimer()
     {
         if(timerStarted){
@@ -277,41 +292,17 @@ public class QuestionActivity extends AppCompatActivity {
         }
         timerStarted = true;
         time = 0;
-        beeped = false;
         startTime = SystemClock.elapsedRealtime();
         ButtonStartStop.setVisibility(View.INVISIBLE);
-        timerTask = new TimerTask() {
-            @Override
-            public void run () {
-                runOnUiThread(() -> {
-                    if(!timerStarted){
-                        return;
-                    }
-                    time = SystemClock.elapsedRealtime() - startTime;
-                    TimerText.setText(getTimerText());
-                    // the player has 2 seconds to answer, the game master decides Siker / Késő
-                    if(time >= 2000){
-                        TimerText.setTextColor(ContextCompat.getColor(QuestionActivity.this, R.color.danger));
-                        // beep once, so the game master can watch the player
-                        if(!beeped){
-                            beeped = true;
-                            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
-                        }
-                    }
-                });
-            }
-        };
-        // refreshed often, so the milliseconds keep running smoothly
-        timer.scheduleAtFixedRate(timerTask, 0, 25);
+        Choreographer.getInstance().postFrameCallback(timerFrame);
+        handler.postDelayed(timeUp, 2000);
     }
 
     @SuppressLint("SetTextI18n")
     private void stopTimer()
     {
-        if(timerTask != null){
-            timerTask.cancel();
-            timerTask = null;
-        }
+        Choreographer.getInstance().removeFrameCallback(timerFrame);
+        handler.removeCallbacks(timeUp);
         timerStarted = false;
         time = 0;
         TimerText.setText(getTimerText());
