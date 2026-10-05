@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Database extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "twoSecondsGame";
@@ -442,5 +446,143 @@ public class Database extends SQLiteOpenHelper
         db.execSQL("DELETE FROM " + TABLE_HISTORY);
         db.execSQL("DELETE FROM " + TABLE_GAMES);
         db.execSQL("UPDATE " + TABLE_ANSWERS + " SET history_id = 0");
+    }
+
+    //
+    // BACKUP
+    //
+
+    public static final int BACKUP_VERSION = 1;
+
+    // Every question (own ones too) and the statistics as JSON
+    public String exportJson() throws JSONException
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        JSONObject backup = new JSONObject();
+        backup.put("app", "TwoSecondsToFindOut");
+        backup.put("version", BACKUP_VERSION);
+        backup.put("exported_at", System.currentTimeMillis());
+        backup.put("questions", exportTable(db, "SELECT id, topic, question, answer FROM " + TABLE_QUESTIONS + " ORDER BY id"));
+        backup.put("history", exportTable(db, "SELECT id, player_name, topic, question_id, success, played_at FROM " + TABLE_HISTORY + " ORDER BY id"));
+        backup.put("games", exportTable(db, "SELECT id, winner, played_at FROM " + TABLE_GAMES + " ORDER BY id"));
+        return backup.toString(2);
+    }
+
+    private JSONArray exportTable(SQLiteDatabase db, String query) throws JSONException
+    {
+        JSONArray rows = new JSONArray();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext())
+        {
+            JSONObject row = new JSONObject();
+            for (int i = 0; i < cursor.getColumnCount(); i++)
+            {
+                if (cursor.getType(i) == Cursor.FIELD_TYPE_INTEGER)
+                {
+                    row.put(cursor.getColumnName(i), cursor.getLong(i));
+                }
+                else
+                {
+                    row.put(cursor.getColumnName(i), cursor.getString(i));
+                }
+            }
+            rows.put(row);
+        }
+        cursor.close();
+        return rows;
+    }
+
+    // replace: everything is replaced by the backup (restore).
+    // otherwise only the questions that are not there yet are added (e.g. questions from a friend).
+    // Returns the number of questions added. Throws JSONException if the file is not a backup of this app.
+    public int importJson(String json, boolean replace) throws JSONException
+    {
+        JSONObject backup = new JSONObject(json);
+        if (!"TwoSecondsToFindOut".equals(backup.optString("app")) || backup.getInt("version") > BACKUP_VERSION)
+        {
+            throw new JSONException("Not a backup of this app");
+        }
+        JSONArray questions = backup.getJSONArray("questions");
+        SQLiteDatabase db = this.getWritableDatabase();
+        int added = 0;
+        db.beginTransaction();
+        try
+        {
+            if (replace)
+            {
+                db.execSQL("DELETE FROM " + TABLE_QUESTIONS);
+                db.execSQL("DELETE FROM " + TABLE_HISTORY);
+                db.execSQL("DELETE FROM " + TABLE_GAMES);
+                // the undo log points to the old questions and statistics
+                db.execSQL("DELETE FROM " + TABLE_ANSWERS);
+            }
+            for (int i = 0; i < questions.length(); i++)
+            {
+                JSONObject question = questions.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(COL_2, question.getInt("topic"));
+                values.put(COL_3, question.getString("question"));
+                values.put(COL_4, question.getString("answer"));
+                if (replace)
+                {
+                    // the statistics refer to the question ids
+                    values.put(COL_1, question.getLong("id"));
+                }
+                else if (questionExists(db, question.getInt("topic"), question.getString("question")))
+                {
+                    continue;
+                }
+                db.insertOrThrow(TABLE_QUESTIONS, null, values);
+                added++;
+            }
+            if (replace)
+            {
+                importTable(db, TABLE_HISTORY, backup.optJSONArray("history"),
+                        new String[]{"id", "player_name", "topic", "question_id", "success", "played_at"});
+                importTable(db, TABLE_GAMES, backup.optJSONArray("games"),
+                        new String[]{"id", "winner", "played_at"});
+            }
+            db.setTransactionSuccessful();
+        }
+        finally
+        {
+            db.endTransaction();
+        }
+        return added;
+    }
+
+    private boolean questionExists(SQLiteDatabase db, int topic, String question)
+    {
+        Cursor cursor = db.rawQuery("SELECT 1 FROM " + TABLE_QUESTIONS + " WHERE topic = ? AND question = ?", new String[]{String.valueOf(topic), question});
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
+
+    // only the given columns are read, so a broken or forged file cannot reach other columns
+    private void importTable(SQLiteDatabase db, String table, JSONArray rows, String[] columns) throws JSONException
+    {
+        if (rows == null)
+        {
+            return;
+        }
+        for (int i = 0; i < rows.length(); i++)
+        {
+            JSONObject row = rows.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            for (String name : columns)
+            {
+                Object value = row.get(name);
+                if (value instanceof Number)
+                {
+                    values.put(name, ((Number) value).longValue());
+                }
+                else
+                {
+                    values.put(name, String.valueOf(value));
+                }
+            }
+            db.insertOrThrow(table, null, values);
+        }
     }
 }
