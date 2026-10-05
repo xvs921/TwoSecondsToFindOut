@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <!-- palette taken from the game box: red lips, pink tongue, black text -->
+    <color name="colorPrimary">#D32F2F</color>
+    <color name="colorPrimaryDark">#9A0007</color>
+    <color name="colorAccent">#D32F2F</color>
+
+    <color name="background">#FFF6F4</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="outline">#F2D6D3</color>
+    <color name="textPrimary">#1F1A1A</color>
+    <color name="textSecondary">#6E6262</color>
+    <color name="pink">#F8BBD0</color>
+    <color name="pinkLight">#FCE4EC</color>
+
+    <color name="success">#2E7D32</color>
+    <color name="successDark">#1B5E20</color>
+    <color name="danger">#C62828</color>
+    <color name="dangerDark">#8E0000</color>
+    <color name="disabled">#E0D6D5</color>
 </resources>

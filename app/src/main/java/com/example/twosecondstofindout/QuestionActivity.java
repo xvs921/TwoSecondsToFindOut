@@ -2,11 +2,11 @@ package com.example.twosecondstofindout;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -35,7 +35,8 @@ public class QuestionActivity extends AppCompatActivity {
 
     private java.util.Timer timer;
     private TimerTask timerTask;
-    private double time = 0.0;
+    // elapsed time in tenths of a second
+    private int time = 0;
     private int defaultTimerColor;
 
     private GameState gameState;
@@ -120,7 +121,6 @@ public class QuestionActivity extends AppCompatActivity {
         gameState = new GameState(this);
         toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
         database = new Database(this);
-        ButtonStartStop.setText("Start");
         defaultTimerColor = TimerText.getCurrentTextColor();
         timerStarted = false;
     }
@@ -256,18 +256,18 @@ public class QuestionActivity extends AppCompatActivity {
                     }
                     TimerText.setText(getTimerText());
                     // the player has 2 seconds to answer, the game master decides Siker / Késő
-                    if(time >= 2){
-                        TimerText.setTextColor(Color.parseColor("#ff0000"));
+                    if(time >= 20){
+                        TimerText.setTextColor(ContextCompat.getColor(QuestionActivity.this, R.color.danger));
                     }
                     // beep once when the 2 seconds are over, so the game master can watch the player
-                    if(time == 2){
+                    if(time == 20){
                         toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
                     }
                     time++;
                 });
             }
         };
-        timer.scheduleAtFixedRate(timerTask, 0, 1000);
+        timer.scheduleAtFixedRate(timerTask, 0, 100);
     }
 
     @SuppressLint("SetTextI18n")
@@ -279,22 +279,14 @@ public class QuestionActivity extends AppCompatActivity {
         }
         timerStarted = false;
         time = 0;
-        TimerText.setText("00 : 00 : 00");
+        TimerText.setText(getTimerText());
         TimerText.setTextColor(defaultTimerColor);
         ButtonStartStop.setVisibility(View.VISIBLE);
     }
 
-    private String getTimerText(){
-        int rounded = (int)Math.round(time);
-        int seconds = ((rounded % 86400)) % 3600 % 60;
-        int minutes = ((rounded % 86400)) % 3600 / 60;
-        int hours = ((rounded % 86400)) / 3600;
-
-        return formatTime(seconds, minutes, hours);
-    }
-
+    // seconds and tenths, e.g. 1,4
     @SuppressLint("DefaultLocale")
-    private String formatTime(int s, int m, int h){
-        return String.format("%02d", h) + " : " + String.format("%02d", m) + " : " + String.format("%02d", s);
+    private String getTimerText(){
+        return String.format("%d,%d", time / 10, time % 10);
     }
 }

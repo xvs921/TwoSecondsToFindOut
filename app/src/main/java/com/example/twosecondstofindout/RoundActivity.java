@@ -15,6 +15,8 @@ public class RoundActivity extends AppCompatActivity {
     private Button ButtonNextRound;
     private TextView FirstPlayer;
     private EditText RoundNumber;
+    private Button ButtonRoundMinus;
+    private Button ButtonRoundPlus;
     private Database database;
 
     @Override
@@ -30,6 +32,8 @@ public class RoundActivity extends AppCompatActivity {
                 finish();
             }
         });
+        ButtonRoundMinus.setOnClickListener(view -> RoundNumber.setText(String.valueOf(Math.max(1, getRoundNumber() - 1))));
+        ButtonRoundPlus.setOnClickListener(view -> RoundNumber.setText(String.valueOf(getRoundNumber() + 1)));
         ButtonNextRound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -46,6 +50,8 @@ public class RoundActivity extends AppCompatActivity {
         ButtonNextRound = findViewById(R.id.ButtonNextRound);
         FirstPlayer = findViewById(R.id.FirstPlayer);
         RoundNumber = findViewById(R.id.RoundNumber);
+        ButtonRoundMinus = findViewById(R.id.ButtonRoundMinus);
+        ButtonRoundPlus = findViewById(R.id.ButtonRoundPlus);
         database = new Database(this);
         String firstPlayerText = FirstPlayer.getText().toString();
 

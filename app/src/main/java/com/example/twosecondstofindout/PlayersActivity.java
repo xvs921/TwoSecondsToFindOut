@@ -33,11 +33,12 @@ public class PlayersActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 for (View row : PlayerRows) {
-                    if (row.getVisibility() == View.INVISIBLE) {
+                    if (row.getVisibility() == View.GONE) {
                         row.setVisibility(View.VISIBLE);
                         break;
                     }
                 }
+                updateNewPlayerButton();
             }
         });
 
@@ -81,8 +82,8 @@ public class PlayersActivity extends AppCompatActivity {
         PlayerRows = new View[]{findViewById(R.id.PlayerRow1), findViewById(R.id.PlayerRow2), findViewById(R.id.PlayerRow3),
                 findViewById(R.id.PlayerRow4), findViewById(R.id.PlayerRow5), findViewById(R.id.PlayerRow6)};
 
-        ArrayAdapter<String> levelAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, LEVELS);
-        levelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> levelAdapter = new ArrayAdapter<>(this, R.layout.spinner_level, LEVELS);
+        levelAdapter.setDropDownViewResource(R.layout.spinner_level_dropdown);
         for (Spinner level : PlayerLevels) {
             level.setAdapter(levelAdapter);
             level.setSelection(1);
@@ -99,11 +100,23 @@ public class PlayersActivity extends AppCompatActivity {
         }
         lastPlayers.close();
         for (int i = Math.max(2, row); i < PlayerRows.length; i++) {
-            PlayerRows[i].setVisibility(View.INVISIBLE);
+            PlayerRows[i].setVisibility(View.GONE);
         }
 
         ButtonNewPlayer = findViewById(R.id.ButtonNewPlayer);
         ButtonBackPlayers = findViewById(R.id.ButtonBackPlayers);
         ButtonNextPlayers = findViewById(R.id.ButtonNextPlayers);
+        updateNewPlayerButton();
+    }
+
+    // there are at most 6 players
+    private void updateNewPlayerButton() {
+        boolean hasHiddenRow = false;
+        for (View row : PlayerRows) {
+            if (row.getVisibility() == View.GONE) {
+                hasHiddenRow = true;
+            }
+        }
+        ButtonNewPlayer.setVisibility(hasHiddenRow ? View.VISIBLE : View.GONE);
     }
 }

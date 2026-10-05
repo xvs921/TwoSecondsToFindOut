@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    tools:ignore="ExtraText">
+    style="@style/Screen"
+    android:gravity="center_horizontal"
+    tools:context=".MainActivity">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <ImageView
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:id="@+id/Image"
+        android:contentDescription="Itt van a nyelvemen"
+        app:srcCompat="@drawable/nyelvkep" />
+
+    <TextView
+        style="@style/ScreenTitle"
+        android:id="@+id/Title"
+        android:layout_marginTop="24dp"
+        android:text="Itt van a nyelvemen" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/Title"
-        android:text="Itt van a nyelvemen játék"
-        android:textSize="30dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="120dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginTop="8dp"
+        android:text="Gyorsan! 2 másodperced van!"
+        android:textColor="@color/colorPrimary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-    <ImageView
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:id="@+id/Image"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/Title"
-        android:layout_marginTop="30dp"
-        app:srcCompat="@drawable/nyelvkep" />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/ButtonSecondary"
         android:id="@+id/ButtonContinue"
-        android:layout_above="@+id/ButtonStart"
-        android:layout_marginBottom="20dp"
-        android:text="FOLYTATÁS"
-        android:textSize="30dp"/>
+        android:layout_marginBottom="12dp"
+        android:text="Folytatás" />
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/ButtonPrimary"
         android:id="@+id/ButtonStart"
-        android:layout_alignParentBottom="true"
-        android:text="START"
-        android:textSize="30dp"/>
+        android:text="Új játék" />
 
-</RelativeLayout>
+</LinearLayout>

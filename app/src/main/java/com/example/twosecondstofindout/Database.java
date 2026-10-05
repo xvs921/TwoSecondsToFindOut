@@ -268,7 +268,8 @@ public class Database extends SQLiteOpenHelper
         int place = 1;
         while (scoreboard.moveToNext())
         {
-            result.append(place).append(". ")
+            String[] medals = {"🥇", "🥈", "🥉"};
+            result.append(place <= 3 ? medals[place - 1] : place + ".").append("  ")
                     .append(scoreboard.getString(0)).append(" - ")
                     .append(scoreboard.getInt(1)).append(" pont\n");
             place++;

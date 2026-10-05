@@ -1,195 +1,278 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/Screen"
     tools:context=".PlayersActivity">
 
-    <View
-        android:id="@+id/playersView"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonBackPlayers"
+            android:text="‹ Vissza" />
+
+        <TextView
+            style="@style/ScreenTitle"
+            android:layout_marginStart="16dp"
+            android:text="Játékosok" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp"
+        android:text="Add meg a neveket, és válassz mindenkinek szintet!"
+        android:textColor="@color/textSecondary"
+        android:textSize="16sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:id="@+id/PlayerRow1"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="1."
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/Player1"
+                    android:background="@null"
+                    android:hint="Név"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textSecondary"
+                    android:textSize="20sp" />
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PlayerLevel1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:id="@+id/PlayerRow2"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="2."
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/Player2"
+                    android:background="@null"
+                    android:hint="Név"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textSecondary"
+                    android:textSize="20sp" />
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PlayerLevel2" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:id="@+id/PlayerRow3"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="3."
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/Player3"
+                    android:background="@null"
+                    android:hint="Név"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textSecondary"
+                    android:textSize="20sp" />
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PlayerLevel3" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:id="@+id/PlayerRow4"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="4."
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/Player4"
+                    android:background="@null"
+                    android:hint="Név"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textSecondary"
+                    android:textSize="20sp" />
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PlayerLevel4" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:id="@+id/PlayerRow5"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="5."
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/Player5"
+                    android:background="@null"
+                    android:hint="Név"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textSecondary"
+                    android:textSize="20sp" />
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PlayerLevel5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:id="@+id/PlayerRow6"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="6."
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/Player6"
+                    android:background="@null"
+                    android:hint="Név"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textSecondary"
+                    android:textSize="20sp" />
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PlayerLevel6" />
+            </LinearLayout>
+
+            <Button
+                style="@style/ButtonSecondary"
+                android:id="@+id/ButtonNewPlayer"
+                android:text="+ Új játékos" />
+        </LinearLayout>
+    </ScrollView>
 
     <Button
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/ButtonBackPlayers"
-        android:layout_alignParentTop="true"
-        android:layout_alignRight="@id/playersView"
-        android:layout_alignParentLeft="true"
-        android:text="Vissza"
-        android:textSize="30dp"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_orange_dark"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/PlayerRow1"
-        android:orientation="horizontal"
-        android:layout_marginTop="80dp">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/Player1"
-            android:text=""
-            android:hint="1. játékos"
-            android:inputType="textPersonName"
-            android:textSize="30dp"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/PlayerLevel1"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/PlayerRow2"
-        android:orientation="horizontal"
-        android:layout_below="@+id/PlayerRow1"
-        android:layout_marginTop="20dp">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/Player2"
-            android:text=""
-            android:hint="2. játékos"
-            android:inputType="textPersonName"
-            android:textSize="30dp"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/PlayerLevel2"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/PlayerRow3"
-        android:orientation="horizontal"
-        android:layout_below="@+id/PlayerRow2"
-        android:layout_marginTop="20dp">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/Player3"
-            android:text=""
-            android:hint="3. játékos"
-            android:inputType="textPersonName"
-            android:textSize="30dp"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/PlayerLevel3"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/PlayerRow4"
-        android:orientation="horizontal"
-        android:layout_below="@+id/PlayerRow3"
-        android:layout_marginTop="20dp">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/Player4"
-            android:text=""
-            android:hint="4. játékos"
-            android:inputType="textPersonName"
-            android:textSize="30dp"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/PlayerLevel4"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/PlayerRow5"
-        android:orientation="horizontal"
-        android:layout_below="@+id/PlayerRow4"
-        android:layout_marginTop="20dp">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/Player5"
-            android:text=""
-            android:hint="5. játékos"
-            android:inputType="textPersonName"
-            android:textSize="30dp"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/PlayerLevel5"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/PlayerRow6"
-        android:orientation="horizontal"
-        android:layout_below="@+id/PlayerRow5"
-        android:layout_marginTop="20dp">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/Player6"
-            android:text=""
-            android:hint="6. játékos"
-            android:inputType="textPersonName"
-            android:textSize="30dp"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/PlayerLevel6"/>
-    </LinearLayout>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/ButtonNewPlayer"
-        android:layout_alignLeft="@id/playersView"
-        android:layout_alignParentRight="true"
-        android:layout_above="@+id/ButtonNextPlayers"
-        android:layout_marginBottom="30dp"
-        android:text="+"
-        android:textSize="30dp"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/ButtonPrimary"
         android:id="@+id/ButtonNextPlayers"
-        android:layout_alignParentBottom="true"
-        android:text="TOVÁBB"
-        android:textSize="30dp"/>
+        android:layout_marginTop="12dp"
+        android:text="Tovább" />
 
-</RelativeLayout>
+</LinearLayout>

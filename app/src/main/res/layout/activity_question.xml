@@ -1,112 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/Screen"
+    android:gravity="center_horizontal"
+    android:keepScreenOn="true"
+    android:paddingBottom="0dp"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp"
     tools:context=".QuestionActivity">
-
-    <View
-        android:id="@+id/questionView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_centerHorizontal="true"
-        android:background="@android:color/holo_blue_bright"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/CurrentPlayer"
+        android:background="@drawable/bg_chip"
+        android:paddingStart="20dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="8dp"
         android:text="Játékos"
-        android:textSize="24sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        style="@style/Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Question"
+            android:gravity="center"
+            android:text="Kérdés"
+            android:textColor="@color/textPrimary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="60dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/outline" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Answer"
+            android:gravity="center"
+            android:text="Válasz"
+            android:textColor="@color/success"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/Question"
-        android:text="Kérdés"
-        android:textSize="30sp"
-        android:textAlignment="center"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/CurrentPlayer"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="10dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/Answer"
-        android:text="Válasz"
-        android:textSize="30sp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/Question"
-        android:layout_marginBottom="10dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
         android:id="@+id/Timer"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/Answer"
-        android:layout_marginTop="30dp"
-        android:textSize="30sp"
-        android:text="00 : 00 : 00"/>
+        android:background="@drawable/bg_timer"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:text="0,0"
+        android:textColor="@color/textPrimary"
+        android:textSize="56sp"
+        android:textStyle="bold" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/ButtonPrimary"
         android:id="@+id/ButtonStartStop"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/Timer"
-        android:layout_marginTop="30dp"
-        android:textSize="30sp"/>
+        android:layout_width="200dp"
+        android:layout_marginTop="20dp"
+        android:text="Start" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/ButtonUndo"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/ButtonNotOk"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="20dp"
-        android:text="Visszavonás"
-        android:textSize="20sp"/>
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
 
-    <Button
-        android:layout_width="wrap_content"
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonUndo"
+            android:text="↶ Visszavonás" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonSkip"
+            android:text="Másik kérdés ›" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/ButtonSkip"
-        android:layout_alignParentEnd="true"
-        android:layout_above="@+id/ButtonOk"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="20dp"
-        android:text="Másik kérdés"
-        android:textSize="20sp"/>
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp"
+        android:orientation="horizontal">
 
-    <Button
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/ButtonNotOk"
-        android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@id/questionView"
-        android:layout_alignParentStart="true"
-        android:text="Késő"
-        android:textSize="30sp"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_red_dark"/>
+        <Button
+            style="@style/ButtonDanger"
+            android:id="@+id/ButtonNotOk"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="Késő" />
 
-    <Button
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/ButtonOk"
-        android:layout_alignParentBottom="true"
-        android:layout_alignStart="@id/questionView"
-        android:layout_alignParentEnd="true"
-        android:text="Siker"
-        android:textSize="30sp"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_green_dark"/>
+        <Button
+            style="@style/ButtonSuccess"
+            android:id="@+id/ButtonOk"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="Siker" />
+    </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
