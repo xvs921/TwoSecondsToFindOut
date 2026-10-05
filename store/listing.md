@@ -11,12 +11,15 @@ Vágd rá! – a villámgyors kvízjáték, amit egy telefonnal az egész csalá
 
 Hogyan játsszunk?
 • A játékmester kezében van a telefon, ő látja a kérdést és a helyes választ.
-• Felolvassa a kérdést, majd megnyomja a Start gombot.
-• A soron következő játékosnak 2 másodperce van rávágni a választ. Ha letelt az idő, a stopper pirosra vált.
+• A kérdést felolvashatja ő maga, vagy a telefon is felolvashatja: bemondja, ki következik, felolvassa a kérdést, és utána magától indítja az időt.
+• A soron következő játékosnak 2 másodperce van rávágni a választ. Ha letelt az idő, a stopper pirosra vált, sípol és rezeg.
 • A játékmester dönt: Siker vagy Késő. A pontokat az alkalmazás számolja.
 
 Mindenkinek a saját szintjén
-Minden játékos saját témát kap, így a gyerekek és a felnőttek egyszerre, egymás ellen is játszhatnak.
+Minden játékos saját témát és saját időt kap (1–5 másodperc), így a gyerekek és a felnőttek egyszerre, egymás ellen is játszhatnak.
+
+Csapatjáték
+Csapat módban a csapattagok felváltva válaszolnak, a pontot a csapat kapja.
 
 Több mint 1300 kérdés, 7 témában:
 • Gyerek
@@ -28,10 +31,13 @@ Több mint 1300 kérdés, 7 témában:
 • Tudomány
 
 További funkciók:
+• Sorozat-bónusz: minden 3. egymás utáni találat +1 pontot ér
+• Hibás kérdés megjelölése játék közben, javítás később
 • Saját kérdések hozzáadása és szerkesztése
 • Statisztika játékosonként, és a legnehezebb kérdések listája
 • A félbehagyott játék később folytatható
 • Kérdések és statisztika mentése fájlba, és visszaállítása új telefonon
+• Sötét mód
 • Nincs reklám, nincs regisztráció, nem kell hozzá internet
 
 Ideális családi estékre, baráti összejövetelekre, utazáshoz vagy osztálykirándulásra.
