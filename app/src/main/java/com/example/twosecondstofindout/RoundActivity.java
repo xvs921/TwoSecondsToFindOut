@@ -33,7 +33,7 @@ public class RoundActivity extends AppCompatActivity {
         ButtonNextRound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intentStart = new Intent(RoundActivity.this, DifficultActivity.class);
+                Intent intentStart = new Intent(RoundActivity.this, QuestionActivity.class);
                 intentStart.putExtra("rounds", getRoundNumber());
                 startActivity(intentStart);
                 finish();
