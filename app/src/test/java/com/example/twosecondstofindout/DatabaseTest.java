@@ -434,6 +434,242 @@ public class DatabaseTest {
     }
 
     //
+    // QUESTIONS MARKED AS WRONG
+    //
+
+    @Test
+    public void questionCanBeFlaggedAndUnflagged() {
+        int question = addTestQuestion("Rossz kérdés?", "Rossz válasz");
+        assertFalse(database.isQuestionFlagged(question));
+
+        database.setQuestionFlagged(question, true);
+        assertTrue(database.isQuestionFlagged(question));
+        Cursor flagged = database.selectFlaggedQuestions();
+        assertEquals(1, flagged.getCount());
+        assertTrue(flagged.moveToFirst());
+        assertEquals(question, flagged.getInt(0));
+        assertEquals("Rossz kérdés?", flagged.getString(1));
+        // the list shows a flag, the editor gets the plain text
+        assertEquals("⚑ Rossz kérdés?", flagged.getString(3));
+        flagged.close();
+
+        database.setQuestionFlagged(question, false);
+        assertFalse(database.isQuestionFlagged(question));
+        Cursor none = database.selectFlaggedQuestions();
+        assertEquals(0, none.getCount());
+        none.close();
+    }
+
+    @Test
+    public void topicListShowsFlagOnlyOnFlaggedQuestions() {
+        int flaggedQuestion = addTestQuestion("Jelölt?", "Igen");
+        addTestQuestion("Jó kérdés?", "Igen");
+        database.setQuestionFlagged(flaggedQuestion, true);
+
+        Cursor questions = database.selectQuestions(TEST_TOPIC);
+        Set<String> shown = new HashSet<>();
+        while (questions.moveToNext()) {
+            shown.add(questions.getString(3));
+        }
+        questions.close();
+        assertTrue(shown.contains("⚑ Jelölt?"));
+        assertTrue(shown.contains("Jó kérdés?"));
+    }
+
+    @Test
+    public void restoreKeepsFlags() throws JSONException {
+        int question = addTestQuestion("Jelölt kérdés?", "Válasz");
+        database.setQuestionFlagged(question, true);
+        String backup = database.exportJson();
+
+        database.setQuestionFlagged(question, false);
+        database.importJson(backup, true);
+
+        assertTrue(database.isQuestionFlagged(question));
+    }
+
+    //
+    // TEAMS
+    //
+
+    @Test
+    public void teamMembersAreSavedAndAnswerInTurns() {
+        database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
+                new String[]{" Anna, Béla ,, Cili ", null}, new int[]{2000, 2000});
+
+        Cursor players = database.selectPlayers();
+        assertTrue(players.moveToFirst());
+        assertEquals("Anna, Béla ,, Cili", players.getString(2));
+        assertTrue(players.moveToNext());
+        assertEquals("", players.getString(2));
+        players.close();
+
+        Cursor next = database.selectNextPlayer();
+        assertTrue(next.moveToFirst());
+        assertEquals("Pirosak", next.getString(1));
+        String members = next.getString(4);
+        next.close();
+        assertEquals("Anna", Database.memberOnTurn(members, 0));
+        assertEquals("Béla", Database.memberOnTurn(members, 1));
+        assertEquals("Cili", Database.memberOnTurn(members, 2));
+        assertEquals("Anna", Database.memberOnTurn(members, 3));
+    }
+
+    @Test
+    public void noMemberOnTurnWithoutTeam() {
+        assertEquals("", Database.memberOnTurn("", 0));
+        assertEquals("", Database.memberOnTurn(null, 5));
+        assertEquals("", Database.memberOnTurn(" , ", 1));
+    }
+
+    //
+    // STREAK BONUS
+    //
+
+    @Test
+    public void everyThirdCorrectAnswerInARowGivesABonus() {
+        startGame("Anna");
+        int anna = nextPlayerId();
+        int question = drawQuestion(1);
+        assertEquals(1, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(1, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(2, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(1, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(1, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(2, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(8, points("Anna"));
+        // the statistics count answers, not points
+        assertArrayEquals(new int[]{0, 6, 6}, database.selectTotals());
+    }
+
+    @Test
+    public void lateAnswerBreaksTheStreak() {
+        startGame("Anna");
+        int anna = nextPlayerId();
+        int question = drawQuestion(1);
+        database.savePlayerAnswer(anna, question, true, true);
+        database.savePlayerAnswer(anna, question, true, true);
+        assertEquals(0, database.savePlayerAnswer(anna, question, false, true));
+        assertEquals(1, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(1, database.savePlayerAnswer(anna, question, true, true));
+        assertEquals(2, database.savePlayerAnswer(anna, question, true, true));
+    }
+
+    @Test
+    public void streakIsCountedPerPlayer() {
+        startGame("Anna", "Béla");
+        int question = drawQuestion(1);
+        int anna = nextPlayerId();
+        database.savePlayerAnswer(anna, question, true, true);
+        int bela = nextPlayerId();
+        database.savePlayerAnswer(bela, question, false, true);
+        database.savePlayerAnswer(anna, question, true, true);
+        database.savePlayerAnswer(bela, question, true, true);
+        assertEquals(2, database.savePlayerAnswer(anna, question, true, true));
+    }
+
+    @Test
+    public void undoTakesBackTheBonus() {
+        startGame("Anna");
+        int anna = nextPlayerId();
+        int question = drawQuestion(1);
+        database.savePlayerAnswer(anna, question, true, true);
+        database.savePlayerAnswer(anna, question, true, true);
+        database.savePlayerAnswer(anna, question, true, true);
+        assertEquals(4, points("Anna"));
+
+        database.undoLastAnswer();
+
+        assertEquals(2, points("Anna"));
+        // answered again, the bonus comes again
+        assertEquals(2, database.savePlayerAnswer(anna, question, true, true));
+    }
+
+    @Test
+    public void noBonusWhenTurnedOff() {
+        startGame("Anna");
+        int anna = nextPlayerId();
+        int question = drawQuestion(1);
+        for (int i = 0; i < 3; i++) {
+            assertEquals(1, database.savePlayerAnswer(anna, question, true, false));
+        }
+        assertEquals(3, points("Anna"));
+    }
+
+    //
+    // TIME TO ANSWER
+    //
+
+    @Test
+    public void everyPlayerHasTheirOwnTime() {
+        database.insertPlayersForNewGame(new String[]{"Kicsi", "Nagy"}, new int[]{1, 2},
+                new String[]{"", ""}, new int[]{4000, 1500});
+
+        Cursor players = database.selectPlayers();
+        assertTrue(players.moveToFirst());
+        assertEquals(4000, players.getInt(3));
+        assertTrue(players.moveToNext());
+        assertEquals(1500, players.getInt(3));
+        players.close();
+
+        Cursor next = database.selectNextPlayer();
+        assertTrue(next.moveToFirst());
+        assertEquals("Kicsi", next.getString(1));
+        assertEquals(4000, next.getInt(5));
+        next.close();
+    }
+
+    @Test
+    public void playersWithoutTimeGetTwoSeconds() {
+        startGame("Anna");
+        Cursor next = database.selectNextPlayer();
+        assertTrue(next.moveToFirst());
+        assertEquals(2000, next.getInt(5));
+        next.close();
+    }
+
+    @Test
+    public void secondsAreShownTheHungarianWay() {
+        assertEquals("2 mp", PlayersActivity.formatSeconds(2000));
+        assertEquals("1,5 mp", PlayersActivity.formatSeconds(1500));
+        assertEquals("2,5 mp", PlayersActivity.formatSeconds(2500));
+    }
+
+    //
+    // UPGRADE
+    //
+
+    @Test
+    public void upgradeFromVersion6KeepsDataAndAddsColumns() {
+        database.close();
+        context.deleteDatabase(Database.DATABASE_NAME);
+        SQLiteDatabase old = SQLiteDatabase.openOrCreateDatabase(context.getDatabasePath(Database.DATABASE_NAME), null);
+        old.execSQL("CREATE TABLE questions(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, topic INTEGER NOT NULL, question VARCHAR(350) NOT NULL, answer VARCHAR(200) NOT NULL, used INTEGER DEFAULT 0)");
+        old.execSQL("CREATE TABLE players(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), topic INTEGER DEFAULT 2, answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0, active INTEGER DEFAULT 1)");
+        old.execSQL("CREATE TABLE answers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_id INTEGER NOT NULL, question_id INTEGER NOT NULL, points INTEGER NOT NULL, deactivated TEXT DEFAULT '', history_id INTEGER DEFAULT 0)");
+        old.execSQL("CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_name VARCHAR(200) NOT NULL, topic INTEGER NOT NULL, question_id INTEGER NOT NULL, success INTEGER NOT NULL, played_at INTEGER NOT NULL)");
+        old.execSQL("CREATE TABLE games(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, winner VARCHAR(200) NOT NULL, played_at INTEGER NOT NULL)");
+        old.execSQL("CREATE TABLE question_topics(question_id INTEGER NOT NULL, topic INTEGER NOT NULL, PRIMARY KEY (question_id, topic))");
+        old.execSQL("INSERT INTO questions(id, topic, question, answer) VALUES (1, 9, 'Régi saját kérdés?', 'Régi válasz')");
+        old.execSQL("INSERT INTO question_topics(question_id, topic) VALUES (1, 9)");
+        old.execSQL("INSERT INTO players(name, topic) VALUES ('Anna', 1)");
+        old.setVersion(6);
+        old.close();
+
+        database = new Database(context);
+
+        assertFalse(database.isQuestionFlagged(1));
+        database.setQuestionFlagged(1, true);
+        assertTrue(database.isQuestionFlagged(1));
+        Cursor players = database.selectPlayers();
+        assertTrue(players.moveToFirst());
+        assertEquals("Anna", players.getString(0));
+        assertEquals("", players.getString(2));
+        assertEquals(Database.DEFAULT_ANSWER_MS, players.getInt(3));
+        players.close();
+    }
+
+    //
     // HELPERS
     //
 
@@ -441,6 +677,15 @@ public class DatabaseTest {
         int[] topics = new int[names.length];
         java.util.Arrays.fill(topics, 1);
         database.insertPlayersForNewGame(names, topics);
+    }
+
+    private int points(String name) {
+        Cursor cursor = database.getReadableDatabase().rawQuery(
+                "SELECT points FROM " + Database.TABLE_PLAYERS + " WHERE name = ?", new String[]{name});
+        assertTrue(name, cursor.moveToFirst());
+        int points = cursor.getInt(0);
+        cursor.close();
+        return points;
     }
 
     private int nextPlayerId() {
