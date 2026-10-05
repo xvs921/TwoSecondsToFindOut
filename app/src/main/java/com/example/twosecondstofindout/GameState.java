@@ -11,6 +11,8 @@ public class GameState
     private static final String KEY_ROUNDS = "rounds";
     private static final String KEY_IN_PROGRESS = "inProgress";
     private static final String KEY_PHONE_READS = "phoneReads";
+    private static final String KEY_BEEP = "beep";
+    private static final String KEY_VIBRATE = "vibrate";
 
     private final SharedPreferences prefs;
 
@@ -48,5 +50,21 @@ public class GameState
     public boolean isPhoneReading()
     {
         return prefs.getBoolean(KEY_PHONE_READS, true);
+    }
+
+    // how the phone signals that the 2 seconds are over, kept for the next games too
+    public void setSignals(boolean beep, boolean vibrate)
+    {
+        prefs.edit().putBoolean(KEY_BEEP, beep).putBoolean(KEY_VIBRATE, vibrate).apply();
+    }
+
+    public boolean isBeeping()
+    {
+        return prefs.getBoolean(KEY_BEEP, true);
+    }
+
+    public boolean isVibrating()
+    {
+        return prefs.getBoolean(KEY_VIBRATE, true);
     }
 }

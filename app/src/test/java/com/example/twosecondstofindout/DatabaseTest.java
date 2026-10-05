@@ -434,6 +434,128 @@ public class DatabaseTest {
     }
 
     //
+    // QUESTIONS MARKED AS WRONG
+    //
+
+    @Test
+    public void questionCanBeFlaggedAndUnflagged() {
+        int question = addTestQuestion("Rossz kérdés?", "Rossz válasz");
+        assertFalse(database.isQuestionFlagged(question));
+
+        database.setQuestionFlagged(question, true);
+        assertTrue(database.isQuestionFlagged(question));
+        Cursor flagged = database.selectFlaggedQuestions();
+        assertEquals(1, flagged.getCount());
+        assertTrue(flagged.moveToFirst());
+        assertEquals(question, flagged.getInt(0));
+        assertEquals("Rossz kérdés?", flagged.getString(1));
+        // the list shows a flag, the editor gets the plain text
+        assertEquals("⚑ Rossz kérdés?", flagged.getString(3));
+        flagged.close();
+
+        database.setQuestionFlagged(question, false);
+        assertFalse(database.isQuestionFlagged(question));
+        Cursor none = database.selectFlaggedQuestions();
+        assertEquals(0, none.getCount());
+        none.close();
+    }
+
+    @Test
+    public void topicListShowsFlagOnlyOnFlaggedQuestions() {
+        int flaggedQuestion = addTestQuestion("Jelölt?", "Igen");
+        addTestQuestion("Jó kérdés?", "Igen");
+        database.setQuestionFlagged(flaggedQuestion, true);
+
+        Cursor questions = database.selectQuestions(TEST_TOPIC);
+        Set<String> shown = new HashSet<>();
+        while (questions.moveToNext()) {
+            shown.add(questions.getString(3));
+        }
+        questions.close();
+        assertTrue(shown.contains("⚑ Jelölt?"));
+        assertTrue(shown.contains("Jó kérdés?"));
+    }
+
+    @Test
+    public void restoreKeepsFlags() throws JSONException {
+        int question = addTestQuestion("Jelölt kérdés?", "Válasz");
+        database.setQuestionFlagged(question, true);
+        String backup = database.exportJson();
+
+        database.setQuestionFlagged(question, false);
+        database.importJson(backup, true);
+
+        assertTrue(database.isQuestionFlagged(question));
+    }
+
+    //
+    // TEAMS
+    //
+
+    @Test
+    public void teamMembersAreSavedAndAnswerInTurns() {
+        database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
+                new String[]{" Anna, Béla ,, Cili ", null});
+
+        Cursor players = database.selectPlayers();
+        assertTrue(players.moveToFirst());
+        assertEquals("Anna, Béla ,, Cili", players.getString(2));
+        assertTrue(players.moveToNext());
+        assertEquals("", players.getString(2));
+        players.close();
+
+        Cursor next = database.selectNextPlayer();
+        assertTrue(next.moveToFirst());
+        assertEquals("Pirosak", next.getString(1));
+        String members = next.getString(4);
+        next.close();
+        assertEquals("Anna", Database.memberOnTurn(members, 0));
+        assertEquals("Béla", Database.memberOnTurn(members, 1));
+        assertEquals("Cili", Database.memberOnTurn(members, 2));
+        assertEquals("Anna", Database.memberOnTurn(members, 3));
+    }
+
+    @Test
+    public void noMemberOnTurnWithoutTeam() {
+        assertEquals("", Database.memberOnTurn("", 0));
+        assertEquals("", Database.memberOnTurn(null, 5));
+        assertEquals("", Database.memberOnTurn(" , ", 1));
+    }
+
+    //
+    // UPGRADE
+    //
+
+    @Test
+    public void upgradeFromVersion6KeepsDataAndAddsColumns() {
+        database.close();
+        context.deleteDatabase(Database.DATABASE_NAME);
+        SQLiteDatabase old = SQLiteDatabase.openOrCreateDatabase(context.getDatabasePath(Database.DATABASE_NAME), null);
+        old.execSQL("CREATE TABLE questions(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, topic INTEGER NOT NULL, question VARCHAR(350) NOT NULL, answer VARCHAR(200) NOT NULL, used INTEGER DEFAULT 0)");
+        old.execSQL("CREATE TABLE players(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), topic INTEGER DEFAULT 2, answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0, active INTEGER DEFAULT 1)");
+        old.execSQL("CREATE TABLE answers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_id INTEGER NOT NULL, question_id INTEGER NOT NULL, points INTEGER NOT NULL, deactivated TEXT DEFAULT '', history_id INTEGER DEFAULT 0)");
+        old.execSQL("CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_name VARCHAR(200) NOT NULL, topic INTEGER NOT NULL, question_id INTEGER NOT NULL, success INTEGER NOT NULL, played_at INTEGER NOT NULL)");
+        old.execSQL("CREATE TABLE games(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, winner VARCHAR(200) NOT NULL, played_at INTEGER NOT NULL)");
+        old.execSQL("CREATE TABLE question_topics(question_id INTEGER NOT NULL, topic INTEGER NOT NULL, PRIMARY KEY (question_id, topic))");
+        old.execSQL("INSERT INTO questions(id, topic, question, answer) VALUES (1, 9, 'Régi saját kérdés?', 'Régi válasz')");
+        old.execSQL("INSERT INTO question_topics(question_id, topic) VALUES (1, 9)");
+        old.execSQL("INSERT INTO players(name, topic) VALUES ('Anna', 1)");
+        old.setVersion(6);
+        old.close();
+
+        database = new Database(context);
+
+        assertFalse(database.isQuestionFlagged(1));
+        database.setQuestionFlagged(1, true);
+        assertTrue(database.isQuestionFlagged(1));
+        Cursor players = database.selectPlayers();
+        assertTrue(players.moveToFirst());
+        assertEquals("Anna", players.getString(0));
+        assertEquals("", players.getString(2));
+        players.close();
+    }
+
+    //
     // HELPERS
     //
 

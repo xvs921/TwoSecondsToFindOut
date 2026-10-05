@@ -9,10 +9,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.os.VibratorManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.view.Choreographer;
@@ -30,6 +34,8 @@ public class QuestionActivity extends AppCompatActivity {
     private TextView Answer;
     private TextView TimerText;
     private Button ButtonStartStop;
+    private Button ButtonRepeat;
+    private TextView FlagQuestion;
     private boolean timerStarted;
     private Database database;
 
@@ -82,12 +88,18 @@ public class QuestionActivity extends AppCompatActivity {
         } else {
             nextTurn();
         }
-        ButtonStartStop.setOnClickListener(view -> {
+        ButtonStartStop.setOnClickListener(view -> begin());
+        // the player did not hear the question: the phone reads it again,
+        // or the game master reads it again and presses Start
+        ButtonRepeat.setOnClickListener(view -> {
+            stopTimer();
             if (canReadAloud) {
                 readQuestion();
-            } else {
-                startTimer();
             }
+        });
+        FlagQuestion.setOnClickListener(view -> {
+            database.setQuestionFlagged(currentQuestionId, !database.isQuestionFlagged(currentQuestionId));
+            showFlag();
         });
         ButtonOk.setOnClickListener(view -> {
             if(timerStarted){
@@ -147,6 +159,8 @@ public class QuestionActivity extends AppCompatActivity {
         Answer = findViewById(R.id.Answer);
         TimerText = findViewById(R.id.Timer);
         ButtonStartStop = findViewById(R.id.ButtonStartStop);
+        ButtonRepeat = findViewById(R.id.ButtonRepeat);
+        FlagQuestion = findViewById(R.id.FlagQuestion);
         ButtonOk = findViewById(R.id.ButtonOk);
         ButtonNotOk = findViewById(R.id.ButtonNotOk);
         ButtonSkip = findViewById(R.id.ButtonSkip);
@@ -220,13 +234,30 @@ public class QuestionActivity extends AppCompatActivity {
         return false;
     }
 
+    // Start, or Felolvasás when the phone reads the question
+    private void begin()
+    {
+        if (canReadAloud) {
+            readQuestion();
+        } else {
+            startTimer();
+        }
+    }
+
+    // Újra takes the place of Start while the question is read or the timer runs
+    private void showRepeatButton(boolean running)
+    {
+        ButtonStartStop.setVisibility(running ? View.GONE : View.VISIBLE);
+        ButtonRepeat.setVisibility(running ? View.VISIBLE : View.GONE);
+    }
+
     private void readQuestion()
     {
         if (timerStarted || readingId != null) {
             return;
         }
         readingId = "question-" + currentQuestionId + "-" + SystemClock.elapsedRealtime();
-        ButtonStartStop.setVisibility(View.INVISIBLE);
+        showRepeatButton(true);
         if (textToSpeech.speak(Question.getText(), TextToSpeech.QUEUE_FLUSH, null, readingId) == TextToSpeech.ERROR) {
             readingId = null;
             startTimer();
@@ -300,13 +331,16 @@ public class QuestionActivity extends AppCompatActivity {
         }
         currentPlayerId = player.getInt(0);
         int answered = player.getInt(2);
+        // in a team game the team members answer in turns
+        String member = Database.memberOnTurn(player.getString(4), answered);
+        String name = member.isEmpty() ? player.getString(1) : player.getString(1) + " · " + member;
         if (answered >= rounds)
         {
-            CurrentPlayer.setText(player.getString(1) + " (szétszavazó)");
+            CurrentPlayer.setText(name + " (szétszavazó)");
         }
         else
         {
-            CurrentPlayer.setText(player.getString(1) + " (" + (answered + 1) + ". kör / " + rounds + ")");
+            CurrentPlayer.setText(name + " (" + (answered + 1) + ". kör / " + rounds + ")");
         }
         currentTopic = player.getInt(3);
         player.close();
@@ -336,6 +370,7 @@ public class QuestionActivity extends AppCompatActivity {
             currentQuestionId = questionId;
             Question.setText(question.getString(0));
             Answer.setText(question.getString(1));
+            showFlag();
         }
         question.close();
         return found;
@@ -354,6 +389,7 @@ public class QuestionActivity extends AppCompatActivity {
             Question.setText("Ebben a témában nincs kérdés.");
             Answer.setText("");
             ButtonStartStop.setVisibility(View.INVISIBLE);
+            FlagQuestion.setVisibility(View.GONE);
             return;
         }
         currentQuestionId = question.getInt(0);
@@ -361,6 +397,16 @@ public class QuestionActivity extends AppCompatActivity {
         Question.setText(question.getString(1));
         Answer.setText(question.getString(2));
         question.close();
+        showFlag();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void showFlag()
+    {
+        boolean flagged = database.isQuestionFlagged(currentQuestionId);
+        FlagQuestion.setVisibility(View.VISIBLE);
+        FlagQuestion.setText(flagged ? "⚑ Megjelölve hibásnak" : "⚑ Hibás kérdés?");
+        FlagQuestion.setTextColor(ContextCompat.getColor(this, flagged ? R.color.danger : R.color.textSecondary));
     }
 
     //
@@ -379,9 +425,29 @@ public class QuestionActivity extends AppCompatActivity {
     // the player has 2 seconds to answer, the game master decides Siker / Késő
     private final Runnable timeUp = () -> {
         TimerText.setTextColor(ContextCompat.getColor(QuestionActivity.this, R.color.danger));
-        // beep once, so the game master can watch the player
-        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
+        // beep and/or vibrate once, so the game master can watch the player
+        if (gameState.isBeeping()) {
+            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
+        }
+        if (gameState.isVibrating()) {
+            vibrate();
+        }
     };
+
+    private void vibrate()
+    {
+        Vibrator vibrator;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            vibrator = ((VibratorManager) getSystemService(VIBRATOR_MANAGER_SERVICE)).getDefaultVibrator();
+        } else {
+            vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(400, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            vibrator.vibrate(400);
+        }
+    }
 
     public void startTimer()
     {
@@ -391,7 +457,7 @@ public class QuestionActivity extends AppCompatActivity {
         timerStarted = true;
         time = 0;
         startTime = SystemClock.elapsedRealtime();
-        ButtonStartStop.setVisibility(View.INVISIBLE);
+        showRepeatButton(true);
         Choreographer.getInstance().postFrameCallback(timerFrame);
         handler.postDelayed(timeUp, 2000);
     }
@@ -409,7 +475,7 @@ public class QuestionActivity extends AppCompatActivity {
         time = 0;
         TimerText.setText(getTimerText());
         TimerText.setTextColor(defaultTimerColor);
-        ButtonStartStop.setVisibility(View.VISIBLE);
+        showRepeatButton(false);
     }
 
     // seconds and milliseconds, e.g. 1,123

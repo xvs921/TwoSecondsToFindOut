@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- the phone vibrates when the 2 seconds are over -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!-- the question is read aloud by the text-to-speech engine of the phone -->
     <queries>
         <intent>
