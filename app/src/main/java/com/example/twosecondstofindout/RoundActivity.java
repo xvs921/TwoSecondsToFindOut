@@ -22,6 +22,7 @@ public class RoundActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemBars.setUp(this);
         setContentView(R.layout.activity_round);
         init();
         ButtonBackRound.setOnClickListener(new View.OnClickListener() {

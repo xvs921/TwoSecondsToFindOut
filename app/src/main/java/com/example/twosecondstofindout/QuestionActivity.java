@@ -1,5 +1,6 @@
 package com.example.twosecondstofindout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -58,7 +59,9 @@ public class QuestionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemBars.setUp(this);
         setContentView(R.layout.activity_question);
+        getOnBackPressedDispatcher().addCallback(this, backToMainMenu);
         init();
         rounds = gameState.getRounds();
         timer = new Timer();
@@ -103,12 +106,14 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     // the game is saved, it can be continued from the main menu
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(QuestionActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
+    private final OnBackPressedCallback backToMainMenu = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            Intent intent = new Intent(QuestionActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    };
 
     @Override
     protected void onDestroy() {

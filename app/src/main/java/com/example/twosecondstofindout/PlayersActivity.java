@@ -27,6 +27,7 @@ public class PlayersActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemBars.setUp(this);
         setContentView(R.layout.activity_players);
         init();
         ButtonNewPlayer.setOnClickListener(new View.OnClickListener() {

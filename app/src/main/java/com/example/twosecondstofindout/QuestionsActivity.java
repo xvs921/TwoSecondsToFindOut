@@ -36,6 +36,7 @@ public class QuestionsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemBars.setUp(this);
         setContentView(R.layout.activity_questions);
         init();
         ButtonBackQuestions.setOnClickListener(view -> finish());
