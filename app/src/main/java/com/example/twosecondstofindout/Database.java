@@ -17,6 +17,8 @@ public class Database extends SQLiteOpenHelper
     public static final String TABLE_QUESTIONS = "questions";
     public static final String TABLE_PLAYERS = "players";
     public static final String TABLE_ANSWERS = "answers";
+    public static final String TABLE_HISTORY = "history";
+    public static final String TABLE_GAMES = "games";
 
     public static final String COL_1 = "id";
     public static final String COL_2 = "topic";
@@ -30,12 +32,15 @@ public class Database extends SQLiteOpenHelper
     public static final String COL_8 = "points";
     public static final String COL_9 = "topic";
 
+    // the topic ids are the position + 1: 1: Gyerek, 2: Felnőtt, 3: Bibliai
+    public static final String[] TOPICS = {"Gyerek", "Felnőtt", "Bibliai"};
+
 
     private final Context context;
 
     public Database(Context context)
     {
-        super(context, DATABASE_NAME, null, 4);
+        super(context, DATABASE_NAME, null, 5);
         this.context = context;
     }
 
@@ -45,8 +50,16 @@ public class Database extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS "+ TABLE_PLAYERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), topic INTEGER DEFAULT 2, answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0, active INTEGER DEFAULT 1)");
         // every Siker / Késő decision, so the last ones can be undone. deactivated: comma separated
         // ids of the players who dropped out of the tie-break right after this answer
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_ANSWERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_id INTEGER NOT NULL, question_id INTEGER NOT NULL, points INTEGER NOT NULL, deactivated TEXT DEFAULT '')");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_ANSWERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_id INTEGER NOT NULL, question_id INTEGER NOT NULL, points INTEGER NOT NULL, deactivated TEXT DEFAULT '', history_id INTEGER DEFAULT 0)");
+        createStatisticsTables(db);
         insertQuestions(db);
+    }
+
+    // Kept across games for the statistics: every answer and every winner
+    private void createStatisticsTables(SQLiteDatabase db)
+    {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_HISTORY + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_name VARCHAR(200) NOT NULL, topic INTEGER NOT NULL, question_id INTEGER NOT NULL, success INTEGER NOT NULL, played_at INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_GAMES + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, winner VARCHAR(200) NOT NULL, played_at INTEGER NOT NULL)");
     }
 
     // Loads the questions from res/raw/questions.txt, one per line: topic<TAB>question<TAB>answer
@@ -82,12 +95,23 @@ public class Database extends SQLiteOpenHelper
         }
     }
 
+    // From version 4 on the data is migrated step by step, so own questions and statistics are kept.
+    // Add a new step here for every new version instead of dropping the tables.
     @Override
-    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYERS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANSWERS);
-        onCreate(db);
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion < 4)
+        {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYERS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANSWERS);
+            onCreate(db);
+            return;
+        }
+        if (oldVersion < 5)
+        {
+            createStatisticsTables(db);
+            db.execSQL("ALTER TABLE " + TABLE_ANSWERS + " ADD COLUMN history_id INTEGER DEFAULT 0");
+        }
     }
 
     // Returns id, question, answer of a random question not used yet. When every
@@ -187,10 +211,26 @@ public class Database extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
         int points = success ? 1 : 0;
         db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered + 1, points = points + ? WHERE id = ?", new Object[]{points, playerId});
+
+        long historyId = 0;
+        Cursor player = db.rawQuery("SELECT name, topic FROM " + TABLE_PLAYERS + " WHERE id = ?", new String[]{String.valueOf(playerId)});
+        if (player.moveToFirst())
+        {
+            ContentValues history = new ContentValues();
+            history.put("player_name", player.getString(0));
+            history.put("topic", player.getInt(1));
+            history.put("question_id", questionId);
+            history.put("success", points);
+            history.put("played_at", System.currentTimeMillis());
+            historyId = db.insert(TABLE_HISTORY, null, history);
+        }
+        player.close();
+
         ContentValues values = new ContentValues();
         values.put("player_id", playerId);
         values.put("question_id", questionId);
         values.put("points", points);
+        values.put("history_id", historyId);
         db.insert(TABLE_ANSWERS, null, values);
     }
 
@@ -232,7 +272,7 @@ public class Database extends SQLiteOpenHelper
     public int undoLastAnswer()
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor last = db.rawQuery("SELECT id, player_id, question_id, points, deactivated FROM " + TABLE_ANSWERS + " ORDER BY id DESC LIMIT 1", null);
+        Cursor last = db.rawQuery("SELECT id, player_id, question_id, points, deactivated, history_id FROM " + TABLE_ANSWERS + " ORDER BY id DESC LIMIT 1", null);
         if (!last.moveToFirst())
         {
             last.close();
@@ -243,8 +283,10 @@ public class Database extends SQLiteOpenHelper
         int questionId = last.getInt(2);
         int points = last.getInt(3);
         String deactivated = last.getString(4);
+        long historyId = last.getLong(5);
         last.close();
 
+        db.execSQL("DELETE FROM " + TABLE_HISTORY + " WHERE id = ?", new Object[]{historyId});
         if (deactivated != null && deactivated.length() > 1)
         {
             db.execSQL("UPDATE " + TABLE_PLAYERS + " SET active = 1 WHERE id IN (" + deactivated.substring(1) + ")");
@@ -302,5 +344,103 @@ public class Database extends SQLiteOpenHelper
                 db.insert(TABLE_PLAYERS, null, values);
             }
         }
+    }
+
+    //
+    // QUESTION EDITOR
+    //
+
+    // _id, question, answer of a topic, for the question list
+    public Cursor selectQuestions(int topic)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT id AS _id, question, answer FROM " + TABLE_QUESTIONS + " WHERE topic = ? ORDER BY id DESC", new String[]{String.valueOf(topic)});
+    }
+
+    public void saveQuestion(int questionId, int topic, String question, String answer)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_2, topic);
+        values.put(COL_3, question.trim());
+        values.put(COL_4, answer.trim());
+        if (questionId < 0)
+        {
+            db.insert(TABLE_QUESTIONS, null, values);
+        }
+        else
+        {
+            db.update(TABLE_QUESTIONS, values, "id = ?", new String[]{String.valueOf(questionId)});
+        }
+    }
+
+    public void deleteQuestion(int questionId)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_QUESTIONS, "id = ?", new String[]{String.valueOf(questionId)});
+    }
+
+    //
+    // STATISTICS
+    //
+
+    // Called when a game is over, the winner is the first on the scoreboard
+    public void saveGameResult()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor winner = db.rawQuery("SELECT name FROM " + TABLE_PLAYERS + " ORDER BY points DESC, active DESC, id LIMIT 1", null);
+        if (winner.moveToFirst())
+        {
+            ContentValues values = new ContentValues();
+            values.put("winner", winner.getString(0));
+            values.put("played_at", System.currentTimeMillis());
+            db.insert(TABLE_GAMES, null, values);
+        }
+        winner.close();
+    }
+
+    // When the last answer of a finished game is undone, the game is not over any more
+    public void deleteLastGameResult()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_GAMES + " WHERE id = (SELECT MAX(id) FROM " + TABLE_GAMES + ")");
+    }
+
+    // {finished games, answered questions, successful answers}
+    public int[] selectTotals()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor totals = db.rawQuery("SELECT (SELECT COUNT(*) FROM " + TABLE_GAMES + "), COUNT(*), IFNULL(SUM(success), 0) FROM " + TABLE_HISTORY, null);
+        int[] result = totals.moveToFirst() ? new int[]{totals.getInt(0), totals.getInt(1), totals.getInt(2)} : new int[]{0, 0, 0};
+        totals.close();
+        return result;
+    }
+
+    // name, answered, successful, wins ordered by wins and success rate
+    public Cursor selectPlayerStatistics()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT h.player_name, COUNT(*), SUM(h.success), "
+                + "(SELECT COUNT(*) FROM " + TABLE_GAMES + " g WHERE g.winner = h.player_name) AS wins "
+                + "FROM " + TABLE_HISTORY + " h GROUP BY h.player_name "
+                + "ORDER BY wins DESC, SUM(h.success) * 1.0 / COUNT(*) DESC", null);
+    }
+
+    // question, answer, asked, successful of the questions that were missed the most (asked at least twice)
+    public Cursor selectHardestQuestions(int limit)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT q.question, q.answer, COUNT(*), SUM(h.success) FROM " + TABLE_HISTORY + " h "
+                + "JOIN " + TABLE_QUESTIONS + " q ON q.id = h.question_id "
+                + "GROUP BY h.question_id HAVING COUNT(*) >= 2 "
+                + "ORDER BY SUM(h.success) * 1.0 / COUNT(*), COUNT(*) DESC LIMIT ?", new String[]{String.valueOf(limit)});
+    }
+
+    public void deleteStatistics()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_HISTORY);
+        db.execSQL("DELETE FROM " + TABLE_GAMES);
+        db.execSQL("UPDATE " + TABLE_ANSWERS + " SET history_id = 0");
     }
 }

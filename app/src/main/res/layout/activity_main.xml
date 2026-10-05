@@ -38,6 +38,29 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonQuestions"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="📝 Kérdések" />
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonStatistics"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="📊 Statisztika" />
+    </LinearLayout>
+
     <Button
         style="@style/ButtonSecondary"
         android:id="@+id/ButtonContinue"

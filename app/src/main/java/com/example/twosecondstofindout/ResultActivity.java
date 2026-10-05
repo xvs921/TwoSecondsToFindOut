@@ -32,6 +32,7 @@ public class ResultActivity extends AppCompatActivity {
             if (questionId < 0) {
                 return;
             }
+            database.deleteLastGameResult();
             new GameState(ResultActivity.this).setInProgress(true);
             Intent intent = new Intent(ResultActivity.this, QuestionActivity.class);
             intent.putExtra("questionId", questionId);

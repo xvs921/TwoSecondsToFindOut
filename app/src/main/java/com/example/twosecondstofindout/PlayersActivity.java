@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 public class PlayersActivity extends AppCompatActivity {
 
-    private static final String[] LEVELS = {"Gyerek", "Felnőtt", "Bibliai"};
+    private static final String[] LEVELS = Database.TOPICS;
 
     private EditText[] Players;
     private Spinner[] PlayerLevels;

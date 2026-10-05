@@ -186,11 +186,8 @@ public class QuestionActivity extends AppCompatActivity {
         }
         currentTopic = player.getInt(3);
         player.close();
-        if (questionId >= 0)
-        {
-            showQuestion(questionId);
-        }
-        else
+        // the undone question may have been deleted in the meantime
+        if (questionId < 0 || !showQuestion(questionId))
         {
             kerdes(currentTopic);
         }
@@ -199,22 +196,25 @@ public class QuestionActivity extends AppCompatActivity {
 
     private void finishGame()
     {
+        database.saveGameResult();
         gameState.setInProgress(false);
         Intent intent = new Intent(QuestionActivity.this, ResultActivity.class);
         startActivity(intent);
         finish();
     }
 
-    private void showQuestion(int questionId)
+    private boolean showQuestion(int questionId)
     {
         Cursor question = database.selectQuestion(questionId);
-        if (question.moveToFirst())
+        boolean found = question.moveToFirst();
+        if (found)
         {
             currentQuestionId = questionId;
             Question.setText(question.getString(0));
             Answer.setText(question.getString(1));
         }
         question.close();
+        return found;
     }
 
     @SuppressLint("SetTextI18n")
