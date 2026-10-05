@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- palette taken from the game box: red lips, pink tongue, black text -->
+    <!-- red, pink and black palette -->
     <color name="colorPrimary">#D32F2F</color>
     <color name="colorPrimaryDark">#9A0007</color>
     <color name="colorAccent">#D32F2F</color>
