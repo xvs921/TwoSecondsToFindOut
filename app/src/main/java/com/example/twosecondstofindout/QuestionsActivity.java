@@ -8,14 +8,17 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // Lists the questions of a topic, new ones can be added, existing ones edited or deleted
 public class QuestionsActivity extends AppCompatActivity {
@@ -23,6 +26,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private Button ButtonBackQuestions;
     private Button ButtonNewQuestion;
     private Button[] TopicButtons;
+    private LinearLayout TopicButtonRow;
     private TextView QuestionCount;
     private ListView QuestionList;
     private SimpleCursorAdapter adapter;
@@ -35,14 +39,14 @@ public class QuestionsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_questions);
         init();
         ButtonBackQuestions.setOnClickListener(view -> finish());
-        ButtonNewQuestion.setOnClickListener(view -> showEditDialog(-1, "", ""));
+        ButtonNewQuestion.setOnClickListener(view -> showEditDialog(-1, "", "", new int[]{topic}));
         for (int i = 0; i < TopicButtons.length; i++) {
             int selectedTopic = i + 1;
             TopicButtons[i].setOnClickListener(view -> selectTopic(selectedTopic));
         }
         QuestionList.setOnItemClickListener((parent, view, position, id) -> {
             Cursor row = (Cursor) adapter.getItem(position);
-            showEditDialog((int) id, row.getString(1), row.getString(2));
+            showEditDialog((int) id, row.getString(1), row.getString(2), database.selectQuestionTopics((int) id));
         });
         selectTopic(1);
     }
@@ -59,7 +63,19 @@ public class QuestionsActivity extends AppCompatActivity {
     private void init() {
         ButtonBackQuestions = findViewById(R.id.ButtonBackQuestions);
         ButtonNewQuestion = findViewById(R.id.ButtonNewQuestion);
-        TopicButtons = new Button[]{findViewById(R.id.ButtonTopic1), findViewById(R.id.ButtonTopic2), findViewById(R.id.ButtonTopic3)};
+        TopicButtonRow = findViewById(R.id.TopicButtons);
+        TopicButtons = new Button[Database.TOPICS.length];
+        int gap = Math.round(8 * getResources().getDisplayMetrics().density);
+        for (int i = 0; i < TopicButtons.length; i++) {
+            Button button = new Button(this, null, 0, R.style.ButtonSmall);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, Math.round(48 * getResources().getDisplayMetrics().density));
+            params.setMarginEnd(gap);
+            button.setLayoutParams(params);
+            button.setText(Database.TOPICS[i]);
+            TopicButtonRow.addView(button);
+            TopicButtons[i] = button;
+        }
         QuestionCount = findViewById(R.id.QuestionCount);
         QuestionList = findViewById(R.id.QuestionList);
         database = new Database(this);
@@ -88,18 +104,25 @@ public class QuestionsActivity extends AppCompatActivity {
         QuestionCount.setText(adapter.getCount() + " kérdés");
     }
 
-    // questionId -1: new question
-    private void showEditDialog(int questionId, String question, String answer) {
+    // questionId -1: new question. A question can be in more topics.
+    private void showEditDialog(int questionId, String question, String answer, int[] topics) {
         View form = getLayoutInflater().inflate(R.layout.dialog_question, null);
         EditText questionInput = form.findViewById(R.id.EditQuestion);
         EditText answerInput = form.findViewById(R.id.EditAnswer);
-        Spinner topicInput = form.findViewById(R.id.EditTopic);
+        LinearLayout topicInputs = form.findViewById(R.id.EditTopics);
         questionInput.setText(question);
         answerInput.setText(answer);
-        ArrayAdapter<String> topicAdapter = new ArrayAdapter<>(this, R.layout.spinner_level, Database.TOPICS);
-        topicAdapter.setDropDownViewResource(R.layout.spinner_level_dropdown);
-        topicInput.setAdapter(topicAdapter);
-        topicInput.setSelection(topic - 1);
+        CheckBox[] topicBoxes = new CheckBox[Database.TOPICS.length];
+        for (int i = 0; i < topicBoxes.length; i++) {
+            CheckBox box = new CheckBox(this);
+            box.setText(Database.TOPICS[i]);
+            box.setTextSize(18);
+            for (int selected : topics) {
+                box.setChecked(box.isChecked() || selected == i + 1);
+            }
+            topicInputs.addView(box);
+            topicBoxes[i] = box;
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(questionId < 0 ? "Új kérdés" : "Kérdés szerkesztése")
@@ -110,15 +133,25 @@ public class QuestionsActivity extends AppCompatActivity {
             builder.setNeutralButton("Törlés", (dialog, which) -> confirmDelete(questionId));
         }
         AlertDialog dialog = builder.show();
-        // the dialog stays open while a field is empty
+        // the dialog stays open while something is missing
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
             String newQuestion = questionInput.getText().toString().trim();
             String newAnswer = answerInput.getText().toString().trim();
-            if (newQuestion.isEmpty() || newAnswer.isEmpty()) {
-                Toast.makeText(this, "Add meg a kérdést és a választ is!", Toast.LENGTH_SHORT).show();
+            List<Integer> checked = new ArrayList<>();
+            for (int i = 0; i < topicBoxes.length; i++) {
+                if (topicBoxes[i].isChecked()) {
+                    checked.add(i + 1);
+                }
+            }
+            if (newQuestion.isEmpty() || newAnswer.isEmpty() || checked.isEmpty()) {
+                Toast.makeText(this, "Add meg a kérdést, a választ és legalább egy kategóriát!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            database.saveQuestion(questionId, topicInput.getSelectedItemPosition() + 1, newQuestion, newAnswer);
+            int[] newTopics = new int[checked.size()];
+            for (int i = 0; i < newTopics.length; i++) {
+                newTopics[i] = checked.get(i);
+            }
+            database.saveQuestion(questionId, newTopics, newQuestion, newAnswer);
             dialog.dismiss();
             reload();
         });

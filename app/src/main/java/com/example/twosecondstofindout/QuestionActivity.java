@@ -1,6 +1,5 @@
 package com.example.twosecondstofindout;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -32,6 +31,13 @@ public class QuestionActivity extends AppCompatActivity {
     private Button ButtonNotOk;
     private Button ButtonSkip;
     private Button ButtonUndo;
+    private View QuestionCard;
+    private View TimerArea;
+    private View RoundArea;
+    private View AnswerButtons;
+    private TextView RoundTitle;
+    private TextView RoundStandings;
+    private Button ButtonNextRound;
     private ToneGenerator toneGenerator;
 
     private java.util.Timer timer;
@@ -86,6 +92,7 @@ public class QuestionActivity extends AppCompatActivity {
             stopTimer();
             kerdes(currentTopic);
         });
+        ButtonNextRound.setOnClickListener(view -> showTurn(-1));
         ButtonNotOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
@@ -121,6 +128,13 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonNotOk = findViewById(R.id.ButtonNotOk);
         ButtonSkip = findViewById(R.id.ButtonSkip);
         ButtonUndo = findViewById(R.id.ButtonUndo);
+        QuestionCard = findViewById(R.id.QuestionCard);
+        TimerArea = findViewById(R.id.TimerArea);
+        RoundArea = findViewById(R.id.RoundArea);
+        AnswerButtons = findViewById(R.id.AnswerButtons);
+        RoundTitle = findViewById(R.id.RoundTitle);
+        RoundStandings = findViewById(R.id.RoundStandings);
+        ButtonNextRound = findViewById(R.id.ButtonNextRound);
         gameState = new GameState(this);
         toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
         database = new Database(this);
@@ -142,7 +156,7 @@ public class QuestionActivity extends AppCompatActivity {
         }
         if (answeredRange[0] < rounds)
         {
-            showRoundDialog(answeredRange[0] + ". kör vége", database.selectScoreboardText());
+            showRoundStandings(answeredRange[0] + ". kör vége", database.selectScoreboardText());
             return;
         }
         if (database.keepLeadersActive() <= 1)
@@ -150,23 +164,32 @@ public class QuestionActivity extends AppCompatActivity {
             finishGame();
             return;
         }
-        showRoundDialog("Holtverseny!", "Szétszavazó kör: " + database.selectActivePlayerNames() + "\n\n" + database.selectScoreboardText());
+        showRoundStandings("Holtverseny!", "Szétszavazó kör: " + database.selectActivePlayerNames() + "\n\n" + database.selectScoreboardText());
     }
 
-    private void showRoundDialog(String title, String message)
+    // the standings take the place of the timer, the game buttons are hidden until Tovább
+    private void showRoundStandings(String title, String standings)
     {
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("Tovább", (dialog, which) -> showTurn(-1))
-                .show();
+        RoundTitle.setText(title);
+        RoundStandings.setText(standings.trim());
+        setRoundAreaVisible(true);
+    }
+
+    private void setRoundAreaVisible(boolean visible)
+    {
+        RoundArea.setVisibility(visible ? View.VISIBLE : View.GONE);
+        TimerArea.setVisibility(visible ? View.GONE : View.VISIBLE);
+        AnswerButtons.setVisibility(visible ? View.GONE : View.VISIBLE);
+        // the last player and question stay readable, but faded
+        CurrentPlayer.setAlpha(visible ? 0.35f : 1f);
+        QuestionCard.setAlpha(visible ? 0.35f : 1f);
     }
 
     // Shows the next player with a new question, or with the given one after an undo
     @SuppressLint("SetTextI18n")
     private void showTurn(int questionId)
     {
+        setRoundAreaVisible(false);
         Cursor player = database.selectNextPlayer();
         if (!player.moveToFirst())
         {

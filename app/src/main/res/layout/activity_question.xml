@@ -27,6 +27,7 @@
         style="@style/Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/QuestionCard"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
@@ -61,82 +62,136 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <TextView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:id="@+id/Timer"
-        android:background="@drawable/bg_timer"
-        android:fontFamily="monospace"
-        android:gravity="center"
-        android:text="0,000"
-        android:textColor="@color/textPrimary"
-        android:textSize="42sp"
-        android:textStyle="bold" />
-
-    <Button
-        style="@style/ButtonPrimary"
-        android:id="@+id/ButtonStartStop"
-        android:layout_width="200dp"
-        android:layout_marginTop="20dp"
-        android:text="Start" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
+    <!-- timer and Start, replaced by the standings at the end of a round -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/TimerArea"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:id="@+id/Timer"
+            android:background="@drawable/bg_timer"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text="0,000"
+            android:textColor="@color/textPrimary"
+            android:textSize="42sp"
+            android:textStyle="bold" />
 
         <Button
-            style="@style/ButtonSmall"
-            android:id="@+id/ButtonUndo"
-            android:text="↶ Visszavonás" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <Button
-            style="@style/ButtonSmall"
-            android:id="@+id/ButtonSkip"
-            android:text="Másik kérdés ›" />
+            style="@style/ButtonPrimary"
+            android:id="@+id/ButtonStartStop"
+            android:layout_width="200dp"
+            android:layout_marginTop="20dp"
+            android:text="Start" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/RoundArea"
+        android:paddingStart="20dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp"
         android:paddingBottom="12dp"
-        android:orientation="horizontal">
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/RoundTitle"
+            android:gravity="center"
+            android:textColor="@color/textPrimary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/RoundStandings"
+                android:gravity="center_horizontal"
+                android:lineSpacingExtra="6dp"
+                android:textColor="@color/textPrimary"
+                android:textSize="20sp" />
+        </ScrollView>
 
         <Button
-            style="@style/ButtonDanger"
-            android:id="@+id/ButtonNotOk"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="6dp"
-            android:text="Késő" />
+            style="@style/ButtonPrimary"
+            android:id="@+id/ButtonNextRound"
+            android:layout_width="200dp"
+            android:layout_marginTop="12dp"
+            android:text="Tovább" />
+    </LinearLayout>
 
-        <Button
-            style="@style/ButtonSuccess"
-            android:id="@+id/ButtonOk"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_marginStart="6dp"
-            android:text="Siker" />
+    <!-- hidden while the standings are shown -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/AnswerButtons"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <Button
+                style="@style/ButtonSmall"
+                android:id="@+id/ButtonUndo"
+                android:text="↶ Visszavonás" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                style="@style/ButtonSmall"
+                android:id="@+id/ButtonSkip"
+                android:text="Másik kérdés ›" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                style="@style/ButtonDanger"
+                android:id="@+id/ButtonNotOk"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:text="Késő" />
+
+            <Button
+                style="@style/ButtonSuccess"
+                android:id="@+id/ButtonOk"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="Siker" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
