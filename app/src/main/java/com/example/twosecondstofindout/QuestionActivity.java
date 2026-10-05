@@ -13,10 +13,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.Choreographer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Locale;
 
 public class QuestionActivity extends AppCompatActivity {
 
@@ -40,6 +45,14 @@ public class QuestionActivity extends AppCompatActivity {
     private TextView RoundStandings;
     private Button ButtonNextRound;
     private ToneGenerator toneGenerator;
+    // e.g. the Samsung engine has no Hungarian voice, the Google one usually has
+    private static final String GOOGLE_TEXT_TO_SPEECH = "com.google.android.tts";
+    private TextToSpeech textToSpeech;
+    private boolean triedGoogleTextToSpeech;
+    // false until a Hungarian voice is ready, until then the button is a plain Start
+    private boolean canReadAloud;
+    // the question being read aloud, the timer starts when it is finished
+    private String readingId;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     // elapsed time in milliseconds, measured from the moment Start was pressed
@@ -70,7 +83,11 @@ public class QuestionActivity extends AppCompatActivity {
             nextTurn();
         }
         ButtonStartStop.setOnClickListener(view -> {
-            startTimer();
+            if (canReadAloud) {
+                readQuestion();
+            } else {
+                startTimer();
+            }
         });
         ButtonOk.setOnClickListener(view -> {
             if(timerStarted){
@@ -118,6 +135,9 @@ public class QuestionActivity extends AppCompatActivity {
         Choreographer.getInstance().removeFrameCallback(timerFrame);
         handler.removeCallbacks(timeUp);
         toneGenerator.release();
+        if (textToSpeech != null) {
+            textToSpeech.shutdown();
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -143,6 +163,84 @@ public class QuestionActivity extends AppCompatActivity {
         database = new Database(this);
         defaultTimerColor = TimerText.getCurrentTextColor();
         timerStarted = false;
+        // otherwise the game master reads the question and presses Start
+        if (gameState.isPhoneReading()) {
+            textToSpeech = new TextToSpeech(this, this::onTextToSpeechReady);
+        }
+    }
+
+    //
+    // READING THE QUESTION ALOUD
+    //
+    @SuppressLint("SetTextI18n")
+    private void onTextToSpeechReady(int status)
+    {
+        if (status != TextToSpeech.SUCCESS || !speaksHungarian()) {
+            if (!triedGoogleTextToSpeech && hasTextToSpeechEngine(GOOGLE_TEXT_TO_SPEECH)) {
+                triedGoogleTextToSpeech = true;
+                textToSpeech.shutdown();
+                textToSpeech = new TextToSpeech(this, this::onTextToSpeechReady, GOOGLE_TEXT_TO_SPEECH);
+            } else {
+                Toast.makeText(this, "A telefonon nincs magyar felolvasó hang, a játékmester olvasson fel.", Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
+        textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {
+            }
+
+            @Override
+            public void onDone(String utteranceId) {
+                runOnUiThread(() -> readingFinished(utteranceId));
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+                runOnUiThread(() -> readingFinished(utteranceId));
+            }
+        });
+        canReadAloud = true;
+        ButtonStartStop.setText("🔊 Felolvasás");
+    }
+
+    private boolean speaksHungarian()
+    {
+        int language = textToSpeech.setLanguage(Locale.forLanguageTag("hu-HU"));
+        return language != TextToSpeech.LANG_MISSING_DATA && language != TextToSpeech.LANG_NOT_SUPPORTED;
+    }
+
+    private boolean hasTextToSpeechEngine(String packageName)
+    {
+        for (TextToSpeech.EngineInfo engine : textToSpeech.getEngines()) {
+            if (engine.name.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void readQuestion()
+    {
+        if (timerStarted || readingId != null) {
+            return;
+        }
+        readingId = "question-" + currentQuestionId + "-" + SystemClock.elapsedRealtime();
+        ButtonStartStop.setVisibility(View.INVISIBLE);
+        if (textToSpeech.speak(Question.getText(), TextToSpeech.QUEUE_FLUSH, null, readingId) == TextToSpeech.ERROR) {
+            readingId = null;
+            startTimer();
+        }
+    }
+
+    // the timer starts right after the question was read, unless it was interrupted by Kihagyás / Visszavonás
+    private void readingFinished(String utteranceId)
+    {
+        if (!utteranceId.equals(readingId)) {
+            return;
+        }
+        readingId = null;
+        startTimer();
     }
 
     // Called after every Siker / Késő. When every active player answered the same number
@@ -301,6 +399,10 @@ public class QuestionActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void stopTimer()
     {
+        if (readingId != null) {
+            readingId = null;
+            textToSpeech.stop();
+        }
         Choreographer.getInstance().removeFrameCallback(timerFrame);
         handler.removeCallbacks(timeUp);
         timerStarted = false;
