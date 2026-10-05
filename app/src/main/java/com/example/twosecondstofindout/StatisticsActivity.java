@@ -29,6 +29,7 @@ public class StatisticsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemBars.setUp(this);
         setContentView(R.layout.activity_statistics);
         StatGames = findViewById(R.id.StatGames);
         StatQuestions = findViewById(R.id.StatQuestions);

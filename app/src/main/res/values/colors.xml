@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- palette taken from the game box: red lips, pink tongue, black text -->
+    <!-- red, pink and black palette -->
     <color name="colorPrimary">#D32F2F</color>
     <color name="colorPrimaryDark">#9A0007</color>
     <color name="colorAccent">#D32F2F</color>
@@ -18,4 +18,18 @@
     <color name="danger">#C62828</color>
     <color name="dangerDark">#8E0000</color>
     <color name="disabled">#E0D6D5</color>
+
+    <!-- text on the filled buttons -->
+    <color name="onPrimary">#FFFFFF</color>
+    <!-- the current player chip and the level spinner -->
+    <color name="chipText">#9A0007</color>
+    <!-- the answer on the question card and in the question list -->
+    <color name="answerText">#2E7D32</color>
+
+    <!-- the launcher icon looks the same in light and dark mode -->
+    <color name="iconBackground">#D32F2F</color>
+    <color name="iconCase">#FFFFFF</color>
+    <color name="iconFace">#FCE4EC</color>
+    <color name="iconSector">#F8BBD0</color>
+    <color name="iconInk">#1F1A1A</color>
 </resources>

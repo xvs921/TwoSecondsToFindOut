@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- outline of the launcher stopwatch for Android 13+ themed icons; only the alpha is used -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:scaleX="0.66"
+        android:scaleY="0.66"
+        android:translateX="21"
+        android:translateY="20.3">
+
+        <!-- crown, side button and the case as a ring -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M42,6h16v8h-16zM47,14h6v6h-6zM79.5,22l4.5,4.5l-4.5,4.5l-4.5,-4.5z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M50,18a39,39 0,1 1,0 78a39,39 0,1 1,0 -78zM50,25a32,32 0,1 0,0 64a32,32 0,1 0,0 -64z" />
+
+        <!-- ticks -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="3"
+            android:strokeLineCap="round"
+            android:pathData="M50,29v5M50,80v5M78,57h-5M22,57h5" />
+
+        <!-- lightning bolt -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,34L38,61h11l-4,21l17,-29h-11z" />
+    </group>
+</vector>
