@@ -47,4 +47,17 @@ public class GameStateTest {
 
         assertFalse(new GameState(context).isPhoneReading());
     }
+
+    @Test
+    public void beepAndVibrateByDefaultAndChoiceIsKept() {
+        GameState gameState = new GameState(context);
+        assertTrue(gameState.isBeeping());
+        assertTrue(gameState.isVibrating());
+
+        gameState.setSignals(false, true);
+
+        GameState later = new GameState(context);
+        assertFalse(later.isBeeping());
+        assertTrue(later.isVibrating());
+    }
 }

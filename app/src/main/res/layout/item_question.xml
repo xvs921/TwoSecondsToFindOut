@@ -19,6 +19,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/ItemAnswer"
         android:layout_marginTop="4dp"
-        android:textColor="@color/success"
+        android:textColor="@color/answerText"
         android:textSize="16sp" />
 </LinearLayout>

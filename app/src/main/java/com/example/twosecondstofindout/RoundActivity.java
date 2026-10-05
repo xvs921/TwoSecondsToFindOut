@@ -20,9 +20,15 @@ public class RoundActivity extends AppCompatActivity {
     private Button ButtonRoundPlus;
     private Button ButtonReaderMaster;
     private Button ButtonReaderPhone;
+    private Button ButtonSignalBeep;
+    private Button ButtonSignalVibrate;
+    private Button ButtonStreakBonus;
     private Database database;
     private GameState gameState;
     private boolean phoneReads;
+    private boolean beep;
+    private boolean vibrate;
+    private boolean streakBonus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +48,16 @@ public class RoundActivity extends AppCompatActivity {
         ButtonRoundPlus.setOnClickListener(view -> RoundNumber.setText(String.valueOf(getRoundNumber() + 1)));
         ButtonReaderMaster.setOnClickListener(view -> setPhoneReads(false));
         ButtonReaderPhone.setOnClickListener(view -> setPhoneReads(true));
+        ButtonSignalBeep.setOnClickListener(view -> setSignals(!beep, vibrate));
+        ButtonSignalVibrate.setOnClickListener(view -> setSignals(beep, !vibrate));
+        ButtonStreakBonus.setOnClickListener(view -> setStreakBonus(!streakBonus));
         ButtonNextRound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 database.resetScores();
                 gameState.start(getRoundNumber(), phoneReads);
+                gameState.setSignals(beep, vibrate);
+                gameState.setStreakBonus(streakBonus);
                 Intent intentStart = new Intent(RoundActivity.this, QuestionActivity.class);
                 startActivity(intentStart);
                 finish();
@@ -62,9 +73,14 @@ public class RoundActivity extends AppCompatActivity {
         ButtonRoundPlus = findViewById(R.id.ButtonRoundPlus);
         ButtonReaderMaster = findViewById(R.id.ButtonReaderMaster);
         ButtonReaderPhone = findViewById(R.id.ButtonReaderPhone);
+        ButtonSignalBeep = findViewById(R.id.ButtonSignalBeep);
+        ButtonSignalVibrate = findViewById(R.id.ButtonSignalVibrate);
+        ButtonStreakBonus = findViewById(R.id.ButtonStreakBonus);
         database = new Database(this);
         gameState = new GameState(this);
         setPhoneReads(gameState.isPhoneReading());
+        setSignals(gameState.isBeeping(), gameState.isVibrating());
+        setStreakBonus(gameState.isStreakBonus());
         String firstPlayerText = FirstPlayer.getText().toString();
 
         Cursor firstPlayerName = database.selectFirstPlayerName();
@@ -91,10 +107,22 @@ public class RoundActivity extends AppCompatActivity {
         showSelected(ButtonReaderMaster, !phoneReads);
     }
 
+    private void setSignals(boolean beep, boolean vibrate) {
+        this.beep = beep;
+        this.vibrate = vibrate;
+        showSelected(ButtonSignalBeep, beep);
+        showSelected(ButtonSignalVibrate, vibrate);
+    }
+
+    private void setStreakBonus(boolean streakBonus) {
+        this.streakBonus = streakBonus;
+        showSelected(ButtonStreakBonus, streakBonus);
+    }
+
     private void showSelected(Button button, boolean selected) {
         button.setBackgroundResource(selected ? R.drawable.btn_primary : R.drawable.btn_secondary);
         button.setTextColor(ContextCompat.getColorStateList(this,
-                selected ? R.color.surface : R.color.text_secondary_button));
+                selected ? R.color.onPrimary : R.color.text_secondary_button));
     }
 
     private int getRoundNumber() {

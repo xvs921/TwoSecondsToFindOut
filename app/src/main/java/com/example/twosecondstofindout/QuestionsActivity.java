@@ -23,6 +23,9 @@ import java.util.List;
 // Lists the questions of a topic, new ones can be added, existing ones edited or deleted
 public class QuestionsActivity extends AppCompatActivity {
 
+    // the last button lists the questions marked as wrong during the games, of every topic
+    private static final int FLAGGED = 0;
+
     private Button ButtonBackQuestions;
     private Button ButtonNewQuestion;
     private Button[] TopicButtons;
@@ -42,7 +45,7 @@ public class QuestionsActivity extends AppCompatActivity {
         ButtonBackQuestions.setOnClickListener(view -> finish());
         ButtonNewQuestion.setOnClickListener(view -> showEditDialog(-1, "", "", new int[]{topic}));
         for (int i = 0; i < TopicButtons.length; i++) {
-            int selectedTopic = i + 1;
+            int selectedTopic = i < Database.TOPICS.length ? i + 1 : FLAGGED;
             TopicButtons[i].setOnClickListener(view -> selectTopic(selectedTopic));
         }
         QuestionList.setOnItemClickListener((parent, view, position, id) -> {
@@ -65,7 +68,7 @@ public class QuestionsActivity extends AppCompatActivity {
         ButtonBackQuestions = findViewById(R.id.ButtonBackQuestions);
         ButtonNewQuestion = findViewById(R.id.ButtonNewQuestion);
         TopicButtonRow = findViewById(R.id.TopicButtons);
-        TopicButtons = new Button[Database.TOPICS.length];
+        TopicButtons = new Button[Database.TOPICS.length + 1];
         int gap = Math.round(8 * getResources().getDisplayMetrics().density);
         for (int i = 0; i < TopicButtons.length; i++) {
             Button button = new Button(this, null, 0, R.style.ButtonSmall);
@@ -73,7 +76,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT, Math.round(48 * getResources().getDisplayMetrics().density));
             params.setMarginEnd(gap);
             button.setLayoutParams(params);
-            button.setText(Database.TOPICS[i]);
+            button.setText(i < Database.TOPICS.length ? Database.TOPICS[i] : "⚑ Megjelölt");
             TopicButtonRow.addView(button);
             TopicButtons[i] = button;
         }
@@ -81,7 +84,7 @@ public class QuestionsActivity extends AppCompatActivity {
         QuestionList = findViewById(R.id.QuestionList);
         database = new Database(this);
         adapter = new SimpleCursorAdapter(this, R.layout.item_question, null,
-                new String[]{"question", "answer"}, new int[]{R.id.ItemQuestion, R.id.ItemAnswer}, 0);
+                new String[]{"shown", "answer"}, new int[]{R.id.ItemQuestion, R.id.ItemAnswer}, 0);
         QuestionList.setAdapter(adapter);
     }
 
@@ -89,20 +92,20 @@ public class QuestionsActivity extends AppCompatActivity {
     private void selectTopic(int selectedTopic) {
         topic = selectedTopic;
         for (int i = 0; i < TopicButtons.length; i++) {
-            boolean selected = i + 1 == topic;
+            boolean selected = i < Database.TOPICS.length ? i + 1 == topic : topic == FLAGGED;
             TopicButtons[i].setBackgroundResource(selected ? R.drawable.btn_primary : R.drawable.btn_secondary);
-            TopicButtons[i].setTextColor(ContextCompat.getColor(this, selected ? R.color.surface : R.color.colorPrimary));
+            TopicButtons[i].setTextColor(ContextCompat.getColor(this, selected ? R.color.onPrimary : R.color.colorPrimary));
         }
         reload();
     }
 
     @SuppressLint("SetTextI18n")
     private void reload() {
-        Cursor old = adapter.swapCursor(database.selectQuestions(topic));
+        Cursor old = adapter.swapCursor(topic == FLAGGED ? database.selectFlaggedQuestions() : database.selectQuestions(topic));
         if (old != null) {
             old.close();
         }
-        QuestionCount.setText(adapter.getCount() + " kérdés");
+        QuestionCount.setText(adapter.getCount() + (topic == FLAGGED ? " hibásnak jelölt kérdés" : " kérdés"));
     }
 
     // questionId -1: new question. A question can be in more topics.
@@ -123,6 +126,15 @@ public class QuestionsActivity extends AppCompatActivity {
             }
             topicInputs.addView(box);
             topicBoxes[i] = box;
+        }
+        // a question marked as wrong during the game, unchecked when it was fixed
+        CheckBox flagBox = new CheckBox(this);
+        flagBox.setText("⚑ Hibásnak jelölve");
+        flagBox.setTextSize(18);
+        flagBox.setTextColor(ContextCompat.getColor(this, R.color.danger));
+        flagBox.setChecked(questionId >= 0 && database.isQuestionFlagged(questionId));
+        if (flagBox.isChecked()) {
+            ((LinearLayout) topicInputs.getParent()).addView(flagBox);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -153,6 +165,9 @@ public class QuestionsActivity extends AppCompatActivity {
                 newTopics[i] = checked.get(i);
             }
             database.saveQuestion(questionId, newTopics, newQuestion, newAnswer);
+            if (questionId >= 0) {
+                database.setQuestionFlagged(questionId, flagBox.isChecked());
+            }
             dialog.dismiss();
             reload();
         });

@@ -21,119 +21,187 @@
             android:text="Körök" />
     </LinearLayout>
 
-    <Space
+    <!-- the settings scroll on small screens, otherwise they are centered -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <LinearLayout
-        style="@style/Card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/FirstPlayer"
-            android:text="Az első játékos: "
-            android:textColor="@color/textSecondary"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/RoundText"
-            android:layout_marginTop="24dp"
-            android:text="Hány kör legyen?"
-            android:textColor="@color/textPrimary"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <Button
-                style="@style/ButtonSecondary"
-                android:id="@+id/ButtonRoundMinus"
-                android:layout_width="64dp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp"
-                android:text="−"
-                android:textSize="28sp" />
-
-            <EditText
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/RoundNumber"
-                android:background="@null"
-                android:gravity="center"
-                android:inputType="number"
-                android:text="1"
-                android:textColor="@color/colorPrimary"
-                android:textSize="48sp"
-                android:textStyle="bold" />
-
-            <Button
-                style="@style/ButtonSecondary"
-                android:id="@+id/ButtonRoundPlus"
-                android:layout_width="64dp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp"
-                android:text="+"
-                android:textSize="28sp" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Ki olvassa fel a kérdéseket?"
-            android:textColor="@color/textPrimary"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
-            <Button
-                style="@style/ButtonSecondary"
-                android:id="@+id/ButtonReaderMaster"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="🧑 Játékmester"
-                android:textSize="18sp" />
+            <LinearLayout
+                style="@style/Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-            <Button
-                style="@style/ButtonSecondary"
-                android:id="@+id/ButtonReaderPhone"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="📱 Telefon"
-                android:textSize="18sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/FirstPlayer"
+                    android:text="Az első játékos: "
+                    android:textColor="@color/textSecondary"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/RoundText"
+                    android:layout_marginTop="24dp"
+                    android:text="Hány kör legyen?"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonRoundMinus"
+                        android:layout_width="64dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:text="−"
+                        android:textSize="28sp" />
+
+                    <EditText
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/RoundNumber"
+                        android:background="@null"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:text="1"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="48sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonRoundPlus"
+                        android:layout_width="64dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:text="+"
+                        android:textSize="28sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="Ki olvassa fel a kérdéseket?"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonReaderMaster"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="🧑 Játékmester"
+                        android:textSize="18sp" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonReaderPhone"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="📱 Telefon"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="Jelzés, ha letelt az idő"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- both can be on, or neither -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonSignalBeep"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="🔊 Hang"
+                        android:textSize="18sp" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonSignalVibrate"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="📳 Rezgés"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="Sorozat-bónusz"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- on / off -->
+                <Button
+                    style="@style/ButtonSecondary"
+                    android:id="@+id/ButtonStreakBonus"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="🔥 3 találat egymás után: +1 pont"
+                    android:textSize="16sp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    </ScrollView>
 
     <Button
         style="@style/ButtonPrimary"
