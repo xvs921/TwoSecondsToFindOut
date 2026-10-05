@@ -14,39 +14,39 @@
 
         <!-- crown and side button -->
         <path
-            android:fillColor="@color/surface"
+            android:fillColor="@color/iconCase"
             android:pathData="M42,6h16v8h-16z" />
         <path
-            android:fillColor="@color/surface"
+            android:fillColor="@color/iconCase"
             android:pathData="M47,14h6v6h-6z" />
         <path
-            android:fillColor="@color/surface"
+            android:fillColor="@color/iconCase"
             android:pathData="M79.5,22l4.5,4.5l-4.5,4.5l-4.5,-4.5z" />
 
         <!-- case -->
         <path
-            android:fillColor="@color/surface"
+            android:fillColor="@color/iconCase"
             android:pathData="M50,18a39,39 0,1 1,0 78a39,39 0,1 1,0 -78z" />
         <!-- face -->
         <path
-            android:fillColor="@color/pinkLight"
+            android:fillColor="@color/iconFace"
             android:pathData="M50,25a32,32 0,1 1,0 64a32,32 0,1 1,0 -64z" />
 
         <!-- highlighted sector of the dial -->
         <path
-            android:fillColor="@color/pink"
+            android:fillColor="@color/iconSector"
             android:pathData="M50,57L50,25A32,32 0,0 1,77.7 41z" />
 
         <!-- ticks -->
         <path
-            android:strokeColor="@color/textPrimary"
+            android:strokeColor="@color/iconInk"
             android:strokeWidth="3"
             android:strokeLineCap="round"
             android:pathData="M50,29v5M50,80v5M78,57h-5M22,57h5" />
 
         <!-- lightning bolt -->
         <path
-            android:fillColor="@color/textPrimary"
+            android:fillColor="@color/iconInk"
             android:pathData="M54,34L38,61h11l-4,21l17,-29h-11z" />
     </group>
 </vector>

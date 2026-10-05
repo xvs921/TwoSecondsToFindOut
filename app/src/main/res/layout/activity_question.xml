@@ -19,7 +19,7 @@
         android:paddingEnd="20dp"
         android:paddingBottom="8dp"
         android:text="Játékos"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/chipText"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -57,7 +57,7 @@
             android:id="@+id/Answer"
             android:gravity="center"
             android:text="Válasz"
-            android:textColor="@color/success"
+            android:textColor="@color/answerText"
             android:textSize="24sp"
             android:textStyle="bold" />
 

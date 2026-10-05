@@ -94,7 +94,7 @@ public class QuestionsActivity extends AppCompatActivity {
         for (int i = 0; i < TopicButtons.length; i++) {
             boolean selected = i < Database.TOPICS.length ? i + 1 == topic : topic == FLAGGED;
             TopicButtons[i].setBackgroundResource(selected ? R.drawable.btn_primary : R.drawable.btn_secondary);
-            TopicButtons[i].setTextColor(ContextCompat.getColor(this, selected ? R.color.surface : R.color.colorPrimary));
+            TopicButtons[i].setTextColor(ContextCompat.getColor(this, selected ? R.color.onPrimary : R.color.colorPrimary));
         }
         reload();
     }

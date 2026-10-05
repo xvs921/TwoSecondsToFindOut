@@ -13,6 +13,7 @@ public class GameState
     private static final String KEY_PHONE_READS = "phoneReads";
     private static final String KEY_BEEP = "beep";
     private static final String KEY_VIBRATE = "vibrate";
+    private static final String KEY_STREAK_BONUS = "streakBonus";
 
     private final SharedPreferences prefs;
 
@@ -66,5 +67,16 @@ public class GameState
     public boolean isVibrating()
     {
         return prefs.getBoolean(KEY_VIBRATE, true);
+    }
+
+    // every 3rd correct answer in a row is worth an extra point, kept for the next games too
+    public void setStreakBonus(boolean streakBonus)
+    {
+        prefs.edit().putBoolean(KEY_STREAK_BONUS, streakBonus).apply();
+    }
+
+    public boolean isStreakBonus()
+    {
+        return prefs.getBoolean(KEY_STREAK_BONUS, true);
     }
 }

@@ -71,6 +71,10 @@ public class QuestionActivity extends AppCompatActivity {
     private int currentPlayerId;
     private int currentTopic;
     private int currentQuestionId;
+    // the time to answer of the current player
+    private int currentAnswerMs = Database.DEFAULT_ANSWER_MS;
+    // who answers now: the player, or the team member on turn
+    private String currentAnswerer = "";
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -94,7 +98,7 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonRepeat.setOnClickListener(view -> {
             stopTimer();
             if (canReadAloud) {
-                readQuestion();
+                readQuestion(false);
             }
         });
         FlagQuestion.setOnClickListener(view -> {
@@ -104,7 +108,10 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
-                database.savePlayerAnswer(currentPlayerId, currentQuestionId, true);
+                int points = database.savePlayerAnswer(currentPlayerId, currentQuestionId, true, gameState.isStreakBonus());
+                if (points > 1) {
+                    Toast.makeText(this, "🔥 " + Database.STREAK_LENGTH + " találat egymás után: +1 bónuszpont!", Toast.LENGTH_LONG).show();
+                }
                 nextTurn();
             }
         });
@@ -238,7 +245,7 @@ public class QuestionActivity extends AppCompatActivity {
     private void begin()
     {
         if (canReadAloud) {
-            readQuestion();
+            readQuestion(true);
         } else {
             startTimer();
         }
@@ -251,14 +258,21 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonRepeat.setVisibility(running ? View.VISIBLE : View.GONE);
     }
 
-    private void readQuestion()
+    // announce: first says who answers, e.g. "Anna következik!". Not when the question is read again.
+    private void readQuestion(boolean announce)
     {
         if (timerStarted || readingId != null) {
             return;
         }
         readingId = "question-" + currentQuestionId + "-" + SystemClock.elapsedRealtime();
         showRepeatButton(true);
-        if (textToSpeech.speak(Question.getText(), TextToSpeech.QUEUE_FLUSH, null, readingId) == TextToSpeech.ERROR) {
+        int queueMode = TextToSpeech.QUEUE_FLUSH;
+        if (announce && !currentAnswerer.isEmpty()) {
+            textToSpeech.speak(currentAnswerer + " következik!", TextToSpeech.QUEUE_FLUSH, null, "announce-" + readingId);
+            textToSpeech.playSilentUtterance(300, TextToSpeech.QUEUE_ADD, "pause-" + readingId);
+            queueMode = TextToSpeech.QUEUE_ADD;
+        }
+        if (textToSpeech.speak(Question.getText(), queueMode, null, readingId) == TextToSpeech.ERROR) {
             readingId = null;
             startTimer();
         }
@@ -334,6 +348,13 @@ public class QuestionActivity extends AppCompatActivity {
         // in a team game the team members answer in turns
         String member = Database.memberOnTurn(player.getString(4), answered);
         String name = member.isEmpty() ? player.getString(1) : player.getString(1) + " · " + member;
+        currentAnswerer = member.isEmpty() ? player.getString(1) : member;
+        currentAnswerMs = player.getInt(5);
+        // a time other than the usual 2 seconds is shown, e.g. "Anna ⏱ 4 mp"
+        if (currentAnswerMs != Database.DEFAULT_ANSWER_MS)
+        {
+            name += " ⏱ " + PlayersActivity.formatSeconds(currentAnswerMs);
+        }
         if (answered >= rounds)
         {
             CurrentPlayer.setText(name + " (szétszavazó)");
@@ -422,7 +443,7 @@ public class QuestionActivity extends AppCompatActivity {
         }
     };
 
-    // the player has 2 seconds to answer, the game master decides Siker / Késő
+    // the player has 2 seconds (or their own time) to answer, the game master decides Siker / Késő
     private final Runnable timeUp = () -> {
         TimerText.setTextColor(ContextCompat.getColor(QuestionActivity.this, R.color.danger));
         // beep and/or vibrate once, so the game master can watch the player
@@ -459,7 +480,7 @@ public class QuestionActivity extends AppCompatActivity {
         startTime = SystemClock.elapsedRealtime();
         showRepeatButton(true);
         Choreographer.getInstance().postFrameCallback(timerFrame);
-        handler.postDelayed(timeUp, 2000);
+        handler.postDelayed(timeUp, currentAnswerMs);
     }
 
     @SuppressLint("SetTextI18n")

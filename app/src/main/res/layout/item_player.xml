@@ -36,10 +36,20 @@
             android:textColorHint="@color/textSecondary"
             android:textSize="20sp" />
 
+        <!-- no arrow, the chip itself shows it can be tapped, so the name has more room -->
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/PlayerLevel" />
+            android:id="@+id/PlayerLevel"
+            android:background="@null" />
+
+        <!-- the time to answer, e.g. more for children -->
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/PlayerTime"
+            android:layout_marginStart="6dp"
+            android:background="@null" />
     </LinearLayout>
 
     <!-- only in team games -->

@@ -39,6 +39,11 @@ public class Database extends SQLiteOpenHelper
     public static final String COL_8 = "points";
     public static final String COL_9 = "topic";
 
+    // the time to answer, unless a player gets more or less
+    public static final int DEFAULT_ANSWER_MS = 2000;
+    // a bonus point for every 3rd correct answer in a row, when the streak bonus is on
+    public static final int STREAK_LENGTH = 3;
+
     // the topic ids are the position + 1: 1: Gyerek, 2: Felnőtt, 3: Bibliai, 4: Sport, ...
     public static final String[] TOPICS = {"Gyerek", "Felnőtt", "Bibliai", "Sport", "Földrajz", "Történelem", "Tudomány"};
 
@@ -46,7 +51,7 @@ public class Database extends SQLiteOpenHelper
 
     public Database(Context context)
     {
-        super(context, DATABASE_NAME, null, 7);
+        super(context, DATABASE_NAME, null, 8);
         this.context = context;
     }
 
@@ -54,7 +59,7 @@ public class Database extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_QUESTIONS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, topic INTEGER NOT NULL, question VARCHAR(350) NOT NULL, answer VARCHAR(200) NOT NULL, used INTEGER DEFAULT 0, flagged INTEGER DEFAULT 0)");
         // in team games a player is a team, members: comma separated names, they answer in turns
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+ TABLE_PLAYERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), topic INTEGER DEFAULT 2, answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0, active INTEGER DEFAULT 1, members TEXT DEFAULT '')");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+ TABLE_PLAYERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(200), topic INTEGER DEFAULT 2, answered INTEGER DEFAULT 0, points INTEGER DEFAULT 0, active INTEGER DEFAULT 1, members TEXT DEFAULT '', answer_ms INTEGER DEFAULT " + DEFAULT_ANSWER_MS + ")");
         // every Siker / Késő decision, so the last ones can be undone. deactivated: comma separated
         // ids of the players who dropped out of the tie-break right after this answer
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_ANSWERS + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_id INTEGER NOT NULL, question_id INTEGER NOT NULL, points INTEGER NOT NULL, deactivated TEXT DEFAULT '', history_id INTEGER DEFAULT 0)");
@@ -187,6 +192,11 @@ public class Database extends SQLiteOpenHelper
             db.execSQL("ALTER TABLE " + TABLE_QUESTIONS + " ADD COLUMN flagged INTEGER DEFAULT 0");
             db.execSQL("ALTER TABLE " + TABLE_PLAYERS + " ADD COLUMN members TEXT DEFAULT ''");
         }
+        if (oldVersion < 8)
+        {
+            // every player can have their own time to answer, e.g. more for children
+            db.execSQL("ALTER TABLE " + TABLE_PLAYERS + " ADD COLUMN answer_ms INTEGER DEFAULT " + DEFAULT_ANSWER_MS);
+        }
     }
 
     // Returns id, question, answer of a random question not used yet. When every
@@ -232,18 +242,18 @@ public class Database extends SQLiteOpenHelper
         return db.rawQuery("SELECT question, answer FROM " + TABLE_QUESTIONS + " WHERE id = ?", new String[]{String.valueOf(questionId)});
     }
 
-    // The players of the last game: name, topic, members
+    // The players of the last game: name, topic, members, answer_ms
     public Cursor selectPlayers()
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT name, topic, members FROM " + TABLE_PLAYERS + " ORDER BY id", null);
+        return db.rawQuery("SELECT name, topic, members, answer_ms FROM " + TABLE_PLAYERS + " ORDER BY id", null);
     }
 
-    // The active player with the fewest answered questions is next: id, name, answered, topic, members
+    // The active player with the fewest answered questions is next: id, name, answered, topic, members, answer_ms
     public Cursor selectNextPlayer()
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT id, name, answered, topic, members FROM " + TABLE_PLAYERS + " WHERE active = 1 ORDER BY answered, id LIMIT 1", null);
+        return db.rawQuery("SELECT id, name, answered, topic, members, answer_ms FROM " + TABLE_PLAYERS + " WHERE active = 1 ORDER BY answered, id LIMIT 1", null);
     }
 
     // The team member whose turn it is: they answer in turns, one question each.
@@ -302,8 +312,19 @@ public class Database extends SQLiteOpenHelper
 
     public void savePlayerAnswer(int playerId, int questionId, boolean success)
     {
+        savePlayerAnswer(playerId, questionId, success, false);
+    }
+
+    // streakBonus: every 3rd correct answer in a row is worth 2 points.
+    // Returns the points given. The undo log keeps them, so an undo takes back the bonus too.
+    public int savePlayerAnswer(int playerId, int questionId, boolean success, boolean streakBonus)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
         int points = success ? 1 : 0;
+        if (success && streakBonus && (correctInARow(db, playerId) + 1) % STREAK_LENGTH == 0)
+        {
+            points = 2;
+        }
         db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered + 1, points = points + ? WHERE id = ?", new Object[]{points, playerId});
 
         long historyId = 0;
@@ -314,7 +335,8 @@ public class Database extends SQLiteOpenHelper
             history.put("player_name", player.getString(0));
             history.put("topic", player.getInt(1));
             history.put("question_id", questionId);
-            history.put("success", points);
+            // a correct answer, whatever bonus it got
+            history.put("success", success ? 1 : 0);
             history.put("played_at", System.currentTimeMillis());
             historyId = db.insert(TABLE_HISTORY, null, history);
         }
@@ -326,6 +348,20 @@ public class Database extends SQLiteOpenHelper
         values.put("points", points);
         values.put("history_id", historyId);
         db.insert(TABLE_ANSWERS, null, values);
+        return points;
+    }
+
+    // the correct answers of the player in this game since their last Késő
+    private int correctInARow(SQLiteDatabase db, int playerId)
+    {
+        Cursor answers = db.rawQuery("SELECT points FROM " + TABLE_ANSWERS + " WHERE player_id = ? ORDER BY id DESC", new String[]{String.valueOf(playerId)});
+        int count = 0;
+        while (answers.moveToNext() && answers.getInt(0) > 0)
+        {
+            count++;
+        }
+        answers.close();
+        return count;
     }
 
     // Only the active players with the most points stay active (tie-break).
@@ -424,11 +460,14 @@ public class Database extends SQLiteOpenHelper
 
     public void insertPlayersForNewGame(String[] players, int[] topics)
     {
-        insertPlayersForNewGame(players, topics, new String[players.length]);
+        int[] answerMs = new int[players.length];
+        java.util.Arrays.fill(answerMs, DEFAULT_ANSWER_MS);
+        insertPlayersForNewGame(players, topics, new String[players.length], answerMs);
     }
 
-    // members: the comma separated team members of each player, null or empty if not a team
-    public void insertPlayersForNewGame(String[] players, int[] topics, String[] members)
+    // members: the comma separated team members of each player, null or empty if not a team.
+    // answerMs: the time of each player to answer.
+    public void insertPlayersForNewGame(String[] players, int[] topics, String[] members, int[] answerMs)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_PLAYERS);
@@ -442,6 +481,7 @@ public class Database extends SQLiteOpenHelper
                 values.put(COL_7, player.trim());
                 values.put(COL_9, topics[i]);
                 values.put("members", members[i] == null ? "" : members[i].trim());
+                values.put("answer_ms", answerMs[i]);
                 db.insert(TABLE_PLAYERS, null, values);
             }
         }
