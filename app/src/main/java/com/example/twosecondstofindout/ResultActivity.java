@@ -3,8 +3,8 @@ package com.example.twosecondstofindout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -13,16 +13,30 @@ public class ResultActivity extends AppCompatActivity {
     private TextView Scoreboard;
     private Button ButtonNewGame;
     private Button ButtonMainMenu;
+    private Button ButtonUndoResult;
     private Database database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemBars.setUp(this);
         setContentView(R.layout.activity_result);
         init();
         ButtonNewGame.setOnClickListener(view -> {
-            database.resetScores();
             Intent intent = new Intent(ResultActivity.this, RoundActivity.class);
+            startActivity(intent);
+            finish();
+        });
+        // a mistake on the last question can still be fixed, the game goes on from there
+        ButtonUndoResult.setOnClickListener(view -> {
+            int questionId = database.undoLastAnswer();
+            if (questionId < 0) {
+                return;
+            }
+            database.deleteLastGameResult();
+            new GameState(ResultActivity.this).setInProgress(true);
+            Intent intent = new Intent(ResultActivity.this, QuestionActivity.class);
+            intent.putExtra("questionId", questionId);
             startActivity(intent);
             finish();
         });
@@ -37,19 +51,10 @@ public class ResultActivity extends AppCompatActivity {
         Scoreboard = findViewById(R.id.Scoreboard);
         ButtonNewGame = findViewById(R.id.ButtonNewGame);
         ButtonMainMenu = findViewById(R.id.ButtonMainMenu);
+        ButtonUndoResult = findViewById(R.id.ButtonUndoResult);
         database = new Database(this);
 
-        Cursor scoreboard = database.selectScoreboard();
-        StringBuilder stringBuilder = new StringBuilder();
-        int place = 1;
-        while (scoreboard.moveToNext())
-        {
-            stringBuilder.append(place).append(". ")
-                    .append(scoreboard.getString(0)).append(" - ")
-                    .append(scoreboard.getInt(1)).append(" pont\n");
-            place++;
-        }
-        scoreboard.close();
-        Scoreboard.setText(stringBuilder.toString());
+        Scoreboard.setText(database.selectScoreboardText());
+        ButtonUndoResult.setVisibility(database.hasAnswers() ? View.VISIBLE : View.GONE);
     }
 }

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Screen"
+    tools:context=".QuestionsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonBackQuestions"
+            android:text="‹ Vissza" />
+
+        <TextView
+            style="@style/ScreenTitle"
+            android:layout_marginStart="16dp"
+            android:text="Kérdések" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:scrollbars="none">
+
+        <!-- one button per topic, added in QuestionsActivity -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/TopicButtons"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/QuestionCount"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/textSecondary"
+        android:textSize="16sp" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/QuestionList"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10dp" />
+
+    <Button
+        style="@style/ButtonPrimary"
+        android:id="@+id/ButtonNewQuestion"
+        android:layout_marginTop="12dp"
+        android:text="+ Új kérdés" />
+
+</LinearLayout>

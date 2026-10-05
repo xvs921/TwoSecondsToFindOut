@@ -1,13 +1,13 @@
-1	Mi Magyarország fővárosa?	Budapest
-1	Mi Spanyolország fővárosa?	Madrid
-1	Mi Anglia fővárosa?	London
+1,5	Mi Magyarország fővárosa?	Budapest
+1,5	Mi Spanyolország fővárosa?	Madrid
+1,5	Mi Anglia fővárosa?	London
 1	Hány éves kortól számít felnőttnek valaki Magyarországon?	18
-1	Mi Magyarország leghosszabb folyója?	Tisza
+1,5	Melyik folyó szakasza a leghosszabb Magyarország területén?	Tisza
 1	Hány lába van a póknak?	8
 1	Hány lába van a rovaroknak?	6
 1	Hány nap van egy héten?	7
 1	Hány hónap van egy évben?	12
-1	Melyik a legnagyobb bolygó a Naprendszerben?	Jupiter
+1,7	Melyik a legnagyobb bolygó a Naprendszerben?	Jupiter
 1	Melyik bolygón élünk?	Föld
 1	Melyik állatot nevezik az állatok királyának?	Oroszlán
 1	Melyik állat mondja azt, hogy „mú”?	Tehén
@@ -22,8 +22,8 @@
 1	Melyik évszak jön a tél után?	Tavasz
 1	Hány évszak van egy évben?	4
 1	Hogy hívják a megfagyott vizet?	Jég
-1	Hány Celsius-fokon fagy meg a víz?	0
-1	Hány Celsius-fokon forr a víz?	100
+1,7	Hány Celsius-fokon fagy meg a víz?	0
+1,7	Hány Celsius-fokon forr a víz?	100
 1	Melyik a legnagyobb szárazföldi állat?	Elefánt
 1	Melyik a legmagasabb állat?	Zsiráf
 1	Melyik madár nem tud repülni, és az Antarktiszon él?	Pingvin
@@ -46,22 +46,22 @@
 1	Hogy hívják Shrek feleségét?	Fiona
 1	Milyen gyümölcsbe harapott bele Hófehérke?	Alma
 1	Melyik gyümölcs sárga és görbe?	Banán
-1	Melyik a legnagyobb óceán?	Csendes-óceán
-1	Melyik földrészen van Magyarország?	Európa
-1	Melyik a legnagyobb földrész?	Ázsia
-1	Melyik országban vannak a gízai piramisok?	Egyiptom
-1	Melyik városban van az Eiffel-torony?	Párizs
-1	Mi Magyarország legnagyobb tava?	Balaton
-1	Mi Magyarország legmagasabb pontja?	Kékes
+1,5	Melyik a legnagyobb óceán?	Csendes-óceán
+1,5	Melyik földrészen van Magyarország?	Európa
+1,5	Melyik a legnagyobb földrész?	Ázsia
+1,5	Melyik országban vannak a gízai piramisok?	Egyiptom
+1,5	Melyik városban van az Eiffel-torony?	Párizs
+1,5	Mi Magyarország legnagyobb tava?	Balaton
+1,5	Mi Magyarország legmagasabb pontja?	Kékes
 1	Hány oldala van a háromszögnek?	3
 1	Hány oldala van a négyzetnek?	4
 1	Hány oldala van a hatszögnek?	6
 1	Hány perc egy negyedóra?	15
 1	Hány napos a február szökőévben?	29
-1	Csillag vagy bolygó a Nap?	Csillag
-1	Melyik bolygót nevezik vörös bolygónak?	Mars
-1	Melyik bolygó van legközelebb a Naphoz?	Merkúr
-1	Melyik bolygónak vannak a leglátványosabb gyűrűi?	Szaturnusz
+1,7	Csillag vagy bolygó a Nap?	Csillag
+1,7	Melyik bolygót nevezik vörös bolygónak?	Mars
+1,7	Melyik bolygó van legközelebb a Naphoz?	Merkúr
+1,7	Melyik bolygónak vannak a leglátványosabb gyűrűi?	Szaturnusz
 1	Mit készítenek a méhek?	Méz
 1	Miből lesz a pillangó?	Hernyó
 1	Melyik állat hordja a házát a hátán?	Csiga
@@ -83,7 +83,7 @@
 1	Milyen színű lámpánál szabad átmenni az úttesten?	Zöld
 1	Mi a mentők telefonszáma Magyarországon?	104
 1	Mi az egységes európai segélyhívó szám?	112
-1	Hány játékos van egy focicsapatból egyszerre a pályán?	11
+1,4	Hány játékos van egy focicsapatból egyszerre a pályán?	11
 1	Mennyi 5 x 5?	25
 1	Mennyi 6 x 7?	42
 1	Mennyi a 100 fele?	50
@@ -98,14 +98,14 @@
 1	Melyik állat ugrál és erszényben hordja a kicsinyét?	Kenguru
 1	Hogy hívják Pinokkió apját?	Geppetto
 1	Melyik mesehős orra nő meg, ha hazudik?	Pinokkió
-2	Mikor kezdődött az első világháború?	1914
-2	Hány államból áll az USA?	50
-2	Mikor ért véget a második világháború?	1945
-2	Melyik évben ünnepelték a magyar millenniumot?	1896
-2	Melyik napon tört ki az 1848-as forradalom?	Március 15.
-2	Melyik napon tört ki az 1956-os forradalom?	Október 23.
-2	Ki volt Magyarország első királya?	Szent István
-2	Melyik évben volt a mohácsi csata?	1526
+2,6	Mikor kezdődött az első világháború?	1914
+2,5	Hány államból áll az USA?	50
+2,6	Mikor ért véget a második világháború?	1945
+2,6	Melyik évben ünnepelték a magyar millenniumot?	1896
+2,6	Melyik napon tört ki az 1848-as forradalom?	Március 15.
+2,6	Melyik napon tört ki az 1956-os forradalom?	Október 23.
+2,6	Ki volt Magyarország első királya?	Szent István
+2,6	Melyik évben volt a mohácsi csata?	1526
 2	Ki írta a Himnuszt?	Kölcsey Ferenc
 2	Ki zenésítette meg a Himnuszt?	Erkel Ferenc
 2	Ki írta a Szózatot?	Vörösmarty Mihály
@@ -114,88 +114,88 @@
 2	Ki írta A kőszívű ember fiait?	Jókai Mór
 2	Ki festette a Mona Lisát?	Leonardo da Vinci
 2	Ki írta a Rómeó és Júliát?	William Shakespeare
-2	Ki érte el Amerikát 1492-ben?	Kolumbusz Kristóf
-2	Ki volt az első ember a Holdon?	Neil Armstrong
-2	Melyik évben szállt le először ember a Holdon?	1969
-2	Mi a víz kémiai képlete?	H2O
-2	Mi az arany vegyjele?	Au
-2	Mi a vas vegyjele?	Fe
-2	Mi az ezüst vegyjele?	Ag
-2	Mi a nátrium vegyjele?	Na
-2	Hány csontja van egy felnőtt embernek?	206
-2	Melyik az emberi test legnagyobb szerve?	Bőr
-2	Ki alkotta meg a relativitáselméletet?	Albert Einstein
-2	Ki találta fel a bűvös kockát?	Rubik Ernő
-2	Melyik magyar tudós kapott Nobel-díjat a C-vitaminnal kapcsolatos kutatásaiért?	Szent-Györgyi Albert
-2	Kb. hány km/s a fény sebessége?	300 000
-2	Mi Japán fővárosa?	Tokió
-2	Mi Ausztrália fővárosa?	Canberra
-2	Mi Kanada fővárosa?	Ottawa
-2	Mi Brazília fővárosa?	Brazíliaváros
-2	Mi Törökország fővárosa?	Ankara
-2	Mi Svájc fővárosa?	Bern
-2	Mi Lengyelország fővárosa?	Varsó
-2	Mi Ausztria fővárosa?	Bécs
-2	Mi Horvátország fővárosa?	Zágráb
-2	Mi Románia fővárosa?	Bukarest
-2	Mi Szlovákia fővárosa?	Pozsony
-2	Mi Norvégia fővárosa?	Oslo
-2	Mi Portugália fővárosa?	Lisszabon
-2	Mi Egyiptom fővárosa?	Kairó
-2	Melyik a világ legmagasabb hegye?	Mount Everest
-2	Melyik a világ legnagyobb forró sivataga?	Szahara
-2	Melyik a világ legnépesebb országa?	India
-2	Hány vármegyéje van Magyarországnak?	19
-2	Melyik Magyarország második legnépesebb városa?	Debrecen
-2	Melyik évben vezették be a forintot?	1946
-2	Melyik évben csatlakozott Magyarország az Európai Unióhoz?	2004
-2	Melyik évben lett Magyarország a NATO tagja?	1999
-2	Melyik évben omlott le a berlini fal?	1989
-2	Ki volt a Szovjetunió utolsó vezetője?	Mihail Gorbacsov
-2	Melyik évben süllyedt el a Titanic?	1912
+2,6	Ki érte el Amerikát 1492-ben?	Kolumbusz Kristóf
+2,6,7	Ki volt az első ember a Holdon?	Neil Armstrong
+2,6	Melyik évben szállt le először ember a Holdon?	1969
+2,7	Mi a víz kémiai képlete?	H2O
+2,7	Mi az arany vegyjele?	Au
+2,7	Mi a vas vegyjele?	Fe
+2,7	Mi az ezüst vegyjele?	Ag
+2,7	Mi a nátrium vegyjele?	Na
+2,7	Hány csontja van egy felnőtt embernek?	206
+2,7	Melyik az emberi test legnagyobb szerve?	Bőr
+2,7	Ki alkotta meg a relativitáselméletet?	Albert Einstein
+2,7	Ki találta fel a bűvös kockát?	Rubik Ernő
+2,7	Melyik magyar tudós kapott Nobel-díjat a C-vitaminnal kapcsolatos kutatásaiért?	Szent-Györgyi Albert
+2,7	Kb. hány km/s a fény sebessége?	300 000
+2,5	Mi Japán fővárosa?	Tokió
+2,5	Mi Ausztrália fővárosa?	Canberra
+2,5	Mi Kanada fővárosa?	Ottawa
+2,5	Mi Brazília fővárosa?	Brazíliaváros
+2,5	Mi Törökország fővárosa?	Ankara
+2,5	Mi Svájc fővárosa?	Bern
+2,5	Mi Lengyelország fővárosa?	Varsó
+2,5	Mi Ausztria fővárosa?	Bécs
+2,5	Mi Horvátország fővárosa?	Zágráb
+2,5	Mi Románia fővárosa?	Bukarest
+2,5	Mi Szlovákia fővárosa?	Pozsony
+2,5	Mi Norvégia fővárosa?	Oslo
+2,5	Mi Portugália fővárosa?	Lisszabon
+2,5	Mi Egyiptom fővárosa?	Kairó
+2,5	Melyik a világ legmagasabb hegye?	Mount Everest
+2,5	Melyik a világ legnagyobb forró sivataga?	Szahara
+2,5	Melyik a világ legnépesebb országa?	India
+2,5	Hány vármegyéje van Magyarországnak?	19
+2,5	Melyik Magyarország második legnépesebb városa?	Debrecen
+2,6	Melyik évben vezették be a forintot?	1946
+2,6	Melyik évben csatlakozott Magyarország az Európai Unióhoz?	2004
+2,6	Melyik évben lett Magyarország a NATO tagja?	1999
+2,6	Melyik évben omlott le a berlini fal?	1989
+2,6	Ki volt a Szovjetunió utolsó vezetője?	Mihail Gorbacsov
+2,6	Melyik évben süllyedt el a Titanic?	1912
 2	Ki írta A kis herceget?	Antoine de Saint-Exupéry
 2	Ki írta az 1984 című regényt?	George Orwell
 2	Ki komponálta a Magyar rapszódiákat?	Liszt Ferenc
 2	Ki komponálta A kékszakállú herceg vára című operát?	Bartók Béla
 2	Ki komponálta a Háry János című daljátékot?	Kodály Zoltán
-2	Ki volt Mátyás király apja?	Hunyadi János
-2	Hány perc egy focimeccs rendes játékideje?	90
-2	Hány karika van az olimpiai zászlón?	5
-2	Hány évente rendeznek nyári olimpiát?	4
-2	Ki a legtöbb aranyérmet nyert magyar olimpikon?	Gerevich Aladár
-2	Melyik sportág legendája Puskás Ferenc?	Labdarúgás
-2	Melyik évben győzött 6:3-ra Anglia ellen a magyar válogatott a Wembley-ben?	1953
-2	Hány játékos van egy kosárlabdacsapatból egyszerre a pályán?	5
-2	Hány mezőből áll a sakktábla?	64
-2	Melyik sakkfigura lép L alakban?	Huszár
+2,6	Ki volt Mátyás király apja?	Hunyadi János
+2,4	Hány perc egy focimeccs rendes játékideje?	90
+2,4	Hány karika van az olimpiai zászlón?	5
+2,4	Hány évente rendeznek nyári olimpiát?	4
+2,4	Ki a legtöbb aranyérmet nyert magyar olimpikon?	Gerevich Aladár
+2,4	Melyik sportág legendája Puskás Ferenc?	Labdarúgás
+2,4	Melyik évben győzött 6:3-ra Anglia ellen a magyar válogatott a Wembley-ben?	1953
+2,4	Hány játékos van egy kosárlabdacsapatból egyszerre a pályán?	5
+2,4	Hány mezőből áll a sakktábla?	64
+2,4	Melyik sakkfigura lép L alakban?	Huszár
 2	Mennyi 15 x 15?	225
 2	Mennyi 2 a tizediken?	1024
-2	Hány fokos a derékszög?	90
-2	Mennyi a háromszög belső szögeinek összege?	180 fok
-2	Mennyi a pí értéke két tizedesjegyre?	3,14
+2,7	Hány fokos a derékszög?	90
+2,7	Mennyi a háromszög belső szögeinek összege?	180 fok
+2,7	Mennyi a pí értéke két tizedesjegyre?	3,14
 2	Hány nulla van egy millióban?	6
-2	Melyik a Naprendszer legforróbb bolygója?	Vénusz
-2	Hány bolygó van a Naprendszerben?	8
-2	Melyik gázból van a legtöbb a levegőben?	Nitrogén
-2	Melyik gázt lélegezzük ki?	Szén-dioxid
-2	Melyik vércsoport az általános vérdonor?	0 Rh negatív
-2	Melyik vitamin termelődik a bőrben napfény hatására?	D-vitamin
-2	Melyik szervben termelődik az inzulin?	Hasnyálmirigy
+2,7	Melyik a Naprendszer legforróbb bolygója?	Vénusz
+2,7	Hány bolygó van a Naprendszerben?	8
+2,7	Melyik gázból van a legtöbb a levegőben?	Nitrogén
+2,7	Melyik gázt lélegezzük ki?	Szén-dioxid
+2,7	Melyik vércsoport az általános vérdonor?	0 Rh negatív
+2,7	Melyik vitamin termelődik a bőrben napfény hatására?	D-vitamin
+2,7	Melyik szervben termelődik az inzulin?	Hasnyálmirigy
 2	Ki alapította a Microsoftot Paul Allennel?	Bill Gates
 2	Ki alapította az Apple-t Steve Wozniakkal?	Steve Jobs
-2	Minek a rövidítése a WWW?	World Wide Web
+2,7	Minek a rövidítése a WWW?	World Wide Web
 2	Melyik évben indult a Facebook?	2004
-2	Ki találta fel a golyóstollat?	Bíró László
+2,7	Ki találta fel a golyóstollat?	Bíró László
 2	Ki tervezte az Országház épületét?	Steindl Imre
 2	Melyik volt Budapest első állandó Duna-hídja?	Lánchíd
-2	Melyik a legnagyobb magyarországi Duna-sziget?	Csepel-sziget
-2	Ki volt Magyarország kormányzója 1920 és 1944 között?	Horthy Miklós
-2	Melyik évben írták alá a trianoni békeszerződést?	1920
-2	Melyik évben végezték ki az aradi vértanúkat?	1849
+2,5	Melyik a legnagyobb magyarországi Duna-sziget?	Csepel-sziget
+2,6	Ki volt Magyarország kormányzója 1920 és 1944 között?	Horthy Miklós
+2,6	Melyik évben írták alá a trianoni békeszerződést?	1920
+2,6	Melyik évben végezték ki az aradi vértanúkat?	1849
 2	Ki festette A magányos cédrust?	Csontváry Kosztka Tivadar
 2	Melyik nyelvnek van a legtöbb anyanyelvi beszélője?	Kínai (mandarin)
 2	Ki írta a Nemzeti dalt?	Petőfi Sándor
-2	Melyik évben kezdődött a második világháború?	1939
+2,6	Melyik évben kezdődött a második világháború?	1939
 2	Ki írta a Hamletet?	William Shakespeare
 2	Ki festette a Napraforgókat?	Vincent van Gogh
 3	Mi Isten neve?	Jehova
@@ -234,7 +234,7 @@
 3	Kit győzött le Dávid parittyával?	Góliát
 3	Milyen hangszeren játszott Dávid Saul előtt?	Hárfa
 3	Melyik királyt ismerték a bölcsességéről?	Salamon
-3	Ki építette fel a templomot Jeruzsálemben?	Salamon
+3	Ki építtette az első templomot Jeruzsálemben?	Salamon
 3	Melyik királynő látogatta meg Salamont?	Sába királynője
 3	Melyik prófétát ragadta el egy forgószél, miután megjelent egy tüzes szekér?	Illés
 3	Ki volt Illés utódja?	Elizeus
@@ -247,7 +247,7 @@
 3	Ki volt Eszter unokatestvére és nevelője?	Márdokeus
 3	Ki akarta kiirtani a zsidókat Eszter idejében?	Hámán
 3	Ki volt az a hűséges férfi, aki mindenét elvesztette, mégis kitartott?	Jób
-3	Melyik a Biblia leghosszabb könyve?	Zsoltárok
+3	Melyik bibliai könyvnek van a legtöbb fejezete?	Zsoltárok
 3	Hány könyvből áll a Biblia?	66
 3	Mi a Biblia első könyve?	1Mózes
 3	Mi a Biblia utolsó könyve?	Jelenések
@@ -298,3 +298,1009 @@
 3	Melyik próféta kente fel Dávidot királlyá?	Sámuel
 3	Hány napig böjtölt Jézus a pusztában?	40
 3	Ki volt Keresztelő János anyja?	Erzsébet
+1	Hány lába van egy kutyának?	4
+1	Hány lába van egy tyúknak?	2
+1	Melyik állat tojja a tojást, amit reggelire eszünk?	Tyúk
+1	Melyik állat mondja azt, hogy „vau”?	Kutya
+1	Melyik állat mondja azt, hogy „miau”?	Macska
+1	Melyik állat mondja azt, hogy „bee”?	Bárány (juh)
+1	Melyik madár hápog?	Kacsa
+1	Hogy hívják a macska kicsinyét?	Kiscica
+1	Hogy hívják a tyúk kicsinyét?	Csibe
+1	Hogy hívják a kecske kicsinyét?	Gida
+1	Hogy hívják a disznó kicsinyét?	Malac
+1	Hogy hívják a medve kicsinyét?	Bocs
+1	Melyik állatnak van ormánya?	Elefánt
+1	Melyik állatnak van páncélja, és nagyon lassan mászik?	Teknős
+1	Melyik állat hasonlít a lóra, de fekete-fehér csíkos?	Zebra
+1	Melyik madár tudja utánozni az emberi beszédet?	Papagáj
+1	Melyik madár huhog éjszaka?	Bagoly
+1	Melyik madár hozza a kisbabát a mese szerint?	Gólya
+1	Melyik állat sző hálót?	Pók
+1	Melyik állat szereti a sajtot a mesékben?	Egér
+1	Melyik állat a ravasz, vörös bundás a mesékben?	Róka
+1	Milyen színű a tej?	Fehér
+1	Milyen színű az ég, ha szép idő van?	Kék
+1	Milyen színű az érett paradicsom?	Piros
+1	Milyen színű a szén?	Fekete
+1	Milyen színt kapunk, ha összekeverjük a pirosat és a sárgát?	Narancssárga
+1	Milyen színt kapunk, ha összekeverjük a kéket és a pirosat?	Lila
+1	Milyen színt kapunk, ha összekeverjük a feketét és a fehéret?	Szürke
+1	Melyik a hét első napja?	Hétfő
+1	Melyik nap jön a kedd után?	Szerda
+1	Melyik nap van a péntek előtt?	Csütörtök
+1	Melyik a hét utolsó napja?	Vasárnap
+1	Melyik hónapban van karácsony?	December
+1	Melyik az év első hónapja?	Január
+1	Hány nap van egy évben, ha nem szökőév?	365
+1	Hány óra van egy napban?	24
+1	Mennyi 2 + 2?	4
+1	Mennyi 10 - 3?	7
+1	Mennyi 8 + 7?	15
+1	Mennyi 4 x 4?	16
+1	Mennyi 3 x 9?	27
+1	Mennyi 20 osztva 4-gyel?	5
+1	Mennyi 50 + 50?	100
+1	Mennyi 1000 - 1?	999
+1	Hány tojás van egy tucatban?	12
+1	Hány perc egy félóra?	30
+1	Mi esik az égből télen, ami fehér és hideg?	Hó
+1	Mi jelenik meg az égen, ha eső közben kisüt a nap?	Szivárvány
+1	Melyik égitest világít éjjel, és változik az alakja?	Hold
+1	Mit szívnak fel a növények a gyökerükkel?	Vizet
+1	Melyik évszakban van a legmelegebb?	Nyár
+1	Melyik évszakban esik a hó?	Tél
+1	Melyik évszakban nyílnak ki a virágok?	Tavasz
+1	Melyik testrészünkkel látunk?	Szem
+1	Melyik testrészünkkel hallunk?	Fül
+1	Melyik testrészünkkel szagolunk?	Orr
+1	Hány ujj van egy lábon?	5
+1	Mit nyomunk a fogkefére fogmosáskor?	Fogkrém
+1	Milyen színű az éretlen banán?	Zöld
+1	Melyik jármű megy síneken?	Vonat
+1	Melyik évszak jön a nyár után?	Ősz
+1	Mi a tűzoltók telefonszáma Magyarországon?	105
+1	Mi a rendőrség telefonszáma Magyarországon?	107
+1	Milyen színű a tűzoltóautó?	Piros
+1	Ki gyógyítja a betegeket a kórházban?	Orvos
+1	Ki süti a kenyeret?	Pék
+1	Ki tanít az iskolában?	Tanár
+1	Melyik alakzatnak nincs sarka?	Kör
+1	Hány oldala van a téglalapnak?	4
+1	Hogy hívják Micimackó kismalac barátját?	Malacka
+1	Hogy hívják Mickey egér kacsa barátját?	Donald kacsa
+1	Melyik mesehős lakik egy ananászban a tenger alatt?	Spongyabob
+1	Hogy hívják Bogyó legjobb barátját?	Babóca
+1	Milyen állat Süsü?	Sárkány
+1	Hány feje van Süsünek?	1
+1	Milyen állat Vuk?	Róka
+1	Ki írta a Vukot?	Fekete István
+1	Milyen színűek a Hupikék törpikék?	Kék
+1	Hogy hívják a Jégvarázs két hercegnőjét?	Anna és Elza
+1	Milyen állat Simba Az oroszlánkirályban?	Oroszlán
+1	Milyen állat Mazsola a mesében?	Malac
+1	Kivel találkozik Piroska az erdőben?	Farkassal
+1	Hány kismalac volt a mesében a farkassal?	3
+1	Hány kecskegida volt a mesében a farkassal?	7
+1	Kik húzzák a Mikulás szánját?	Rénszarvasok
+1	Hogy hívják a Mikulás piros orrú rénszarvasát?	Rudolf
+1	Mit festünk húsvétkor?	Tojást
+1	Hány gyertya van az adventi koszorún?	4
+1	Mi lesz az ebihalból?	Béka
+1	Miből készül a mazsola?	Szőlőből
+1	Miből készül a sült krumpli?	Burgonyából
+1	Miből készül a vaj?	Tejből
+1	Melyik gabonából készül leggyakrabban a kenyér?	Búzából
+1	Melyik állat ad gyapjút?	Juh
+1	Melyik bogár piros, fekete pöttyökkel?	Katica
+1	Melyik hangszernek vannak fekete és fehér billentyűi?	Zongora
+1	Melyik hangszert ütjük dobverővel?	Dob
+1	Hány kereke van egy autónak?	4
+1	Melyik a legkisebb bolygó a Naprendszerben?	Merkúr
+1	Hány perc egy tanóra az iskolában?	45
+2	Ki írta a Légy jó mindhalálig című regényt?	Móricz Zsigmond
+2	Ki írta az Ábel a rengetegben című regényt?	Tamási Áron
+2	Ki írta a Tüskevárat?	Fekete István
+2	Ki írta Az arany embert?	Jókai Mór
+2	Ki írta a Szent Péter esernyőjét?	Mikszáth Kálmán
+2	Ki írta a Sorstalanságot?	Kertész Imre
+2	Melyik évben kapott irodalmi Nobel-díjat Kertész Imre?	2002
+2	Ki írta a Toldi estéjét?	Arany János
+2	Ki írta a Szeptember végén című verset?	Petőfi Sándor
+2	Ki írta a Mama című verset?	József Attila
+2	Ki írta a Góg és Magóg fia vagyok én kezdetű verset?	Ady Endre
+2	Ki írta a Pacsirta című regényt?	Kosztolányi Dezső
+2	Ki írta a Csongor és Tündét?	Vörösmarty Mihály
+2	Ki írta a Bánk bánt?	Katona József
+2	Ki írta a Don Quijotét?	Miguel de Cervantes
+2	Ki írta a Háború és békét?	Lev Tolsztoj
+2	Ki írta a Bűn és bűnhődést?	Fjodor Dosztojevszkij
+2	Ki írta A nyomorultakat?	Victor Hugo
+2	Ki írta a Harry Potter-könyveket?	J. K. Rowling
+2	Ki írta A Gyűrűk Urát?	J. R. R. Tolkien
+2	Ki írta a Faustot?	Johann Wolfgang von Goethe
+2	Ki írta az Isteni színjátékot?	Dante Alighieri
+2	Ki írta az Odüsszeiát?	Homérosz
+2	Ki írta a Sherlock Holmes-történeteket?	Arthur Conan Doyle
+2	Ki írta a Robinson Crusoe-t?	Daniel Defoe
+2	Ki írta a Pinokkiót?	Carlo Collodi
+2	Ki írta a Micimackót?	A. A. Milne
+2	Ki írta Az öreg halász és a tenger című regényt?	Ernest Hemingway
+2	Ki festette Az utolsó vacsorát?	Leonardo da Vinci
+2	Ki festette a Sixtus-kápolna mennyezetét?	Michelangelo
+2	Ki festette A csillagos éjt?	Vincent van Gogh
+2	Ki festette A sikolyt?	Edvard Munch
+2	Ki festette a Guernicát?	Pablo Picasso
+2	Ki festette A magyarok bejövetele körképet?	Feszty Árpád
+2	Ki festette a Krisztus Pilátus előtt című képet?	Munkácsy Mihály
+2	Ki festette a Majálist?	Szinyei Merse Pál
+2	Ki faragta a firenzei Dávid-szobrot?	Michelangelo
+2	Ki komponálta a Kis éji zenét?	Wolfgang Amadeus Mozart
+2	Ki komponálta az Örömódát tartalmazó IX. szimfóniát?	Ludwig van Beethoven
+2	Ki komponálta A négy évszakot?	Antonio Vivaldi
+2	Ki komponálta A diótörőt?	Pjotr Iljics Csajkovszkij
+2	Ki komponálta a Bánk bán című operát?	Erkel Ferenc
+2	Ki komponálta a Csárdáskirálynőt?	Kálmán Imre
+2	Ki komponálta A víg özvegyet?	Lehár Ferenc
+2	Melyik együttes énekelte a Yesterday-t?	The Beatles
+2	Kit neveznek a pop királyának?	Michael Jackson
+2	Melyik zenekar énekese volt Freddie Mercury?	Queen
+2	Melyik együttes dala a Gyöngyhajú lány?	Omega
+2	Ki rendezte A keresztapát?	Francis Ford Coppola
+2	Ki rendezte a Titanicot?	James Cameron
+2	Ki rendezte a Jurassic Parkot?	Steven Spielberg
+2	Melyik magyar film nyert Oscar-díjat 2016-ban?	Saul fia
+2	Ki rendezte a Saul fiát?	Nemes Jeles László
+2	Ki alakította elsőként James Bondot a mozivásznon?	Sean Connery
+2	Hogy hívják az Amerikai Filmakadémia díját?	Oscar-díj
+2	Melyik nyelvből származik a „karaoke” szó?	Japán
+2	Hány betűből áll a magyar ábécé?	44
+2	Hány magánhangzó van a magyar nyelvben?	14
+2	Hogy mondjuk angolul, hogy „köszönöm”?	Thank you
+2	Hogy mondjuk németül, hogy „jó napot”?	Guten Tag
+2	Hogy mondjuk spanyolul, hogy „szia”?	Hola
+2	Melyik nyelv a hivatalos Brazíliában?	Portugál
+2	Melyik fűszer adja a gulyás piros színét?	Pirospaprika
+2	Melyik ország nemzeti étele a pizza?	Olaszország
+2	Melyik országból származik a szusi?	Japán
+2	Melyik híres édes bort készítik Tokaj-Hegyalján?	Tokaji aszú
+2	Melyik gyümölcsből készül a guacamole?	Avokádó
+2	Mi a hummusz fő alapanyaga?	Csicseriborsó
+2	Melyik torta viseli egy pesti cukrász nevét, karamellás tetővel?	Dobostorta
+2	Mi az Egyesült Királyság pénzneme?	Font sterling
+2	Mi Japán pénzneme?	Jen
+2	Mi Svájc pénzneme?	Svájci frank
+2	Hány cent egy euró?	100
+2	Minek a rövidítése az ENSZ?	Egyesült Nemzetek Szervezete
+2	Melyik városban van az ENSZ székháza?	New York
+2	Hány csillag van az Európai Unió zászlaján?	12
+2	Hány lapból áll a francia kártya joker nélkül?	52
+2	Hány lapból áll a magyar kártya?	32
+2	Hány pötty van összesen egy dobókockán?	21
+2	Hány éves kortól lehet Magyarországon személyautóra jogosítványt szerezni?	17
+2	Hány évente tartanak országgyűlési választást Magyarországon?	4
+2	Hány képviselő ül a magyar Országgyűlésben?	199
+2	Hány évre választják a köztársasági elnököt Magyarországon?	5
+2	Hány napos egy szökőév?	366
+2	Melyik napon van a magyar kultúra napja?	Január 22.
+2	Melyik napon ünnepeljük az államalapítást?	Augusztus 20.
+2	Melyik napon van a nőnap?	Március 8.
+2	Melyik napon van Bálint-nap (Valentin-nap)?	Február 14.
+2	Mit ünneplünk november 1-jén?	Mindenszenteket
+2	Hány napos a szeptember?	30
+2	Hogy hívják a Facebook anyacégét?	Meta
+2	Melyik cég gyártja az iPhone-t?	Apple
+2	Melyik cég fejleszti az Android rendszert?	Google
+2	Mi a magyar internetes oldalak végződése?	.hu
+2	Hány gramm egy kilogramm?	1000
+2	Hány liter egy hektoliter?	100
+2	Kb. hány centiméter egy hüvelyk (col)?	2,54
+2	Hány perc egy nap?	1440
+2	Hány másodperc egy óra?	3600
+2	Mi a hivatalos nyelv Ausztriában?	Német
+3	Ki volt Keresztelő János apja?	Zakariás
+3	Melyik főpapnál szolgált Sámuel gyermekként?	Éli
+3	Ki volt Ábrahám unokaöccse?	Lót
+3	Melyik városból indult el Ábrahám családja?	Úr (a káldeusok Úr városa)
+3	Hány éves volt Ábrahám, amikor Izsák született?	100
+3	Mit adott el Ézsau Jákobnak egy tál lencséért?	Az elsőszülöttségi jogát
+3	Ki volt Jákob két felesége?	Lea és Ráhel
+3	Melyik feleségét szerette jobban Jákob?	Ráhelt
+3	Milyen különleges ruhát kapott József az apjától?	Hosszú, díszes köntöst
+3	Hány kövér tehenet látott a fáraó az álmában?	7
+3	Ki volt József egyiptomi gazdája?	Potifár
+3	Hogy hívták József két fiát?	Manassé és Efraim
+3	Hová rejtették el a csecsemő Mózest?	Egy kosárba a Nílus nádasában
+3	Ki találta meg a kis Mózest?	A fáraó lánya
+3	Miben jelent meg Jehova angyala Mózesnek?	Égő csipkebokorban
+3	Mivé változott Áron botja a fáraó előtt?	Kígyóvá
+3	Mi volt az első csapás Egyiptomban?	A víz vérré változott
+3	Mi volt a tizedik csapás Egyiptomban?	Az elsőszülöttek halála
+3	Melyik ünnepet tartották az Egyiptomból való kivonulás emlékére?	Pászka
+3	Milyen bálványt készítettek az izraeliták a pusztában?	Aranyborjút
+3	Hány kémet küldött Mózes Kánaán földjére?	12
+3	Melyik két kém hozott jó hírt Kánaánról?	Józsué és Káleb
+3	Melyik próféta szamara szólalt meg?	Bálámé
+3	Hány napig vonultak körbe Jerikó körül?	7
+3	Melyik prófétanő bíráskodott Izraelben Bárák idejében?	Débora
+3	Ki győzte le a midianitákat 300 emberrel?	Gedeon
+3	Melyik néphez tartozott Góliát?	A filiszteusokhoz
+3	Ki volt Dávid első felesége, Saul lánya?	Mikál
+3	Ki volt Uriás felesége, akit Dávid elvett?	Betsabé
+3	Melyik próféta figyelmeztette Dávidot Betsabé miatt?	Nátán
+3	Melyik fia lázadt fel Dávid ellen?	Absolon
+3	Melyik prófétát szólította meg Jehova gyermekként éjszaka a szent sátorban?	Sámuel
+3	Ki lett a király Salamon után?	Roboám
+3	Hány királyságra szakadt Izrael Salamon halála után?	2
+3	Melyik gonosz királyné üldözte Illést?	Jezabel
+3	Ki volt Jezabel férje?	Akháb
+3	Melyik hegyen győzte le Illés Baál prófétáit?	Kármel-hegyen
+3	Kik vittek ennivalót Illésnek a Kerit-pataknál?	Hollók
+3	Ki gyógyult meg a leprából, miután hétszer megmerült a Jordánban?	Naámán
+3	Melyik próféta látta, hogy a száraz csontok életre kelnek?	Ezékiel
+3	Melyik próféta írta a Siralmakat?	Jeremiás
+3	Melyik próféta jövendölte meg, hogy a Messiás Betlehemben születik?	Mikeás
+3	Melyik babiloni király lakomáján jelent meg az írás a falon?	Belsazár
+3	Milyen nevet kapott Dániel Babilonban?	Beltsazár
+3	Mi volt a tüzes kemencébe dobott három fiatal babiloni neve?	Sadrak, Mésak és Abednegó
+3	Melyik perzsa király engedte haza a zsidókat Babilonból?	Círusz
+3	Ki építtette újjá Jeruzsálem falait?	Nehémiás
+3	Melyik perzsa király felesége lett Eszter?	Ahasvérus
+3	Melyik pap és írnok vezetett haza egy csoportot Babilonból?	Ezsdrás
+3	Hány zsoltár van a Zsoltárok könyvében?	150
+3	Ki írta a Példabeszédek nagy részét?	Salamon
+3	Melyik nyelven írták a Héber Iratok nagy részét?	Héber
+3	Melyik nyelven írták a Keresztény Görög Iratokat?	Görög
+3	Melyik idős férfi vette a karjába a csecsemő Jézust a templomban?	Simeon
+3	Melyik idős prófétanő beszélt a kis Jézusról a templomban?	Anna
+3	Kik látogatták meg a mezőről az újszülött Jézust?	Pásztorok
+3	Melyik király akarta megöletni a kis Jézust?	Heródes
+3	Hová menekült József és Mária a kis Jézussal?	Egyiptomba
+3	Hány éves volt Jézus, amikor a templomban a tanítókkal beszélgetett?	12
+3	Hány éves volt Jézus, amikor elkezdte a szolgálatát?	Kb. 30
+3	Mi volt Jézus mestersége?	Ács
+3	Ki volt Péter apostol testvére?	András
+3	Kik voltak Zebedeus fiai?	Jakab és János
+3	Melyik apostol kételkedett Jézus feltámadásában?	Tamás
+3	Ki került Júdás helyére az apostolok közé?	Mátyás
+3	Melyik tavon járt Jézus a víz felszínén?	Galileai-tengeren
+3	Melyik példázatban segít egy idegen a kirabolt emberen?	Az irgalmas samaritánus
+3	Melyik példázatban tér haza a fiú, aki elherdálta az örökségét?	A tékozló fiú
+3	Hány szűz várta a vőlegényt Jézus példázatában?	10
+3	Hány leprást gyógyított meg Jézus, akik közül csak egy köszönte meg?	10
+3	Melyik zsinagógai elöljáró lányát támasztotta fel Jézus?	Jairusét
+3	Melyik faluban lakott Lázár?	Betániában
+3	Milyen állaton vonult be Jézus Jeruzsálembe?	Szamárcsikón
+3	Melyik kertben imádkozott Jézus az elfogása előtt?	Getsemáné
+3	Kinek a fülét vágta le Péter?	Malkusét
+3	Melyik főpap előtt hallgatták ki Jézust a Szanhedrin előtt?	Kajafás
+3	Kit engedett szabadon Pilátus Jézus helyett?	Barabást
+3	Kit kényszerítettek, hogy vigye Jézus kínoszlopát?	Cirénei Simont
+3	Hány nappal a feltámadása után ment fel Jézus a mennybe?	40
+3	Melyik ünnepen kapták meg a tanítványok a szent szellemet?	Pünkösdkor
+3	Kit keresztelt meg Fülöp az úton, aki Ézsaiás könyvét olvasta?	Az etióp eunuchot
+3	Melyik római századost keresztelte meg Péter?	Kornéliuszt
+3	Ki volt Pál társa az első misszionáriusi útján?	Barnabás
+3	Melyik városban nevezték először keresztényeknek a tanítványokat?	Antiókhiában
+3	Ki volt Pál társa a filippi börtönben?	Szilász
+3	Melyik fiatal esett ki az ablakon Pál beszéde alatt?	Eutikhusz
+3	Melyik szigeten szenvedett hajótörést Pál?	Máltán
+3	Melyik szigeten kapta János a Jelenések könyvét?	Patmoszon
+3	Hány levelet írt Pál a korinthusiaknak a Bibliában?	2
+3	Ki volt Timóteus nagyanyja?	Lóisz
+3	Ki volt Timóteus anyja?	Eunika
+3	Melyik házaspár hazudott a szent szellemnek?	Anániás és Szafira
+3	Ki írta a legtöbb levelet a Keresztény Görög Iratokban?	Pál apostol
+3	Hány tulajdonságból áll a szellem gyümölcse a Galata 5-ben?	9
+3	Hit, remény és szeretet: melyik a legnagyobb az 1Korinthus 13 szerint?	A szeretet
+3	Melyik angyal jelentette be Máriának Jézus születését?	Gábriel
+3	Melyik arkangyal harcol a sárkánnyal a Jelenések 12-ben?	Mihály
+3	Hány könyvből állnak a Héber Iratok?	39
+3	Hány könyvből állnak a Keresztény Görög Iratok?	27
+3	Hány napig volt Jónás a nagy hal gyomrában?	3
+4	Hány játékos van egy röplabdacsapatból egyszerre a pályán?	6
+4	Hány játékos van egy vízilabdacsapatból egyszerre a vízben, a kapussal együtt?	7
+4	Hány játékos van egy kézilabdacsapatból egyszerre a pályán, a kapussal együtt?	7
+4	Hány játékos van egy jégkorongcsapatból egyszerre a jégen, a kapussal együtt?	6
+4	Hány játékos van egy rögbicsapatból (rugby union) egyszerre a pályán?	15
+4	Hány játékos van egy baseballcsapatból egyszerre a pályán?	9
+4	Hány perces egy negyed a kosárlabdában a FIBA szabályai szerint?	10
+4	Hány negyedből áll egy kosárlabdameccs?	4
+4	Hány harmadból áll egy jégkorongmeccs?	3
+4	Hány perces egy harmad a jégkorongban?	20
+4	Hány negyedből áll egy vízilabdameccs?	4
+4	Hány perces egy félidő a felnőtt kézilabdában?	30
+4	Hány pontot ér egy kosár a hárompontos vonalon kívülről?	3
+4	Hány pontot ér egy sikeres büntetődobás a kosárlabdában?	1
+4	Milyen magasan van a kosárlabdagyűrű?	3,05 méter
+4	Hány méter a maratoni futás távja?	42 195
+4	Hány méter hosszú egy olimpiai úszómedence?	50
+4	Hány nyert szett kell a győzelemhez egy férfi Grand Slam-teniszmeccsen?	3
+4	Mit mondanak angolul a 0 pontra a teniszben?	Love
+4	Melyik Grand Slam-tenisztornát játsszák füves pályán?	Wimbledon
+4	Melyik Grand Slam-tenisztornát játsszák salakon?	Roland Garros
+4	Melyik városban rendezik a US Open teniszbajnokságot?	New York
+4	Melyik városban rendezik az Australian Opent?	Melbourne
+4	Hány lyukból áll egy szabványos golfpálya?	18
+4	Mit jelent a golfban a „birdie”?	Eggyel kevesebb ütés a parnál
+4	Mit jelent a golfban a „hole in one”?	Egy ütéssel a lyukba
+4	Hány bábut kell ledönteni a bowlingban egy strike-hoz?	10
+4	Hány pont a legmagasabb elérhető eredmény egy bowlingjátszmában?	300
+4	Hány golyó van a snookerasztalon a kezdéskor, a fehérrel együtt?	22
+4	Hány pontot ér a fekete golyó a snookerben?	7
+4	Hány pont a maximális break a snookerben?	147
+4	Hány számozott mező van a darts-táblán?	20
+4	Mennyi a legtöbb pont, amit három nyíllal el lehet érni a dartsban?	180
+4	Hány méterről rúgják a büntetőt a fociban?	11
+4	Hány méterről dobják a büntetőt a kézilabdában?	7
+4	Hány játékost cserélhet le egy csapat egy focimeccs rendes játékidejében?	5
+4	Milyen színű lapot kap a kiállított focista?	Piros
+4	Hány sárga lap után jár piros lap egy focimeccsen?	2
+4	Hány évente rendezik a labdarúgó-világbajnokságot?	4
+4	Melyik ország nyerte a legtöbb labdarúgó-világbajnokságot?	Brazília
+4	Hányszor nyert Brazília labdarúgó-világbajnokságot?	5
+4	Melyik ország nyerte a 2022-es labdarúgó-világbajnokságot?	Argentína
+4	Melyik ország rendezte a 2022-es labdarúgó-világbajnokságot?	Katar
+4	Melyik ország nyerte a 2018-as labdarúgó-világbajnokságot?	Franciaország
+4	Melyik ország nyerte a 2014-es labdarúgó-világbajnokságot?	Németország
+4	Melyik ország nyerte a 2010-es labdarúgó-világbajnokságot?	Spanyolország
+4	Melyik ország nyerte az első labdarúgó-világbajnokságot 1930-ban?	Uruguay
+4	Melyik ország nyerte a 2024-es labdarúgó-Európa-bajnokságot?	Spanyolország
+4	Melyik három ország rendezte a 2026-os labdarúgó-világbajnokságot?	USA, Kanada és Mexikó
+4	Hányszor játszott a magyar válogatott labdarúgó-vb-döntőt?	2
+4	Melyik években játszott vb-döntőt a magyar labdarúgó-válogatott?	1938 és 1954
+4	Ki ellen kapott ki Magyarország az 1954-es vb-döntőben?	Nyugat-Németország (NSZK)
+4	Hogy nevezték az 1950-es évek legendás magyar labdarúgó-válogatottját?	Aranycsapat
+4	Melyik londoni stadionban győzött 6:3-ra az Aranycsapat?	Wembley
+4	Mi lett az eredmény a magyar–angol visszavágón Budapesten 1954-ben?	7:1
+4	Ki volt az Aranycsapat szövetségi kapitánya?	Sebes Gusztáv
+4	Ki volt az Aranycsapat kapusa?	Grosics Gyula
+4	Melyik spanyol klubban játszott Puskás Ferenc?	Real Madrid
+4	Mit díjaznak a FIFA Puskás-díjjal?	Az év legszebb gólját
+4	Melyik klubban futballozott Lionel Messi a pályafutása nagy részében?	FC Barcelona
+4	Melyik országból származik Cristiano Ronaldo?	Portugália
+4	Hány Aranylabdát nyert Lionel Messi 2023-ig?	8
+4	Melyik klub stadionja az Old Trafford?	Manchester United
+4	Melyik klub stadionja a Santiago Bernabéu?	Real Madrid
+4	Melyik városban van az Allianz Arena?	München
+4	Melyik magyar labdarúgócsapat nyerte a legtöbb bajnoki címet?	Ferencváros
+4	Hogy hívják Magyarország nemzeti stadionját?	Puskás Aréna
+4	Melyik évben nyílt meg a Puskás Aréna?	2019
+4	Melyik városban rendezték a 2016-os nyári olimpiát?	Rio de Janeiro
+4	Melyik városban rendezték a 2021-ben megtartott, 2020-as nyári olimpiát?	Tokió
+4	Melyik városban rendezték a 2024-es nyári olimpiát?	Párizs
+4	Melyik városban rendezik a 2028-as nyári olimpiát?	Los Angeles
+4	Hol rendezték a 2026-os téli olimpiát?	Milánó és Cortina d’Ampezzo
+4	Melyik városban rendezték az első újkori olimpiát 1896-ban?	Athén
+4	Ki az újkori olimpiai játékok alapítója?	Pierre de Coubertin
+4	Mi az olimpiai jelmondat első három szava latinul?	Citius, altius, fortius
+4	Hol gyújtják meg az olimpiai lángot?	Olümpiában (Görögország)
+4	Ki volt az első magyar olimpiai bajnok?	Hajós Alfréd
+4	Melyik sportágban nyerte Hajós Alfréd az olimpiát?	Úszás
+4	Melyik sportágban nyert három olimpiai aranyat Papp László?	Ökölvívás
+4	Hány olimpiai aranyérmet nyert Egerszegi Krisztina?	5
+4	Melyik sportágban nyert olimpiai aranyat Kásás Tamás?	Vízilabda
+4	Hány egymást követő olimpiát nyert meg a magyar férfi vízilabda-válogatott 2000-től?	3
+4	Melyik versenyszámban lett olimpiai bajnok Milák Kristóf Tokióban?	200 m pillangó
+4	Mi Hosszú Katinka beceneve?	Iron Lady (Vasnő)
+4	Melyik sportágban versenyzett Kovács Katalin?	Kajak
+4	Hány egymást követő olimpián nyert egyéni kardvívásban Szilágyi Áron?	3
+4	Melyik sportágban versenyeztek a Liu testvérek, Shaolin Sándor és Shaoang?	Rövidpályás gyorskorcsolya
+4	Melyik versenyszámban nyerte Magyarország az első téli olimpiai aranyát 2018-ban?	Rövidpályás gyorskorcsolya, férfi váltó
+4	Melyik sportágban nyerte Magyarország a legtöbb olimpiai aranyérmet?	Vívás
+4	Hány olimpiai aranyérmet nyert Kozák Danuta?	6
+4	Ki volt az első magyar Forma–1-es versenyző?	Baumgartner Zsolt
+4	Hol rendezik a Forma–1 Magyar Nagydíjat?	Hungaroringen
+4	Melyik évben rendezték az első Magyar Nagydíjat a Hungaroringen?	1986
+4	Hány világbajnoki címet nyert Michael Schumacher a Forma–1-ben?	7
+4	Hány világbajnoki címet nyert Lewis Hamilton a Forma–1-ben?	7
+4	Melyik olasz istálló versenyez piros autókkal a Forma–1-ben?	Ferrari
+4	Melyik versenyző nyert négy Forma–1-es világbajnokságot zsinórban 2021 és 2024 között?	Max Verstappen
+4	Melyik csapatnál lett világbajnok Max Verstappen?	Red Bull
+4	Hány pontot kap a futamgyőztes a Forma–1-ben?	25
+4	Melyik autómárka csapatát nevezik ezüstnyílnak?	Mercedes
+4	Ki nyerte a legtöbb Grand Slam-tornát a férfi teniszezők közül?	Novak Djokovic
+4	Hányszor nyerte meg Rafael Nadal a Roland Garrost?	14
+4	Melyik országból származik Roger Federer?	Svájc
+4	Melyik teniszezőnő nyert 23 Grand Slam-tornát egyesben az open érában?	Serena Williams
+4	Melyik sportág sztárja volt Michael Jordan?	Kosárlabda
+4	Melyik csapatban játszott Michael Jordan a legtöbbet?	Chicago Bulls
+4	Mi a neve az észak-amerikai profi kosárlabdaligának?	NBA
+4	Melyik sportág döntője a Super Bowl?	Amerikai futball
+4	Melyik sportágban adják a Stanley-kupát?	Jégkorong
+4	Melyik sportágban kell egy kis labdát ütővel átütni egy asztal fölötti hálón?	Asztalitenisz
+4	Melyik sportághoz tartozik a „zsákolás” (slam dunk)?	Kosárlabda
+4	Melyik küzdősportban lehet „ipponnal” nyerni?	Cselgáncs (judo)
+4	Melyik koreai harcművészet híres a rúgásairól?	Taekwondo
+4	Melyik országból ered a cselgáncs?	Japán
+4	Melyik országból ered a krikett?	Anglia
+4	Hány gátat kell átugrani a 110 méteres gátfutásban?	10
+4	Hány méter a futópálya egy köre az atlétikai stadionban?	400
+4	Hány versenyszámból áll a hétpróba?	7
+4	Ki tartja a 100 méteres síkfutás világcsúcsát?	Usain Bolt
+4	Mennyi Usain Bolt 100 méteres világcsúcsa?	9,58 másodperc
+4	Melyik országból származik Usain Bolt?	Jamaica
+4	Ki futotta le elsőként a maratoni távot két órán belül (nem hivatalos versenyen)?	Eliud Kipchoge
+4	Melyik atlétikai számban versenyez Armand Duplantis?	Rúdugrás
+4	Melyik tornász kapott elsőként tízes pontszámot az olimpián 1976-ban?	Nadia Comăneci
+4	Melyik sportágban kell egymás után úszni, kerékpározni és futni?	Triatlon
+4	Milyen színű trikót visel a Tour de France összetett listájának vezetője?	Sárga
+4	Melyik országban rendezik a Tour de France-t?	Franciaország
+4	Hány pontot ér egy kosár a hárompontos vonalon belülről?	2
+4	Hány másodperc a támadóidő a kosárlabdában?	24
+4	Hány másodperc alatt kell a labdát a saját térfélről átvinni a kosárlabdában?	8
+4	Milyen széles a futballkapu?	7,32 méter
+4	Milyen magas a futballkapu?	2,44 méter
+4	Hány perc összesen a hosszabbítás a fociban?	30
+4	Mit jelent a fociban a mesterhármas?	Egy játékos három gólja egy meccsen
+4	Hogy hívják azt a gólt, amit egy játékos a saját kapujába lő?	Öngól
+4	Hány játékos van egy strandröplabda-csapatban?	2
+4	Melyik sportágban van liberó, aki eltérő színű mezt visel?	Röplabda
+4	Melyik sportágban ütik a labdát lóháton ülve?	Lópóló
+4	Melyik sportágat játsszák kővel és seprűvel a jégen?	Curling
+4	Melyik téli sportágban kell sífutni és lőni is?	Biatlon
+4	Melyik téli sportágban repülnek a versenyzők egy sáncról?	Síugrás
+4	Melyik téli sportágban csúsznak hason, fejjel előre egy szánkón?	Szkeleton
+4	Hány ember ül egy kettes bobban?	2
+4	Melyik sportágban hívják pole position-nek a rajtsor első helyét?	Autóversenyzés
+4	Milyen színű öv jelzi a mesterfokozatot a cselgáncsban és a karatéban?	Fekete
+4	Hány menetből áll legfeljebb egy profi világbajnoki ökölvívó-mérkőzés?	12
+4	Hány perces egy menet a profi ökölvívásban?	3
+4	Melyik sportágban lehet tussal győzni?	Birkózás
+4	Melyik két stílus van az olimpiai birkózásban?	Kötöttfogás és szabadfogás
+4	Melyik sportágban versenyez a kormányos nyolcas?	Evezés
+4	Melyik sportágban vívnak párbajtőrrel, tőrrel és karddal?	Vívás
+4	Melyik vívófegyvernél ér találatot az egész test?	Párbajtőr
+4	Milyen magasan van a röplabdaháló a férfiaknál?	2,43 méter
+4	Hány pontig tart egy röplabdaszett, az ötödiket kivéve?	25
+4	Hány pontig tart egy játszma az asztaliteniszben?	11
+4	Hány pontig tart egy játszma a tollaslabdában?	21
+4	Melyik sportágban vannak műlesiklás és óriás-műlesiklás versenyek?	Alpesi sí
+4	Melyik magyar sakkozónőt tartják minden idők legerősebb női sakkozójának?	Polgár Judit
+4	Hány Polgár nővér lett sikeres sakkozó?	3
+4	Hány gyalogja van egy sakkjátékosnak a játék elején?	8
+4	Melyik norvég sakkozó volt világbajnok 2013 és 2023 között?	Magnus Carlsen
+4	Melyik sportágban ér pontot a touchdown?	Amerikai futball
+4	Hány pontot ér egy touchdown?	6
+4	Melyik sportágban ütnek home runt?	Baseball
+4	Melyik ország nyerte a legtöbb olimpiai aranyat férfi kosárlabdában?	USA
+4	Melyik ország nemzeti sportja a szumó?	Japán
+4	Kb. hány kilométer a Balaton-átúszás távja?	5,2
+4	Melyik magyar városban van a Nagyerdei Stadion?	Debrecen
+4	Melyik évben rendezte Budapest az atlétikai világbajnokságot?	2023
+4	Melyik évben rendezte Budapest először a vizes világbajnokságot?	2017
+4	Melyik sportág versenye a Tour de Hongrie?	Kerékpározás
+4	Melyik csapat nyerte a legtöbb Bajnokok Ligája-címet?	Real Madrid
+4	Melyik csapat nyerte a 2005-ös isztambuli BL-döntőt 0:3-ról fordítva?	Liverpool
+4	Melyik portugál focilegendát hívták Fekete Párducnak?	Eusébio
+4	Kit neveztek a Császárnak (Kaiser) a német fociban?	Franz Beckenbauer
+4	Melyik brazil focistát hívták a Királynak?	Pelé
+4	Hány világbajnoki címet nyert Pelé?	3
+4	Ki lőtte az „Isten keze” gólt 1986-ban?	Diego Maradona
+4	Melyik ország válogatottját hívják Három Oroszlánnak?	Anglia
+4	Melyik ország válogatottját hívják Azzurrinak?	Olaszország
+4	Melyik ország válogatottja játszik narancssárga mezben?	Hollandia
+4	Hány perces egy félidő a fociban?	45
+4	Melyik sportág eszköze az íj és a vessző?	Íjászat
+4	Melyik sportágban végeznek gyakorlatot gyűrűn és lólengésen?	Torna
+4	Hány szeren versenyeznek a nők a tornában?	4
+4	Hány szeren versenyeznek a férfiak a tornában?	6
+4	Hány méter magas a legmagasabb olimpiai műugrótorony?	10
+4	Melyik a leggyorsabb úszásnem?	Gyorsúszás
+4	Hány úszó alkot egy váltót?	4
+5	Mi Franciaország fővárosa?	Párizs
+5	Mi Németország fővárosa?	Berlin
+5	Mi Olaszország fővárosa?	Róma
+5	Mi Görögország fővárosa?	Athén
+5	Mi Hollandia fővárosa?	Amszterdam
+5	Mi Belgium fővárosa?	Brüsszel
+5	Mi Dánia fővárosa?	Koppenhága
+5	Mi Svédország fővárosa?	Stockholm
+5	Mi Finnország fővárosa?	Helsinki
+5	Mi Írország fővárosa?	Dublin
+5	Mi Csehország fővárosa?	Prága
+5	Mi Szlovénia fővárosa?	Ljubljana
+5	Mi Szerbia fővárosa?	Belgrád
+5	Mi Bulgária fővárosa?	Szófia
+5	Mi Ukrajna fővárosa?	Kijev
+5	Mi Oroszország fővárosa?	Moszkva
+5	Mi Litvánia fővárosa?	Vilnius
+5	Mi Lettország fővárosa?	Riga
+5	Mi Észtország fővárosa?	Tallinn
+5	Mi Izland fővárosa?	Reykjavík
+5	Mi Albánia fővárosa?	Tirana
+5	Mi Bosznia-Hercegovina fővárosa?	Szarajevó
+5	Mi Észak-Macedónia fővárosa?	Szkopje
+5	Mi Montenegró fővárosa?	Podgorica
+5	Mi Moldova fővárosa?	Chișinău (Kisinyov)
+5	Mi Fehéroroszország fővárosa?	Minszk
+5	Mi Málta fővárosa?	Valletta
+5	Mi Ciprus fővárosa?	Nicosia
+5	Mi az Amerikai Egyesült Államok fővárosa?	Washington
+5	Mi Mexikó fővárosa?	Mexikóváros
+5	Mi Argentína fővárosa?	Buenos Aires
+5	Mi Chile fővárosa?	Santiago
+5	Mi Peru fővárosa?	Lima
+5	Mi Kolumbia fővárosa?	Bogotá
+5	Mi Venezuela fővárosa?	Caracas
+5	Mi Kuba fővárosa?	Havanna
+5	Mi Kína fővárosa?	Peking
+5	Mi India fővárosa?	Újdelhi
+5	Mi Dél-Korea fővárosa?	Szöul
+5	Mi Észak-Korea fővárosa?	Phenjan
+5	Mi Thaiföld fővárosa?	Bangkok
+5	Mi Vietnám fővárosa?	Hanoi
+5	Mi a Fülöp-szigetek fővárosa?	Manila
+5	Mi Irán fővárosa?	Teherán
+5	Mi Irak fővárosa?	Bagdad
+5	Mi Szaúd-Arábia fővárosa?	Rijád
+5	Mi Afganisztán fővárosa?	Kabul
+5	Mi Pakisztán fővárosa?	Iszlámábád
+5	Mi Kenya fővárosa?	Nairobi
+5	Mi Nigéria fővárosa?	Abuja
+5	Mi Marokkó fővárosa?	Rabat
+5	Mi Etiópia fővárosa?	Addisz-Abeba
+5	Mi Új-Zéland fővárosa?	Wellington
+5	Mi Mongólia fővárosa?	Ulánbátor
+5	Mi Grúzia fővárosa?	Tbiliszi
+5	Mi Örményország fővárosa?	Jereván
+5	Mi Kazahsztán fővárosa?	Asztana
+5	Mi Uruguay fővárosa?	Montevideo
+5	Mi Ecuador fővárosa?	Quito
+5	Melyik Magyarország legnagyobb területű vármegyéje?	Bács-Kiskun
+5	Melyik vármegye székhelye Pécs?	Baranya
+5	Melyik vármegye székhelye Miskolc?	Borsod-Abaúj-Zemplén
+5	Melyik vármegye székhelye Szeged?	Csongrád-Csanád
+5	Melyik vármegye székhelye Győr?	Győr-Moson-Sopron
+5	Melyik vármegye székhelye Debrecen?	Hajdú-Bihar
+5	Melyik vármegye székhelye Eger?	Heves
+5	Melyik vármegye székhelye Szombathely?	Vas
+5	Melyik vármegye székhelye Nyíregyháza?	Szabolcs-Szatmár-Bereg
+5	Melyik vármegye székhelye Zalaegerszeg?	Zala
+5	Melyik vármegye székhelye Szekszárd?	Tolna
+5	Melyik vármegye székhelye Kaposvár?	Somogy
+5	Melyik vármegye székhelye Salgótarján?	Nógrád
+5	Melyik vármegye székhelye Tatabánya?	Komárom-Esztergom
+5	Melyik vármegye székhelye Szolnok?	Jász-Nagykun-Szolnok
+5	Melyik vármegye székhelye Békéscsaba?	Békés
+5	Melyik vármegye székhelye Székesfehérvár?	Fejér
+5	Hány országgal határos Magyarország?	7
+5	Melyik ország határos Magyarországgal nyugaton?	Ausztria
+5	Melyik ország határos Magyarországgal északon?	Szlovákia
+5	Melyik ország határos Magyarországgal keleten?	Románia
+5	Melyik folyó folyik át Szegeden?	Tisza
+5	Melyik folyó torkollik a Mosoni-Dunába Győrnél?	Rába
+5	Melyik a Tisza leghosszabb mellékfolyója?	Maros
+5	Melyik a legnagyobb mesterséges tó Magyarországon?	Tisza-tó
+5	Melyik tó fekszik Magyarország és Ausztria határán?	Fertő-tó
+5	Melyik a világ legnagyobb, biológiailag aktív természetes termáltava?	Hévízi-tó
+5	Melyik hegységben van a Kékes?	Mátra
+5	Melyik folyó partján fekszik Esztergom?	Duna
+5	Melyik hegységben van Lillafüred?	Bükk
+5	Mi az Aggteleki-karszt leghíresebb barlangjának neve?	Baradla-barlang
+5	Melyik a Balaton legnagyobb félszigete?	Tihanyi-félsziget
+5	Melyik folyó táplálja leginkább a Balatont?	Zala
+5	Melyik csatornán folyik le a Balaton vize a Duna felé?	Sió
+5	Melyik város határában van Magyarország legalacsonyabb pontja?	Szeged (Gyálarét)
+5	Melyik Magyarország legnagyobb tájegysége?	Alföld
+5	Melyik Magyarország legrégebbi nemzeti parkja?	Hortobágyi Nemzeti Park
+5	Hány nemzeti park van Magyarországon?	10
+5	Melyik városban van a Zsolnay Kulturális Negyed?	Pécs
+5	Melyik magyar várost nevezik a napfény városának?	Szeged
+5	Melyik magyar várost nevezik a hűség városának?	Sopron
+5	Melyik magyar várost nevezik a királyok városának?	Székesfehérvár
+5	Melyik borvidékek híresek a bikavérről?	Eger és Szekszárd
+5	Melyik sziget van a budapesti Margit híd és Árpád híd között?	Margit-sziget
+5	Melyik Budapest legmagasabb pontja?	János-hegy
+5	Melyik budapesti hegyen áll a Szabadság-szobor?	Gellért-hegy
+5	Melyik a világ területre legnagyobb országa?	Oroszország
+5	Melyik a világ legkisebb országa?	Vatikán
+5	Melyik a második legnagyobb óceán?	Atlanti-óceán
+5	Melyik földrészen van Egyiptom nagy része?	Afrika
+5	Melyik a világ leghosszabb hegyvonulata a szárazföldön?	Andok
+5	Melyik hegység választja el Európát Ázsiától?	Urál
+5	Melyik hegységben van az Elbrusz?	Kaukázus
+5	Melyik az Alpok legmagasabb csúcsa?	Mont Blanc
+5	Melyik Afrika legmagasabb hegye?	Kilimandzsáró
+5	Melyik Észak-Amerika legmagasabb hegye?	Denali
+5	Melyik Dél-Amerika legmagasabb hegye?	Aconcagua
+5	Melyik Európa leghosszabb folyója?	Volga
+5	Melyik Európa második leghosszabb folyója?	Duna
+5	Hány országon folyik keresztül a Duna?	10
+5	Hol ered a Duna?	A németországi Fekete-erdőben
+5	Melyik tengerbe ömlik a Duna?	Fekete-tenger
+5	Melyik folyó folyik át Párizson?	Szajna
+5	Melyik folyó folyik át Londonon?	Temze
+5	Melyik folyó folyik át Rómán?	Tevere
+5	Melyik folyó folyik át Prágán?	Moldva
+5	Melyik folyó folyik át Varsón?	Visztula
+5	Melyik folyó folyik át Kairón?	Nílus
+5	Melyik a világ legbővizűbb folyója?	Amazonas
+5	Melyik a világ legmagasabb vízesése?	Angel-vízesés
+5	Melyik két ország határán van a Viktória-vízesés?	Zambia és Zimbabwe
+5	Melyik a világ legmélyebb tava?	Bajkál-tó
+5	Melyik tenger partján fekszik Velence?	Adriai-tenger
+5	Melyik a világ legnagyobb szigete?	Grönland
+5	Melyik országhoz tartozik Grönland?	Dánia
+5	Melyik a világtenger legmélyebb pontja?	Mariana-árok
+5	Melyik a Föld legszárazabb sivataga?	Atacama
+5	Melyik a világ legnagyobb sivataga, ha a hideg sivatagokat is számítjuk?	Antarktisz
+5	Melyik Afrika legnépesebb országa?	Nigéria
+5	Melyik Afrika legnagyobb területű országa?	Algéria
+5	Melyik Dél-Amerika legnagyobb országa?	Brazília
+5	Melyik a legnagyobb ország, amely teljes egészében Európában van?	Ukrajna
+5	Hány tagállama van az Európai Uniónak?	27
+5	Melyik ország lépett ki az Európai Unióból 2020-ban?	Egyesült Királyság
+5	Melyik országban van Machu Picchu?	Peru
+5	Melyik országban van a Tádzs Mahal?	India
+5	Melyik városban van a Szabadság-szobor?	New York
+5	Melyik városban van a Colosseum?	Róma
+5	Melyik városban van a Big Ben?	London
+5	Melyik városban van a Sagrada Família?	Barcelona
+5	Melyik városban van a Brandenburgi kapu?	Berlin
+5	Melyik városban van az Akropolisz?	Athén
+5	Melyik városban van a Vörös tér?	Moszkva
+5	Melyik városban van a vitorla alakú tetejéről híres operaház?	Sydney
+5	Melyik városban van a Corcovado-hegyi Krisztus-szobor?	Rio de Janeiro
+5	Melyik városban van a Hagia Szophia?	Isztambul
+5	Melyik szoros köti össze a Földközi-tengert az Atlanti-óceánnal?	Gibraltári-szoros
+5	Melyik csatorna köti össze a Földközi-tengert a Vörös-tengerrel?	Szuezi-csatorna
+5	Melyik csatorna köti össze az Atlanti- és a Csendes-óceánt?	Panama-csatorna
+5	Melyik országban van a Fudzsi?	Japán
+5	Melyik vulkán temette be Pompejit?	Vezúv
+5	Melyik Európa legmagasabb működő vulkánja?	Etna
+5	Melyik országhoz tartozik Szicília?	Olaszország
+5	Melyik országhoz tartozik Korzika?	Franciaország
+5	Melyik országhoz tartozik Kréta?	Görögország
+5	Melyik országhoz tartoznak a Kanári-szigetek?	Spanyolország
+5	Melyik országhoz tartozik Hawaii?	USA
+5	Melyik országhoz tartozik Tasmánia?	Ausztrália
+5	Hány szövetségi állama van Ausztráliának?	6
+6	Ki vezette a honfoglaló magyarokat?	Árpád
+6	Hány törzs vett részt a honfoglalásban a hagyomány szerint?	7
+6	Mi volt a neve a hét vezér szövetségkötésének?	Vérszerződés
+6	Ki volt Szent István apja?	Géza fejedelem
+6	Ki volt Szent István felesége?	Gizella
+6	Ki volt Szent István fia?	Imre herceg
+6	Ki lázadt fel Szent István ellen Somogyban?	Koppány
+6	Melyik király idején volt a tatárjárás?	IV. Béla
+6	Melyik évben volt a muhi csata?	1241
+6	Ki adta ki az Aranybullát?	II. András
+6	Melyik évben adták ki az Aranybullát?	1222
+6	Ki volt az utolsó Árpád-házi király?	III. András
+6	Melyik évben halt ki az Árpád-ház?	1301
+6	Melyik király alapított egyetemet Pécsett 1367-ben?	Nagy Lajos
+6	Ki győzött a nándorfehérvári diadalban?	Hunyadi János
+6	Melyik évben volt a nándorfehérvári diadal?	1456
+6	Melyik győzelemre emlékeztet a déli harangszó?	A nándorfehérvári diadalra
+6	Melyik évben választották királlyá Hunyadi Mátyást?	1458
+6	Hogy hívták Mátyás király zsoldos hadseregét?	Fekete sereg
+6	Ki volt Mátyás király második felesége?	Beatrix
+6	Hogy hívják Mátyás király híres könyvtárának köteteit?	Corvinák
+6	Melyik csatában halt meg II. Lajos király?	A mohácsi csatában
+6	Melyik évben foglalták el a törökök Budát?	1541
+6	Ki volt Eger várkapitánya 1552-ben?	Dobó István
+6	Melyik évben védték meg Eger várát a törökkel szemben?	1552
+6	Ki védte Szigetvárt 1566-ban?	Zrínyi Miklós
+6	Melyik évben foglalták vissza Budát a töröktől?	1686
+6	Ki vezette a Rákóczi-szabadságharcot?	II. Rákóczi Ferenc
+6	Melyik békével zárult a Rákóczi-szabadságharc?	Szatmári béke
+6	Melyik évben kötötték a szatmári békét?	1711
+6	Melyik uralkodónőnek ajánlották fel a magyar rendek „életünket és vérünket”?	Mária Terézia
+6	Melyik uralkodót nevezték kalapos királynak?	II. József
+6	Kit nevezett Kossuth a legnagyobb magyarnak?	Széchenyi István
+6	Melyik évben alapították a Magyar Tudományos Akadémiát?	1825
+6	Ki volt Magyarország első felelős miniszterelnöke?	Batthyány Lajos
+6	Ki volt Magyarország kormányzó-elnöke 1849-ben?	Kossuth Lajos
+6	Melyik csatában tűnt el Petőfi Sándor?	A segesvári csatában
+6	Hol tette le a fegyvert a magyar honvédsereg 1849-ben?	Világosnál
+6	Melyik évben volt a kiegyezés?	1867
+6	Kit neveztek a haza bölcsének?	Deák Ferenc
+6	Melyik évben egyesült Pest, Buda és Óbuda?	1873
+6	Melyik évben adták át a budapesti kisföldalattit?	1896
+6	Ki volt a miniszterelnök az 1956-os forradalom idején?	Nagy Imre
+6	Melyik évben temették újra Nagy Imrét?	1989
+6	Ki volt a rendszerváltás utáni első szabadon választott miniszterelnök?	Antall József
+6	Melyik évben tartották a rendszerváltó első szabad választásokat?	1990
+6	Ki volt a rendszerváltás utáni első köztársasági elnök?	Göncz Árpád
+6	Melyik évben hagyták el a szovjet csapatok Magyarországot?	1991
+6	Melyik évben csatlakozott Magyarország a schengeni övezethez?	2007
+6	Melyik évben kezdődött a francia forradalom?	1789
+6	Melyik eseménnyel kezdődött a francia forradalom?	A Bastille ostromával
+6	Melyik évben koronázták császárrá Napóleont?	1804
+6	Hol szenvedett végső vereséget Napóleon 1815-ben?	Waterloonál
+6	Melyik szigeten halt meg száműzetésben Napóleon?	Szent Ilona
+6	Melyik évben fogadták el az Egyesült Államok Függetlenségi Nyilatkozatát?	1776
+6	Ki volt az Egyesült Államok első elnöke?	George Washington
+6	Melyik amerikai elnök adta ki az Emancipációs Kiáltványt 1863-ban?	Abraham Lincoln
+6	Melyik évben gyilkolták meg John F. Kennedyt?	1963
+6	Ki mondta el az „I have a dream” beszédet?	Martin Luther King
+6	Melyik évben esett el Konstantinápoly?	1453
+6	Melyik évben bukott el a Nyugatrómai Birodalom?	476
+6	Ki volt Róma első császára?	Augustus
+6	Melyik római császár idején égett le Róma Kr. u. 64-ben?	Néró
+6	Melyik fáraó sírját találták meg szinte érintetlenül 1922-ben?	Tutanhamon
+6	Ki fedezte fel Tutanhamon sírját?	Howard Carter
+6	Ki volt Nagy Sándor tanítója?	Arisztotelész
+6	Melyik ország királya volt Nagy Sándor?	Makedónia
+6	Ki volt a hunok leghíresebb királya?	Attila
+6	Kit koronáztak császárrá 800 karácsonyán?	Nagy Károly
+6	Melyik évben volt a hastingsi csata?	1066
+6	Ki tette közzé 95 tételét 1517-ben?	Luther Márton
+6	Ki találta fel a könyvnyomtatást Európában?	Johannes Gutenberg
+6	Kinek az expedíciója hajózta körül elsőként a Földet?	Magellán
+6	Ki jutott el elsőként tengeren Európából Indiába, Afrika megkerülésével?	Vasco da Gama
+6	Ki érte el elsőként a Déli-sarkot?	Roald Amundsen
+6	Melyik évben érte el Amundsen a Déli-sarkot?	1911
+6	Ki mászta meg elsőként a Mount Everestet Tenzing Norgayjel?	Edmund Hillary
+6	Melyik évben mászták meg először a Mount Everestet?	1953
+6	Ki volt az első ember a világűrben?	Jurij Gagarin
+6	Melyik évben repült a világűrbe Gagarin?	1961
+6	Hogy hívták az első mesterséges holdat?	Szputnyik–1
+6	Melyik évben lőtték fel a Szputnyik–1-et?	1957
+6	Melyik merénylet robbantotta ki az első világháborút?	A szarajevói merénylet
+6	Kit gyilkoltak meg Szarajevóban 1914-ben?	Ferenc Ferdinánd trónörököst
+6	Melyik évben ért véget az első világháború?	1918
+6	Melyik évben támadta meg Japán Pearl Harbort?	1941
+6	Melyik napon szálltak partra a szövetségesek Normandiában?	1944. június 6.
+6	Melyik két japán városra dobtak atombombát 1945-ben?	Hirosima és Nagaszaki
+6	Ki volt a Szovjetunió vezetője a második világháborúban?	Sztálin
+6	Ki volt Nagy-Britannia miniszterelnöke a második világháború nagy részében?	Winston Churchill
+6	Ki volt az Egyesült Államok elnöke a második világháború nagy részében?	Franklin D. Roosevelt
+6	Melyik évben alakult meg az ENSZ?	1945
+6	Melyik évben alakult meg a NATO?	1949
+6	Melyik évben építették fel a berlini falat?	1961
+6	Melyik évben egyesült újra Németország?	1990
+6	Melyik évben bomlott fel a Szovjetunió?	1991
+6	Ki volt Dél-Afrika első fekete elnöke?	Nelson Mandela
+6	Hány évet töltött börtönben Nelson Mandela?	27
+6	Ki vezette India erőszakmentes függetlenségi mozgalmát?	Mahátma Gandhi
+6	Melyik évben lett független India?	1947
+6	Ki kiáltotta ki a Kínai Népköztársaságot 1949-ben?	Mao Ce-tung
+6	Melyik két nagyhatalom állt szemben a hidegháborúban?	USA és Szovjetunió
+6	Melyik válság sodorta a világot az atomháború szélére 1962-ben?	A kubai rakétaválság
+6	Melyik évben támadták meg a New York-i ikertornyokat?	2001
+6	Melyik dinasztia uralkodott Oroszországban 1917-ig?	Romanov
+6	Melyik évben volt az oroszországi októberi forradalom?	1917
+6	Ki vezette az októberi forradalmat?	Lenin
+6	Melyik évben pusztult el Pompeji a Vezúv kitörésében?	Kr. u. 79
+6	Melyik ókori világcsoda állt Alexandriában?	A világítótorony (Pharosz)
+6	Hány ókori világcsoda volt?	7
+6	Melyik ókori világcsoda áll ma is?	A gízai piramisok
+6	Melyik évben rendezték a hagyomány szerint az első ókori olimpiát?	Kr. e. 776
+6	Melyik spártai király harcolt Thermopülainál a perzsák ellen?	Leonidász
+6	Hány spártai harcolt a hagyomány szerint Thermopülainál?	300
+6	Melyik római hadvezért gyilkolták meg Kr. e. 44-ben?	Julius Caesar
+6	Melyik ország királynője volt Kleopátra?	Egyiptom
+6	Melyik birodalom fővárosa volt Tenochtitlan?	Az Azték Birodalomé
+6	Ki hódította meg az Azték Birodalmat?	Hernán Cortés
+6	Melyik birodalmat hódította meg Francisco Pizarro?	Az Inka Birodalmat
+6	Melyik brit királynő uralkodott 63 évig a XIX. században?	Viktória
+6	Melyik brit uralkodó uralkodott a leghosszabb ideig?	II. Erzsébet
+6	Melyik évben halt meg II. Erzsébet?	2022
+6	Melyik angol király alapította az anglikán egyházat?	VIII. Henrik
+6	Hány felesége volt VIII. Henriknek?	6
+6	Melyik francia parasztlány vezette a franciákat a százéves háborúban?	Jeanne d’Arc
+6	Hány évig tartott valójában a százéves háború?	116
+6	Melyik járvány pusztított Európában a XIV. században?	A pestis (fekete halál)
+6	Melyik francia királyt nevezték Napkirálynak?	XIV. Lajos
+6	Melyik kastélyba költöztette XIV. Lajos a francia királyi udvart?	Versailles
+6	Melyik francia királynét fejezték le 1793-ban?	Marie Antoinette
+6	Melyik évben szűnt meg az Osztrák–Magyar Monarchia?	1918
+6	Ki volt az utolsó magyar király?	IV. Károly
+6	Hogy hívták Ferenc József feleségét?	Erzsébet (Sisi)
+6	Hány évig uralkodott Ferenc József?	68
+6	Melyik évben halt meg Ferenc József?	1916
+6	Melyik városban koronázták a magyar királyokat a török kortól 1830-ig?	Pozsony
+6	Hol őrzik ma a Szent Koronát?	Az Országházban
+6	Melyik évben hozták vissza a Szent Koronát az Egyesült Államokból?	1978
+6	Melyik csatában szenvedtek vereséget a kalandozó magyarok 955-ben?	Az augsburgi csatában
+6	Melyik vezért végezték ki Augsburgnál a kürtje legendája szerint?	Lehel
+6	Melyik évben győztek a magyarok a pozsonyi csatában?	907
+6	Melyik királyunkat nevezték lovagkirálynak?	Szent László
+6	Melyik királyunkat nevezték Könyvesnek?	Kálmán
+6	Ki vezette az 1514-es parasztfelkelést?	Dózsa György
+6	Ki írta a Hármaskönyvet?	Werbőczy István
+6	Ki volt Erdély fejedelme 1613 és 1629 között?	Bethlen Gábor
+6	Melyik magyar városnál rendezték a páneurópai pikniket 1989-ben?	Sopron
+6	Ki volt Magyarország első női köztársasági elnöke?	Novák Katalin
+6	Melyik évben fogadták el Magyarország Alaptörvényét?	2011
+6	Melyik évben ért véget Budapest ostroma?	1945
+6	Melyik évben került hatalomra Hitler Németországban?	1933
+6	Melyik krími konferencián döntöttek a szövetségesek a háború utáni Európáról 1945-ben?	Jaltai konferencia
+6	Melyik városban tartották a háborús főbűnösök perét?	Nürnberg
+6	Melyik ország adott elsőként szavazati jogot a nőknek?	Új-Zéland
+6	Melyik évben jelent meg az euró készpénzként?	2002
+6	Ki vezette a kubai forradalmat?	Fidel Castro
+6	Melyik évben történt a csernobili atomkatasztrófa?	1986
+6	Melyik mai országban van Csernobil?	Ukrajna
+6	Melyik ókori nép írta az ékírást?	Sumerok
+6	Melyik ókori nép építette a gízai piramisokat?	Az egyiptomiak
+6	Kiről nevezték el az athéni demokrácia aranykorát?	Periklész
+6	Melyik ókori görög filozófust ítélték halálra méregpohárral?	Szókratész
+6	Melyik ókori birodalom építette a Hadrianus-falat Britanniában?	Római Birodalom
+6	Ki volt a mongol birodalom alapítója?	Dzsingisz kán
+6	Ki volt az első ember, aki átrepülte egyedül, megállás nélkül az Atlanti-óceánt?	Charles Lindbergh
+6	Melyik évben repült az első motoros repülőgép a Wright fivérekkel?	1903
+6	Melyik évben süllyedt el a Lusitania hajó?	1915
+6	Melyik évben kezdődött a nagy gazdasági világválság?	1929
+6	Melyik amerikai elnök mondott le a Watergate-botrány miatt?	Richard Nixon
+6	Ki volt az Egyesült Államok első fekete elnöke?	Barack Obama
+6	Melyik évben léptek be a balti államok az EU-ba Magyarországgal együtt?	2004
+6	Melyik évben volt a magyar Tanácsköztársaság?	1919
+6	Ki volt a Tanácsköztársaság vezetője?	Kun Béla
+6	Melyik évben nyitották meg a Lánchidat?	1849
+6	Ki kezdeményezte a Lánchíd megépítését?	Széchenyi István
+6	Melyik évben volt az első Magyar Nagydíj a Népligetben?	1936
+6	Ki volt az első magyar miniszterelnök a kiegyezés után?	Andrássy Gyula
+6	Melyik évben koronázták magyar királlyá Ferenc Józsefet?	1867
+6	Mi a legrégebbi fennmaradt, összefüggő magyar nyelvű szövegemlék?	Halotti beszéd és könyörgés
+7	Mi az oxigén vegyjele?	O
+7	Mi a szén vegyjele?	C
+7	Mi a hidrogén vegyjele?	H
+7	Mi a kálium vegyjele?	K
+7	Mi a kalcium vegyjele?	Ca
+7	Mi a réz vegyjele?	Cu
+7	Mi az ólom vegyjele?	Pb
+7	Mi a higany vegyjele?	Hg
+7	Mi az ón vegyjele?	Sn
+7	Mi a klór vegyjele?	Cl
+7	Mi a nitrogén vegyjele?	N
+7	Mi a hélium vegyjele?	He
+7	Mi az urán vegyjele?	U
+7	Mi a cink vegyjele?	Zn
+7	Mi a kén vegyjele?	S
+7	Melyik elem rendszáma 1?	Hidrogén
+7	Melyik elem rendszáma 6?	Szén
+7	Melyik elem rendszáma 8?	Oxigén
+7	Melyik elem vegyjele a Ne?	Neon
+7	Ki alkotta meg a periódusos rendszert?	Dmitrij Mengyelejev
+7	Melyik gázzal töltik a felszálló lufikat?	Hélium
+7	Melyik fém folyékony szobahőmérsékleten?	Higany
+7	Melyik a legkeményebb természetes anyag?	Gyémánt
+7	Melyik elemből áll a gyémánt?	Szén
+7	Mi a konyhasó kémiai neve?	Nátrium-klorid
+7	Mi a konyhasó képlete?	NaCl
+7	Mi a szén-dioxid képlete?	CO2
+7	Mi az ózon képlete?	O3
+7	Mennyi a semleges oldat pH-ja?	7
+7	Savas vagy lúgos az ecet?	Savas
+7	Milyen kémiai folyamat a vas rozsdásodása?	Oxidáció
+7	Hány Celsius-fok az abszolút nulla fok?	-273,15
+7	Mi a hőmérséklet SI-mértékegysége?	Kelvin
+7	Mi az erő mértékegysége?	Newton
+7	Mi az energia mértékegysége?	Joule
+7	Mi a teljesítmény mértékegysége?	Watt
+7	Mi az elektromos feszültség mértékegysége?	Volt
+7	Mi az elektromos áramerősség mértékegysége?	Amper
+7	Mi az elektromos ellenállás mértékegysége?	Ohm
+7	Mi a frekvencia mértékegysége?	Hertz
+7	Mi a nyomás mértékegysége?	Pascal
+7	Ki fogalmazta meg az egyetemes tömegvonzás törvényét?	Isaac Newton
+7	Hogy szól Newton második törvénye képlettel?	F = m · a
+7	Mi Einstein leghíresebb képlete?	E = mc²
+7	Kb. hány méter másodpercenként a hang sebessége levegőben?	340
+7	Kb. mekkora a nehézségi gyorsulás a Földön?	9,81 m/s²
+7	Mi a neve a jelenségnek, amikor a fény két közeg határán irányt változtat?	Fénytörés
+7	Ki fedezte fel a röntgensugárzást?	Wilhelm Conrad Röntgen
+7	Ki volt az első nő, aki Nobel-díjat kapott?	Marie Curie
+7	Hány Nobel-díjat kapott Marie Curie?	2
+7	Ki fedezte fel a penicillint?	Alexander Fleming
+7	Melyik évben fedezték fel a penicillint?	1928
+7	Ki dolgozta ki a természetes kiválasztódás elméletét?	Charles Darwin
+7	Melyik hajón utazta körül a világot Darwin?	Beagle
+7	Kit tartanak a genetika atyjának a borsókísérletei miatt?	Gregor Mendel
+7	Ki fedezte fel Francis Crickkel a DNS kettős spirál szerkezetét?	James Watson
+7	Minek a rövidítése a DNS?	Dezoxiribonukleinsav
+7	Hány kromoszómája van egy egészséges embernek?	46
+7	Hány kromoszómapárja van az embernek?	23
+7	Melyik sejtalkotót nevezik a sejt erőművének?	Mitokondrium
+7	Melyik sejtalkotóban található a DNS legnagyobb része?	Sejtmag
+7	Melyik zöld színanyag felel a fotoszintézisért?	Klorofill
+7	Melyik az emberi test legnagyobb belső szerve?	Máj
+7	Melyik szerv szűri a vért és termeli a vizeletet?	Vese
+7	Hány üregből áll az emberi szív?	4
+7	Melyik az emberi test leghosszabb csontja?	Combcsont
+7	Melyik az emberi test legkisebb csontja?	Kengyel
+7	Hány tejfoga van egy gyereknek?	20
+7	Melyik vércsoport az általános vérbefogadó?	AB Rh pozitív
+7	Melyik vérsejtek szállítják az oxigént?	Vörösvértestek
+7	Melyik vérsejtek védenek a fertőzések ellen?	Fehérvérsejtek
+7	Melyik vérsejtek segítik a véralvadást?	Vérlemezkék
+7	Melyik vitamin hiánya okozza a skorbutot?	C-vitamin
+7	Melyik ásványi anyagra van a csontoknak a legnagyobb szükségük?	Kalcium
+7	Melyik ásványi anyag hiánya okozza leggyakrabban a vérszegénységet?	Vas
+7	Melyik mirigy termeli a tiroxint?	Pajzsmirigy
+7	Hány érzékszervünk van hagyományosan?	5
+7	Melyik a leggyorsabb madár zuhanórepülésben?	Vándorsólyom
+7	Melyik emlős képes valódi repülésre?	Denevér
+7	Melyik a legnagyobb madár?	Strucc
+7	Hány szíve van a polipnak?	3
+7	Melyik gerinces él a leghosszabb ideig?	Grönlandi cápa
+7	Hal vagy emlős a bálna?	Emlős
+7	Melyik állatosztályba tartozik a béka?	Kétéltűek
+7	Melyik állatosztályba tartozik a krokodil?	Hüllők
+7	Mivel lélegzik a hal?	Kopoltyúval
+7	Hogy hívják a növényekkel foglalkozó tudományt?	Botanika
+7	Hogy hívják a madarakkal foglalkozó tudományt?	Ornitológia
+7	Hogy hívják a rovarokkal foglalkozó tudományt?	Entomológia
+7	Hogy hívják a gombákkal foglalkozó tudományt?	Mikológia
+7	Hogy hívják az égitestekkel foglalkozó tudományt?	Csillagászat
+7	Hogy hívják a földrengésekkel foglalkozó tudományt?	Szeizmológia
+7	Melyik skálán mérik hagyományosan a földrengések erősségét?	Richter-skála
+7	Melyik bolygónak van a Naprendszer legnagyobb holdja?	Jupiter
+7	Hogy hívják a Mars két holdját?	Phobos és Deimos
+7	Melyik bolygó forog oldalára dőlve a Nap körül?	Uránusz
+7	Melyik a Naptól legtávolabbi bolygó?	Neptunusz
+7	Melyik égitestet sorolták át törpebolygóvá 2006-ban?	Plútó
+7	Kb. hány perc alatt ér a Nap fénye a Földre?	8
+7	Kb. milyen messze van a Hold a Földtől?	384 000 km
+7	Kb. hány nap alatt kerüli meg a Hold a Földet?	27
+7	Hogy hívják a mi galaxisunkat?	Tejútrendszer
+7	Melyik a Tejútrendszerhez legközelebbi nagy galaxis?	Androméda-galaxis
+7	Melyik a Naphoz legközelebbi csillag?	Proxima Centauri
+7	Mit mér a fényév: időt vagy távolságot?	Távolságot
+7	Melyik csillagképben van a Sarkcsillag?	Kis Göncöl (Kis Medve)
+7	Ki alkotta meg a 16. században a Nap-középpontú (heliocentrikus) világképet?	Kopernikusz
+7	Ki fedezte fel távcsővel a Jupiter négy nagy holdját?	Galileo Galilei
+7	Ki volt az első nő a világűrben?	Valentyina Tyereskova
+7	Ki volt az első magyar űrhajós?	Farkas Bertalan
+7	Melyik évben repült a világűrbe Farkas Bertalan?	1980
+7	Ki a második magyar űrhajós?	Kapu Tibor
+7	Melyik űrállomáson járt Kapu Tibor 2025-ben?	Nemzetközi Űrállomás
+7	Mi az amerikai űrkutatási hivatal neve?	NASA
+7	Hogy hívták a NASA Holdra szállást célzó programját?	Apollo-program
+7	Melyik nagy űrtávcsövet lőtték fel 2021-ben?	James Webb-űrtávcső
+7	Ki szabadalmaztatta a telefont 1876-ban?	Alexander Graham Bell
+7	Ki tette széles körben használhatóvá az izzólámpát?	Thomas Edison
+7	Ki tökéletesítette a gőzgépet?	James Watt
+7	Melyik magyar bencés szerzetes fedezte fel a dinamó elvét?	Jedlik Ányos
+7	Ki találta fel a zajtalan gyufát?	Irinyi János
+7	Ki találta fel a porlasztót Bánki Donáttal együtt?	Csonka János
+7	Melyik magyar kapott Nobel-díjat a holográfia feltalálásáért?	Gábor Dénes
+7	Melyik magyar tudósról nevezték el a számítógépek felépítésének elveit?	Neumann János
+7	Ki ismerte fel, hogy a kézfertőtlenítés megelőzi a gyermekágyi lázat?	Semmelweis Ignác
+7	Ki találta fel a transzformátort Bláthy Ottóval és Déri Miksával?	Zipernowsky Károly
+7	Ki találta fel a Telefonhírmondót?	Puskás Tivadar
+7	Melyik magyar kutató kapott Nobel-díjat 2023-ban az mRNS-kutatásaiért?	Karikó Katalin
+7	Melyik magyar fizikus kapott Nobel-díjat 2023-ban az attoszekundumos kutatásaiért?	Krausz Ferenc
+7	Ki hozta létre a világhálót (World Wide Web)?	Tim Berners-Lee
+7	Hogy hívják a számítógép központi feldolgozóegységét röviden?	Processzor (CPU)
+7	Mit jelent a RAM?	Közvetlen hozzáférésű memória
+7	Hány bit egy bájt?	8
+7	Hány bájt egy kilobájt a hagyományos számítás szerint?	1024
+7	Mi a kettes számrendszer másik neve?	Bináris számrendszer
+7	Hogyan írjuk le a 2-es számot kettes számrendszerben?	10
+7	Mit jelent az angol AI rövidítés?	Mesterséges intelligencia
+7	Melyik cég fejleszti a Windows operációs rendszert?	Microsoft
+7	Melyik cég fejlesztette a ChatGPT-t?	OpenAI
+7	Mit jelent a GPS?	Globális helymeghatározó rendszer
+7	Mit mér a barométer?	Légnyomást
+7	Mit mér a szeizmográf?	Földrengést
+7	Mit mér az ampermérő?	Áramerősséget
+7	Mit mér a higrométer?	Páratartalmat
+7	Kb. mekkora a víz sűrűsége?	1 g/cm³
+7	Hány Fahrenheit-fokon forr a víz?	212
+7	Hány Fahrenheit-fokon fagy meg a víz?	32
+7	Hány kelvin 0 Celsius-fok?	273,15
+7	Melyik két fém alkotja főleg a Föld magját?	Vas és nikkel
+7	Hogy hívják a Föld legkülső szilárd rétegét?	Földkéreg
+7	Melyik kőzet keletkezik a láva megszilárdulásával a leggyakrabban?	Bazalt
+7	Hogy hívják a föld alatti olvadt kőzetet?	Magma
+7	Mi a tömeg SI-mértékegysége?	Kilogramm
+7	Mi a hosszúság SI-mértékegysége?	Méter
+7	Mi az idő SI-mértékegysége?	Másodperc
+7	Mi a fényerősség SI-mértékegysége?	Kandela
+7	Hány SI-alapmértékegység van?	7
+7	Mi a gyorsulás mértékegysége?	m/s²
+7	Melyik két részecske alkotja az atommagot?	Proton és neutron
+7	Melyik részecske negatív töltésű az atomban?	Elektron
+7	Ki fedezte fel az elektront?	J. J. Thomson
+7	Ki fedezte fel az atommagot?	Ernest Rutherford
+7	Melyik részecskét fedezték fel 2012-ben a CERN-ben?	Higgs-bozon
+7	Melyik városnál van a CERN?	Genf
+7	Hogy hívják a CERN nagy részecskegyorsítóját?	Nagy Hadronütköztető (LHC)
+7	Ki fedezte fel az elektromágneses indukciót?	Michael Faraday
+7	Melyik vírus okozta a 2020-ban kitört világjárványt?	Koronavírus (SARS-CoV-2)
+7	Ki fejlesztette ki az első himlő elleni oltást?	Edward Jenner
+7	Ki fejlesztette ki a veszettség elleni oltást?	Louis Pasteur

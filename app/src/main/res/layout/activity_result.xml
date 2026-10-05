@@ -1,53 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/Screen"
+    android:gravity="center_horizontal"
     tools:context=".ResultActivity">
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="🏆"
+        android:textSize="64sp" />
+
+    <TextView
+        style="@style/ScreenTitle"
         android:id="@+id/ResultTitle"
-        android:text="Eredmények"
-        android:textAlignment="center"
-        android:textSize="36sp"
-        android:layout_marginTop="50dp"/>
+        android:layout_marginTop="8dp"
+        android:text="Eredmények" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ResultTitle"
-        android:layout_above="@+id/ButtonNewGame"
-        android:layout_marginTop="30dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="20dp">
 
         <TextView
+            style="@style/Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/Scoreboard"
-            android:paddingStart="30dp"
-            android:paddingEnd="30dp"
-            android:textSize="28sp"/>
+            android:lineSpacingExtra="10dp"
+            android:textColor="@color/textPrimary"
+            android:textSize="22sp" />
     </ScrollView>
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/ButtonNewGame"
-        android:layout_above="@+id/ButtonMainMenu"
-        android:text="Új játék"
-        android:textSize="30sp"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_green_dark"/>
+        style="@style/ButtonSmall"
+        android:id="@+id/ButtonUndoResult"
+        android:layout_marginTop="16dp"
+        android:text="↶ Utolsó döntés visszavonása" />
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/ButtonSecondary"
         android:id="@+id/ButtonMainMenu"
-        android:layout_alignParentBottom="true"
-        android:text="Főmenü"
-        android:textSize="30sp"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_orange_dark"/>
+        android:layout_marginTop="16dp"
+        android:text="Főmenü" />
 
-</RelativeLayout>
+    <Button
+        style="@style/ButtonPrimary"
+        android:id="@+id/ButtonNewGame"
+        android:layout_marginTop="12dp"
+        android:text="Új játék ugyanezekkel" />
+
+</LinearLayout>
