@@ -15,10 +15,12 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <!-- long press to move the row: the players are given in the order they sit -->
         <TextView
             android:layout_width="28dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/PlayerNumber"
+            android:gravity="center_vertical"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -50,22 +52,38 @@
             android:id="@+id/PlayerTime"
             android:layout_marginStart="6dp"
             android:background="@null" />
+
+        <!-- removes the player or the team, the rows below move up -->
+        <TextView
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:id="@+id/PlayerRemove"
+            android:contentDescription="Törlés"
+            android:gravity="center"
+            android:text="✕"
+            android:textColor="@color/textSecondary"
+            android:textSize="18sp" />
     </LinearLayout>
 
-    <!-- only in team games -->
-    <EditText
+    <!-- only in team games: the members, every one with their own level and time -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/PlayerMembers"
+        android:id="@+id/MemberList"
+        android:layout_marginStart="4dp"
+        android:orientation="vertical"
+        android:visibility="gone" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ButtonNewMember"
         android:layout_marginStart="28dp"
-        android:background="@null"
-        android:hint="Tagok, vesszővel: Anna, Béla"
-        android:importantForAutofill="no"
-        android:inputType="textPersonName|textCapWords"
+        android:gravity="center_vertical"
         android:minHeight="48dp"
-        android:paddingBottom="12dp"
-        android:textColor="@color/textPrimary"
-        android:textColorHint="@color/textSecondary"
+        android:text="+ Új tag"
+        android:textColor="@color/colorPrimary"
         android:textSize="16sp"
+        android:textStyle="bold"
         android:visibility="gone" />
 </LinearLayout>

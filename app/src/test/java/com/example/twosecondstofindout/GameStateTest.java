@@ -24,6 +24,13 @@ public class GameStateTest {
     }
 
     @Test
+    public void playersAskIsKept() {
+        assertFalse(new GameState(context).isPlayersAsk());
+        new GameState(context).setPlayersAsk(true);
+        assertTrue(new GameState(context).isPlayersAsk());
+    }
+
+    @Test
     public void phoneReadsByDefault() {
         assertTrue(new GameState(context).isPhoneReading());
     }
@@ -59,5 +66,43 @@ public class GameStateTest {
         GameState later = new GameState(context);
         assertFalse(later.isBeeping());
         assertTrue(later.isVibrating());
+    }
+
+    @Test
+    public void roundsFlashAndPassesByDefault() {
+        GameState gameState = new GameState(context);
+        assertFalse(gameState.isByPoints());
+        assertEquals(GameState.DEFAULT_TARGET_POINTS, gameState.getTargetPoints());
+        assertFalse(gameState.isFlash());
+        assertEquals(0, gameState.getPasses());
+    }
+
+    @Test
+    public void goalFlashAndPassesAreKept() {
+        GameState gameState = new GameState(context);
+        gameState.setGoal(true, 15);
+        gameState.setFlash(true);
+        gameState.setPasses(2);
+
+        GameState later = new GameState(context);
+        assertTrue(later.isByPoints());
+        assertEquals(15, later.getTargetPoints());
+        assertTrue(later.isFlash());
+        assertEquals(2, later.getPasses());
+    }
+
+    @Test
+    public void aNewGameDoesNotStartWithAFlashRound() {
+        GameState gameState = new GameState(context);
+        gameState.setFlashPending(true);
+        gameState.start(3, true);
+        assertFalse(new GameState(context).isFlashPending());
+    }
+
+    @Test
+    public void anybodyCanAnswerIsKept() {
+        assertFalse(new GameState(context).isFlashOnly());
+        new GameState(context).setFlashOnly(true);
+        assertTrue(new GameState(context).isFlashOnly());
     }
 }

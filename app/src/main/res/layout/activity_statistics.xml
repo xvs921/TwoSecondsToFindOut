@@ -52,6 +52,19 @@
                     android:id="@+id/StatSuccess" />
             </LinearLayout>
 
+            <!-- only if there is a record yet -->
+            <TextView
+                style="@style/SectionTitle"
+                android:id="@+id/RecordsTitle"
+                android:text="Rekordok" />
+
+            <LinearLayout
+                style="@style/Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Records"
+                android:orientation="vertical" />
+
             <TextView
                 style="@style/SectionTitle"
                 android:text="Játékosok" />
@@ -61,6 +74,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/PlayerStatistics"
+                android:orientation="vertical" />
+
+            <!-- only if there was a team game -->
+            <TextView
+                style="@style/SectionTitle"
+                android:id="@+id/TeamStatisticsTitle"
+                android:text="Csapatok" />
+
+            <LinearLayout
+                style="@style/Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/TeamStatistics"
                 android:orientation="vertical" />
 
             <TextView

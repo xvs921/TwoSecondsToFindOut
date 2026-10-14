@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- one member of a team on the players screen, with their own level and time -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <!-- long press to move the member: they answer in this order -->
+    <TextView
+        android:layout_width="24dp"
+        android:layout_height="match_parent"
+        android:id="@+id/MemberHandle"
+        android:contentDescription="Áthelyezés"
+        android:gravity="center_vertical"
+        android:text="≡"
+        android:textColor="@color/textSecondary"
+        android:textSize="20sp" />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/MemberName"
+        android:background="@null"
+        android:hint="Tag neve"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName|textCapWords"
+        android:textColor="@color/textPrimary"
+        android:textColorHint="@color/textSecondary"
+        android:textSize="17sp" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/MemberLevel"
+        android:background="@null" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/MemberTime"
+        android:layout_marginStart="6dp"
+        android:background="@null" />
+
+    <TextView
+        android:layout_width="36dp"
+        android:layout_height="match_parent"
+        android:id="@+id/MemberRemove"
+        android:contentDescription="Törlés"
+        android:gravity="center"
+        android:text="✕"
+        android:textColor="@color/textSecondary"
+        android:textSize="16sp" />
+</LinearLayout>
