@@ -12,6 +12,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.graphics.Typeface;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,6 +24,10 @@ public class StatisticsActivity extends AppCompatActivity {
     private TextView StatQuestions;
     private TextView StatSuccess;
     private LinearLayout PlayerStatistics;
+    private TextView RecordsTitle;
+    private LinearLayout Records;
+    private TextView TeamStatisticsTitle;
+    private LinearLayout TeamStatistics;
     private LinearLayout HardestQuestions;
     private Database database;
 
@@ -35,6 +40,10 @@ public class StatisticsActivity extends AppCompatActivity {
         StatQuestions = findViewById(R.id.StatQuestions);
         StatSuccess = findViewById(R.id.StatSuccess);
         PlayerStatistics = findViewById(R.id.PlayerStatistics);
+        RecordsTitle = findViewById(R.id.RecordsTitle);
+        Records = findViewById(R.id.Records);
+        TeamStatisticsTitle = findViewById(R.id.TeamStatisticsTitle);
+        TeamStatistics = findViewById(R.id.TeamStatistics);
         HardestQuestions = findViewById(R.id.HardestQuestions);
         database = new Database(this);
 
@@ -59,19 +68,27 @@ public class StatisticsActivity extends AppCompatActivity {
         StatQuestions.setText(tile(String.valueOf(totals[1]), "kérdés"));
         StatSuccess.setText(tile(percent(totals[2], totals[1]), "siker"));
 
-        PlayerStatistics.removeAllViews();
-        Cursor players = database.selectPlayerStatistics();
-        while (players.moveToNext()) {
-            int answered = players.getInt(1);
-            int successful = players.getInt(2);
-            int wins = players.getInt(3);
-            addRow(PlayerStatistics, players.getString(0),
-                    "🏆 " + wins + "   ✓ " + successful + "/" + answered + " (" + percent(successful, answered) + ")");
+        Records.removeAllViews();
+        addRecord("🔥 Leghosszabb sorozat", database.selectLongestStreak(), " találat");
+        String[] fastest = database.selectFastestAnswer();
+        if (fastest != null) {
+            // the time until Siker was pressed, e.g. 0,412 mp
+            long ms = Long.parseLong(fastest[1]);
+            fastest[1] = String.format(java.util.Locale.ROOT, "%d,%03d", ms / 1000, ms % 1000);
         }
-        if (players.getCount() == 0) {
+        addRecord("⚡ Leggyorsabb válasz", fastest, " mp");
+        addRecord("🏆 Legtöbb győzelem zsinórban", database.selectMostWinsInARow(), "");
+        boolean hasRecords = Records.getChildCount() > 0;
+        RecordsTitle.setVisibility(hasRecords ? View.VISIBLE : View.GONE);
+        Records.setVisibility(hasRecords ? View.VISIBLE : View.GONE);
+
+        // everybody as if they played alone, also the answers they gave in a team
+        if (addStatisticsRows(PlayerStatistics, database.selectPlayerStatistics()) == 0) {
             addRow(PlayerStatistics, "Még nincs lejátszott kérdés.", "");
         }
-        players.close();
+        boolean hasTeams = addStatisticsRows(TeamStatistics, database.selectTeamStatistics()) > 0;
+        TeamStatisticsTitle.setVisibility(hasTeams ? View.VISIBLE : View.GONE);
+        TeamStatistics.setVisibility(hasTeams ? View.VISIBLE : View.GONE);
 
         HardestQuestions.removeAllViews();
         Cursor questions = database.selectHardestQuestions(10);
@@ -83,6 +100,28 @@ public class StatisticsActivity extends AppCompatActivity {
             addRow(HardestQuestions, "Egy kérdés legalább kétszer kell, hogy elhangozzon.", "");
         }
         questions.close();
+    }
+
+    // record: {name, value}, or null if there is none yet
+    private void addRecord(String title, String[] record, String unit) {
+        if (record != null) {
+            addRow(Records, title + "\n" + record[0], record[1] + unit);
+        }
+    }
+
+    // name, answered, successful, wins. Returns the number of rows.
+    private int addStatisticsRows(LinearLayout parent, Cursor rows) {
+        parent.removeAllViews();
+        while (rows.moveToNext()) {
+            int answered = rows.getInt(1);
+            int successful = rows.getInt(2);
+            int wins = rows.getInt(3);
+            addRow(parent, rows.getString(0),
+                    "🏆 " + wins + "   ✓ " + successful + "/" + answered + " (" + percent(successful, answered) + ")");
+        }
+        int count = rows.getCount();
+        rows.close();
+        return count;
     }
 
     // a big number with a small label under it

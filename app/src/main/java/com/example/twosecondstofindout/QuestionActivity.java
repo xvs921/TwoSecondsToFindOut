@@ -22,6 +22,7 @@ import android.speech.tts.UtteranceProgressListener;
 import android.view.Choreographer;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +31,12 @@ import java.util.Locale;
 public class QuestionActivity extends AppCompatActivity {
 
     private TextView CurrentPlayer;
+    private TextView Asker;
     private TextView Question;
     private TextView Answer;
+    // the answer is hidden until it is tapped, or until the phone has read the question
+    private String currentAnswerText = "";
+    private int defaultAnswerColor;
     private TextView TimerText;
     private Button ButtonStartStop;
     private Button ButtonRepeat;
@@ -43,6 +48,9 @@ public class QuestionActivity extends AppCompatActivity {
     private Button ButtonNotOk;
     private Button ButtonSkip;
     private Button ButtonUndo;
+    private Button ButtonPass;
+    private View OkButtons;
+    private LinearLayout FlashButtons;
     private View QuestionCard;
     private View TimerArea;
     private View RoundArea;
@@ -68,6 +76,8 @@ public class QuestionActivity extends AppCompatActivity {
 
     private GameState gameState;
     private int rounds;
+    // in a team game every member answers in a round
+    private int answersPerRound;
     private int currentPlayerId;
     private int currentTopic;
     private int currentQuestionId;
@@ -75,6 +85,22 @@ public class QuestionActivity extends AppCompatActivity {
     private int currentAnswerMs = Database.DEFAULT_ANSWER_MS;
     // who answers now: the player, or the team member on turn
     private String currentAnswerer = "";
+    // without a game master: {the player who holds the phone now, their team or empty}, null if none
+    private String[] currentAsker;
+    // the phone is only announced when it goes to another player
+    private String announcedAsker;
+    // the phone reads the questions, so the one holding it only checks the answer
+    private boolean askerChecks;
+    // what the phone says before the question, e.g. "Anna következik!"
+    private String announcement = "";
+    // a flash round: a question for everybody, the one who answers first gets a point
+    private boolean flashTurn;
+    // after the standings of the round comes a flash round
+    private boolean flashNext;
+    // anybody can answer: every question is a flash question
+    private boolean flashOnly;
+    // without a game master in a flash only game: the player or team with the phone does not answer
+    private int flashAskerId = -1;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -85,10 +111,20 @@ public class QuestionActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, backToMainMenu);
         init();
         rounds = gameState.getRounds();
+        answersPerRound = database.answersPerRound();
         // after an undo on the results screen the undone question comes back
         int undoneQuestionId = getIntent().getIntExtra("questionId", -1);
-        if (undoneQuestionId >= 0) {
+        flashOnly = gameState.isFlashOnly();
+        if (flashOnly) {
+            if (undoneQuestionId >= 0) {
+                showFlash(undoneQuestionId);
+            } else {
+                nextFlash();
+            }
+        } else if (undoneQuestionId >= 0) {
             showTurn(undoneQuestionId);
+        } else if (gameState.isFlashPending()) {
+            showFlash(-1);
         } else {
             nextTurn();
         }
@@ -107,20 +143,38 @@ public class QuestionActivity extends AppCompatActivity {
         });
         ButtonOk.setOnClickListener(view -> {
             if(timerStarted){
+                long elapsed = SystemClock.elapsedRealtime() - startTime;
                 stopTimer();
-                int points = database.savePlayerAnswer(currentPlayerId, currentQuestionId, true, gameState.isStreakBonus());
+                int points = database.savePlayerAnswer(currentPlayerId, currentQuestionId, true, gameState.isStreakBonus(), elapsed);
                 if (points > 1) {
                     Toast.makeText(this, "🔥 " + Database.STREAK_LENGTH + " találat egymás után: +1 bónuszpont!", Toast.LENGTH_LONG).show();
                 }
                 nextTurn();
             }
         });
-        // takes back the last Siker / Késő, the player gets the same question again
+        // takes back the last Siker / Késő, flash round or pass, its question comes back
         ButtonUndo.setOnClickListener(view -> {
             stopTimer();
+            int kind = database.selectLastAnswerKind();
             int questionId = database.undoLastAnswer();
-            if (questionId >= 0) {
+            if (questionId < 0) {
+                return;
+            }
+            if (kind == Database.FLASH) {
+                showFlash(questionId);
+            } else {
+                // the round of the flash round is not over any more
+                gameState.setFlashPending(false);
                 showTurn(questionId);
+            }
+        });
+        // the player passes, and gets another question without losing a point
+        ButtonPass.setOnClickListener(view -> {
+            stopTimer();
+            if (database.usePass(currentPlayerId, currentQuestionId)) {
+                kerdes(currentTopic);
+                showPassButton();
+                ButtonUndo.setEnabled(true);
             }
         });
         // a new question for the same player, without scoring
@@ -128,7 +182,13 @@ public class QuestionActivity extends AppCompatActivity {
             stopTimer();
             kerdes(currentTopic);
         });
-        ButtonNextRound.setOnClickListener(view -> showTurn(-1));
+        ButtonNextRound.setOnClickListener(view -> {
+            if (flashNext) {
+                showFlash(-1);
+            } else {
+                showTurn(-1);
+            }
+        });
         ButtonNotOk.setOnClickListener(view -> {
             if(timerStarted){
                 stopTimer();
@@ -162,8 +222,11 @@ public class QuestionActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void init() {
         CurrentPlayer = findViewById(R.id.CurrentPlayer);
+        Asker = findViewById(R.id.Asker);
         Question = findViewById(R.id.Question);
         Answer = findViewById(R.id.Answer);
+        defaultAnswerColor = Answer.getCurrentTextColor();
+        Answer.setOnClickListener(view -> showAnswer());
         TimerText = findViewById(R.id.Timer);
         ButtonStartStop = findViewById(R.id.ButtonStartStop);
         ButtonRepeat = findViewById(R.id.ButtonRepeat);
@@ -172,6 +235,9 @@ public class QuestionActivity extends AppCompatActivity {
         ButtonNotOk = findViewById(R.id.ButtonNotOk);
         ButtonSkip = findViewById(R.id.ButtonSkip);
         ButtonUndo = findViewById(R.id.ButtonUndo);
+        ButtonPass = findViewById(R.id.ButtonPass);
+        OkButtons = findViewById(R.id.OkButtons);
+        FlashButtons = findViewById(R.id.FlashButtons);
         QuestionCard = findViewById(R.id.QuestionCard);
         TimerArea = findViewById(R.id.TimerArea);
         RoundArea = findViewById(R.id.RoundArea);
@@ -185,6 +251,7 @@ public class QuestionActivity extends AppCompatActivity {
         defaultTimerColor = TimerText.getCurrentTextColor();
         timerStarted = false;
         // otherwise the game master reads the question and presses Start
+        askerChecks = gameState.isPhoneReading();
         if (gameState.isPhoneReading()) {
             textToSpeech = new TextToSpeech(this, this::onTextToSpeechReady);
         }
@@ -202,7 +269,9 @@ public class QuestionActivity extends AppCompatActivity {
                 textToSpeech.shutdown();
                 textToSpeech = new TextToSpeech(this, this::onTextToSpeechReady, GOOGLE_TEXT_TO_SPEECH);
             } else {
-                Toast.makeText(this, "A telefonon nincs magyar felolvasó hang, a játékmester olvasson fel.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "A telefonon nincs magyar felolvasó hang, " + (gameState.isPlayersAsk() ? "a kérdező" : "a játékmester") + " olvasson fel.", Toast.LENGTH_LONG).show();
+                askerChecks = false;
+                showAskerText();
             }
             return;
         }
@@ -223,6 +292,10 @@ public class QuestionActivity extends AppCompatActivity {
         });
         canReadAloud = true;
         ButtonStartStop.setText("🔊 Felolvasás");
+        // the first turn was shown before the voice was ready
+        if (RoundArea.getVisibility() != View.VISIBLE) {
+            announceAsker();
+        }
     }
 
     private boolean speaksHungarian()
@@ -267,14 +340,25 @@ public class QuestionActivity extends AppCompatActivity {
         readingId = "question-" + currentQuestionId + "-" + SystemClock.elapsedRealtime();
         showRepeatButton(true);
         int queueMode = TextToSpeech.QUEUE_FLUSH;
-        if (announce && !currentAnswerer.isEmpty()) {
-            textToSpeech.speak(currentAnswerer + " következik!", TextToSpeech.QUEUE_FLUSH, null, "announce-" + readingId);
+        if (announce && !announcement.isEmpty()) {
+            textToSpeech.speak(announcement, TextToSpeech.QUEUE_FLUSH, null, "announce-" + readingId);
             textToSpeech.playSilentUtterance(300, TextToSpeech.QUEUE_ADD, "pause-" + readingId);
             queueMode = TextToSpeech.QUEUE_ADD;
         }
         if (textToSpeech.speak(Question.getText(), queueMode, null, readingId) == TextToSpeech.ERROR) {
             readingId = null;
+            showAnswer();
             startTimer();
+        }
+    }
+
+    // e.g. "Béla ellenőriz, nála legyen a telefon.", so the phone is passed on before Felolvasás.
+    // Only when the phone goes to another player.
+    private void announceAsker()
+    {
+        if (canReadAloud && currentAsker != null && !currentAsker[0].equals(announcedAsker) && readingId == null && !timerStarted) {
+            announcedAsker = currentAsker[0];
+            textToSpeech.speak(currentAsker[0] + " ellenőriz, nála legyen a telefon.", TextToSpeech.QUEUE_FLUSH, null, "asker-" + SystemClock.elapsedRealtime());
         }
     }
 
@@ -285,24 +369,33 @@ public class QuestionActivity extends AppCompatActivity {
             return;
         }
         readingId = null;
+        // the phone has read the question, now the one with the phone can see the answer
+        showAnswer();
         startTimer();
     }
 
     // Called after every Siker / Késő. When every active player answered the same number
-    // of questions a round is over: the standings are shown, and after the last round the
+    // of questions (in a team game: every member one) a round is over: the standings are shown, and after the last round the
     // players with the most points play tie-break rounds until there is one winner.
     private void nextTurn()
     {
+        flashNext = false;
         int[] answeredRange = database.selectActiveAnsweredRange();
-        boolean roundOver = answeredRange[0] == answeredRange[1] && answeredRange[0] > 0;
+        boolean roundOver = answeredRange[0] == answeredRange[1] && answeredRange[0] > 0 && answeredRange[0] % answersPerRound == 0;
+        int finishedRounds = answeredRange[0] / answersPerRound;
         if (!roundOver)
         {
             showTurn(-1);
             return;
         }
-        if (answeredRange[0] < rounds)
+        // until somebody has the target points at the end of a round, or for the rounds
+        boolean goesOn = gameState.isByPoints()
+                ? database.selectMostActivePoints() < gameState.getTargetPoints()
+                : finishedRounds < rounds;
+        if (goesOn)
         {
-            showRoundStandings(answeredRange[0] + ". kör vége", database.selectScoreboardText());
+            flashNext = gameState.isFlash();
+            showRoundStandings(finishedRounds + ". kör vége", database.selectScoreboardText());
             return;
         }
         if (database.keepLeadersActive() <= 1)
@@ -310,6 +403,38 @@ public class QuestionActivity extends AppCompatActivity {
             finishGame();
             return;
         }
+        showRoundStandings("Holtverseny!", "Szétszavazó kör: " + database.selectActivePlayerNames() + "\n\n" + database.selectScoreboardText());
+    }
+
+    // Only flash questions: a round has a question for every player or team. After a round the
+    // standings are shown, and the game is over like with the turns: after the rounds, or when
+    // somebody has the target points. The leaders play tie-break rounds.
+    private void nextFlash()
+    {
+        flashNext = false;
+        int asked = database.countFlashAnswers();
+        int perRound = Math.max(1, database.countPlayers());
+        if (asked == 0 || asked % perRound != 0)
+        {
+            showFlash(-1);
+            return;
+        }
+        int finishedRounds = asked / perRound;
+        boolean goesOn = gameState.isByPoints()
+                ? database.selectMostActivePoints() < gameState.getTargetPoints()
+                : finishedRounds < rounds;
+        if (goesOn)
+        {
+            flashNext = true;
+            showRoundStandings(finishedRounds + ". kör vége", database.selectScoreboardText());
+            return;
+        }
+        if (database.keepLeadersActive() <= 1)
+        {
+            finishGame();
+            return;
+        }
+        flashNext = true;
         showRoundStandings("Holtverseny!", "Szétszavazó kör: " + database.selectActivePlayerNames() + "\n\n" + database.selectScoreboardText());
     }
 
@@ -326,8 +451,12 @@ public class QuestionActivity extends AppCompatActivity {
         RoundArea.setVisibility(visible ? View.VISIBLE : View.GONE);
         TimerArea.setVisibility(visible ? View.GONE : View.VISIBLE);
         AnswerButtons.setVisibility(visible ? View.GONE : View.VISIBLE);
+        if (visible) {
+            ButtonNextRound.setText(flashNext && !flashOnly ? "⚡ Jöhet a villámkör" : "Tovább");
+        }
         // the last player and question stay readable, but faded
         CurrentPlayer.setAlpha(visible ? 0.35f : 1f);
+        Asker.setAlpha(visible ? 0.35f : 1f);
         QuestionCard.setAlpha(visible ? 0.35f : 1f);
     }
 
@@ -335,8 +464,10 @@ public class QuestionActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void showTurn(int questionId)
     {
+        flashNext = false;
         setRoundAreaVisible(false);
-        Cursor player = database.selectNextPlayer();
+        showFlashButtons(false);
+        Cursor player = database.selectNextPlayer(gameState.isPlayersAsk());
         if (!player.moveToFirst())
         {
             player.close();
@@ -345,32 +476,192 @@ public class QuestionActivity extends AppCompatActivity {
         }
         currentPlayerId = player.getInt(0);
         int answered = player.getInt(2);
-        // in a team game the team members answer in turns
-        String member = Database.memberOnTurn(player.getString(4), answered);
-        String name = member.isEmpty() ? player.getString(1) : player.getString(1) + " · " + member;
-        currentAnswerer = member.isEmpty() ? player.getString(1) : member;
-        currentAnswerMs = player.getInt(5);
+        // in a team game the team members answer in turns, each with their own level and time
+        Database.Member member = database.selectMemberOnTurn(currentPlayerId, answered);
+        String name = member == null ? player.getString(1) : player.getString(1) + " · " + member.name;
+        currentAnswerer = member == null ? player.getString(1) : member.name;
+        announcement = currentAnswerer + " következik!";
+        currentAnswerMs = member == null ? player.getInt(4) : member.answerMs;
+        currentTopic = member == null ? player.getInt(3) : member.topic;
         // a time other than the usual 2 seconds is shown, e.g. "Anna ⏱ 4 mp"
         if (currentAnswerMs != Database.DEFAULT_ANSWER_MS)
         {
             name += " ⏱ " + PlayersActivity.formatSeconds(currentAnswerMs);
         }
-        if (answered >= rounds)
+        int round = answered / answersPerRound;
+        boolean byPoints = gameState.isByPoints();
+        if (byPoints ? database.hasInactivePlayers() : round >= rounds)
         {
             CurrentPlayer.setText(name + " (szétszavazó)");
         }
+        else if (byPoints)
+        {
+            CurrentPlayer.setText(name + " (" + (round + 1) + ". kör · " + gameState.getTargetPoints() + " pontig)");
+        }
         else
         {
-            CurrentPlayer.setText(name + " (" + (answered + 1) + ". kör / " + rounds + ")");
+            CurrentPlayer.setText(name + " (" + (round + 1) + ". kör / " + rounds + ")");
         }
-        currentTopic = player.getInt(3);
         player.close();
+        showAsker(answered);
         // the undone question may have been deleted in the meantime
         if (questionId < 0 || !showQuestion(questionId))
         {
             kerdes(currentTopic);
         }
+        showPassButton();
         ButtonUndo.setEnabled(database.hasAnswers());
+    }
+
+    // 🃏 with the passes left, only if passes are on
+    @SuppressLint("SetTextI18n")
+    private void showPassButton()
+    {
+        int left = database.selectPassesLeft(currentPlayerId);
+        ButtonPass.setVisibility(gameState.getPasses() > 0 && !flashTurn ? View.VISIBLE : View.GONE);
+        ButtonPass.setText("🃏\n" + left);
+        ButtonPass.setEnabled(left > 0);
+    }
+
+    // A question for everybody after a round, the game master chooses who answered first.
+    // questionId: the question after an undo, or -1 for a new one.
+    @SuppressLint("SetTextI18n")
+    private void showFlash(int questionId)
+    {
+        flashNext = false;
+        gameState.setFlashPending(!flashOnly);
+        setRoundAreaVisible(false);
+        int asked = database.countFlashAnswers();
+        flashAskerId = -1;
+        String[] flashAsker = flashOnly && gameState.isPlayersAsk() ? database.selectFlashAsker(asked) : null;
+        if (flashAsker != null) {
+            flashAskerId = Integer.parseInt(flashAsker[2]);
+        }
+        showFlashButtons(true);
+        if (flashOnly) {
+            int perRound = Math.max(1, database.countPlayers());
+            int round = asked / perRound;
+            boolean byPoints = gameState.isByPoints();
+            String progress = (byPoints ? database.hasInactivePlayers() : round >= rounds) ? "szétszavazó"
+                    : byPoints ? (round + 1) + ". kör · " + gameState.getTargetPoints() + " pontig"
+                    : (round + 1) + ". kör / " + rounds;
+            CurrentPlayer.setText("⚡ Bárki válaszolhat! (" + progress + ")");
+        } else {
+            CurrentPlayer.setText("⚡ Villámkör – bárki válaszolhat!");
+        }
+        currentAnswerer = "";
+        announcement = "Villámkör! Bárki válaszolhat.";
+        currentAnswerMs = Database.DEFAULT_ANSWER_MS;
+        // without a game master the one with the phone asks, the asker of the next turn
+        currentAsker = flashAsker == null ? null : new String[]{flashAsker[0], flashAsker[1]};
+        if (!flashOnly && gameState.isPlayersAsk()) {
+            Cursor next = database.selectNextPlayer(true);
+            if (next.moveToFirst()) {
+                currentAsker = database.selectAsker(next.getInt(0), next.getInt(2));
+            }
+            next.close();
+        }
+        showAskerText();
+        announceAsker();
+        currentTopic = database.selectRandomActiveTopic();
+        if (questionId < 0 || !showQuestion(questionId))
+        {
+            kerdes(currentTopic);
+        }
+        ButtonUndo.setEnabled(database.hasAnswers());
+    }
+
+    // the players' buttons take the place of Siker / Késő in a flash round
+    private void showFlashButtons(boolean flash)
+    {
+        flashTurn = flash;
+        OkButtons.setVisibility(flash ? View.GONE : View.VISIBLE);
+        FlashButtons.setVisibility(flash ? View.VISIBLE : View.GONE);
+        // the title stays, the buttons are made again
+        while (FlashButtons.getChildCount() > 1) {
+            FlashButtons.removeViewAt(1);
+        }
+        if (!flash) {
+            return;
+        }
+        LinearLayout row = null;
+        Cursor players = database.selectActivePlayers();
+        while (players.moveToNext()) {
+            // three in a row
+            if (row == null || row.getChildCount() == 3) {
+                row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                FlashButtons.addView(row);
+            }
+            Button button = flashButton(players.getString(1), players.getInt(0), false);
+            // the one with the phone sees the answer
+            if (players.getInt(0) == flashAskerId) {
+                button.setEnabled(false);
+                button.setAlpha(0.4f);
+            }
+            row.addView(button);
+        }
+        players.close();
+        LinearLayout nobody = new LinearLayout(this);
+        nobody.addView(flashButton("Senki", 0, true));
+        FlashButtons.addView(nobody);
+    }
+
+    // playerId: who gets the point, 0 for nobody
+    private Button flashButton(String name, int playerId, boolean secondary)
+    {
+        Button button = new Button(this);
+        button.setText(name);
+        button.setAllCaps(false);
+        button.setTextSize(16);
+        button.setMaxLines(1);
+        button.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        button.setBackgroundResource(secondary ? R.drawable.btn_secondary : R.drawable.btn_success);
+        button.setTextColor(ContextCompat.getColorStateList(this, secondary ? R.color.text_secondary_button : R.color.onPrimary));
+        int margin = Math.round(4 * getResources().getDisplayMetrics().density);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, Math.round(52 * getResources().getDisplayMetrics().density), 1);
+        params.setMargins(margin, margin, margin, margin);
+        button.setLayoutParams(params);
+        button.setOnClickListener(view -> {
+            // like Siker, only after the question was read and the timer started
+            if (!timerStarted) {
+                return;
+            }
+            stopTimer();
+            database.saveFlashAnswer(playerId, currentQuestionId);
+            gameState.setFlashPending(false);
+            if (playerId > 0) {
+                Toast.makeText(this, "⚡ +1 pont: " + name, Toast.LENGTH_SHORT).show();
+            }
+            if (flashOnly) {
+                nextFlash();
+            } else {
+                showTurn(-1);
+            }
+        });
+        return button;
+    }
+
+    // without a game master the asker of the round holds the phone
+    private void showAsker(int answered)
+    {
+        currentAsker = gameState.isPlayersAsk() ? database.selectAsker(currentPlayerId, answered) : null;
+        showAskerText();
+        announceAsker();
+    }
+
+    // e.g. "📱 Béla (Kékek) kérdez", or "ellenőriz" when the phone reads the question
+    @SuppressLint("SetTextI18n")
+    private void showAskerText()
+    {
+        if (currentAsker == null) {
+            Asker.setVisibility(View.GONE);
+            return;
+        }
+        String team = currentAsker[1].isEmpty() ? "" : " (" + currentAsker[1] + ")";
+        Asker.setText("📱 " + currentAsker[0] + team + (askerChecks ? " ellenőriz" : " kérdez") + "\nNála legyen a telefon!"
+                + (flashTurn ? " Most ő nem válaszol." : ""));
+        Asker.setVisibility(View.VISIBLE);
     }
 
     private void finishGame()
@@ -390,7 +681,7 @@ public class QuestionActivity extends AppCompatActivity {
         {
             currentQuestionId = questionId;
             Question.setText(question.getString(0));
-            Answer.setText(question.getString(1));
+            hideAnswer(question.getString(1));
             showFlag();
         }
         question.close();
@@ -408,7 +699,7 @@ public class QuestionActivity extends AppCompatActivity {
                 question.close();
             }
             Question.setText("Ebben a témában nincs kérdés.");
-            Answer.setText("");
+            hideAnswer("");
             ButtonStartStop.setVisibility(View.INVISIBLE);
             FlagQuestion.setVisibility(View.GONE);
             return;
@@ -416,7 +707,7 @@ public class QuestionActivity extends AppCompatActivity {
         currentQuestionId = question.getInt(0);
         database.markQuestionUsed(currentQuestionId);
         Question.setText(question.getString(1));
-        Answer.setText(question.getString(2));
+        hideAnswer(question.getString(2));
         question.close();
         showFlag();
     }
@@ -468,6 +759,25 @@ public class QuestionActivity extends AppCompatActivity {
         } else {
             vibrator.vibrate(400);
         }
+    }
+
+    // A new question: its answer is hidden, so the player cannot see it on the screen
+    @SuppressLint("SetTextI18n")
+    private void hideAnswer(String answer)
+    {
+        currentAnswerText = answer;
+        if (answer.isEmpty()) {
+            Answer.setText("");
+            return;
+        }
+        Answer.setText("👁 Koppints a válaszért");
+        Answer.setTextColor(ContextCompat.getColor(this, R.color.textSecondary));
+    }
+
+    private void showAnswer()
+    {
+        Answer.setText(currentAnswerText);
+        Answer.setTextColor(defaultAnswerColor);
     }
 
     public void startTimer()

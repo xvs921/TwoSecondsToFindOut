@@ -23,6 +23,19 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
+    <!-- without a game master: who asks and holds the phone -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Asker"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center"
+        android:textColor="@color/textPrimary"
+        android:textSize="18sp"
+        android:visibility="gone" />
+
     <LinearLayout
         style="@style/Card"
         android:layout_width="match_parent"
@@ -191,9 +204,32 @@
                 android:text="Másik kérdés ›" />
         </LinearLayout>
 
+        <!-- in a flash round: who answered first, the buttons are added in QuestionActivity -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/FlashButtons"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:text="Ki vágta rá elsőként?"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/OkButtons"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:paddingBottom="12dp"
@@ -206,6 +242,20 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
                 android:text="Késő" />
+
+            <!-- the player passes the question, only if passes are on. Shows the passes left. -->
+            <Button
+                style="@style/ButtonSecondary"
+                android:id="@+id/ButtonPass"
+                android:layout_width="72dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:text="🃏"
+                android:textSize="16sp"
+                android:visibility="gone" />
 
             <Button
                 style="@style/ButtonSuccess"

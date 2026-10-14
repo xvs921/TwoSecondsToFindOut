@@ -47,9 +47,100 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/FirstPlayer"
-                    android:text="Az első játékos: "
+                    android:gravity="center"
                     android:textColor="@color/textSecondary"
                     android:textSize="18sp" />
+
+<!-- one player answers in turn, or anybody: only flash questions, whoever answers first -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Ki válaszolhat?"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonAnswerOne"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="🙋 Egy ember"
+                        android:textSize="18sp" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonAnswerAnybody"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="⚡ Bárki"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/AnswerHint"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp" />
+
+                <!-- a number of rounds, or until somebody has the target points -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Meddig tart a játék?"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonGoalRounds"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="🔁 Körökig"
+                        android:textSize="18sp" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonGoalPoints"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="🎯 Pontig"
+                        android:textSize="18sp" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -99,6 +190,65 @@
                         android:textSize="28sp" />
                 </LinearLayout>
 
+                <!-- e.g. "Mindenki 3 kérdést kap, összesen 9." -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/RoundTotal"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="Ki kérdez?"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonAskerMaster"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="🧑 Játékmester"
+                        android:textSize="18sp" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonAskerPlayers"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="👥 Egymást"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/AskerHint"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -123,7 +273,7 @@
                         android:layout_marginEnd="6dp"
                         android:paddingStart="8dp"
                         android:paddingEnd="8dp"
-                        android:text="🧑 Játékmester"
+                        android:text="🧑 Kérdező"
                         android:textSize="18sp" />
 
                     <Button
@@ -183,6 +333,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:id="@+id/StreakTitle"
                     android:layout_marginTop="32dp"
                     android:text="Sorozat-bónusz"
                     android:textColor="@color/textPrimary"
@@ -199,6 +350,87 @@
                     android:paddingEnd="8dp"
                     android:text="🔥 3 találat egymás után: +1 pont"
                     android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/FlashTitle"
+                    android:layout_marginTop="32dp"
+                    android:text="Villámkör"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- on / off: after every round a question for everybody, who answers first gets a point -->
+                <Button
+                    style="@style/ButtonSecondary"
+                    android:id="@+id/ButtonFlash"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="⚡ Minden kör után egy kérdés mindenkinek"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PassTitle"
+                    android:layout_marginTop="32dp"
+                    android:text="Passz"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- how many questions everybody can pass in a game -->
+                <LinearLayout
+                    android:id="@+id/PassRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonPass0"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:text="Nincs"
+                        android:textSize="18sp" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonPass1"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:text="🃏 1"
+                        android:textSize="18sp" />
+
+                    <Button
+                        style="@style/ButtonSecondary"
+                        android:id="@+id/ButtonPass2"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:text="🃏 2"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/PassHint"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="Fejenként ennyi kérdést lehet továbbadni egy játékban, pontvesztés nélkül."
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

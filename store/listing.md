@@ -15,11 +15,14 @@ Hogyan játsszunk?
 • A soron következő játékosnak 2 másodperce van rávágni a választ. Ha letelt az idő, a stopper pirosra vált, sípol és rezeg.
 • A játékmester dönt: Siker vagy Késő. A pontokat az alkalmazás számolja.
 
+Játékmester nélkül is
+Ha nincs külön játékmester, a játékosok egymást kérdezik. Körönként egy kérdező kérdez végig mindenkit, és a telefon csak a kör végén kerül tovább. Az alkalmazás kiírja, és fel is olvassa, kinél legyen éppen a telefon.
+
 Mindenkinek a saját szintjén
 Minden játékos saját témát és saját időt kap (1–5 másodperc), így a gyerekek és a felnőttek egyszerre, egymás ellen is játszhatnak.
 
 Csapatjáték
-Csapat módban a csapattagok felváltva válaszolnak, a pontot a csapat kapja.
+Csapat módban egy körben minden csapattag kap egy kérdést, mindenki a saját szintjén és a saját idejével. A pontot a csapat kapja.
 
 Több mint 1300 kérdés, 7 témában:
 • Gyerek
@@ -31,14 +34,21 @@ Több mint 1300 kérdés, 7 témában:
 • Tudomány
 
 További funkciók:
+• Játék adott számú körig, vagy amíg valaki el nem éri a kitűzött pontszámot
+• Villámkör minden kör után: egy kérdés mindenkinek, aki elsőként rávágja, pontot kap
+• „Bárki válaszolhat” mód: csak villámkérdések, aki elsőként rávágja, az nyer
+• Passz: fejenként 1 vagy 2 kérdést pontvesztés nélkül tovább lehet adni
 • Sorozat-bónusz: minden 3. egymás utáni találat +1 pontot ér
 • Hibás kérdés megjelölése játék közben, javítás később
 • Saját kérdések hozzáadása és szerkesztése
-• Statisztika játékosonként, és a legnehezebb kérdések listája
+• Statisztika játékosonként (a csapatban adott válaszokkal együtt) és csapatonként, és a legnehezebb kérdések listája
+• Rekordok: leghosszabb sorozat, leggyorsabb válasz, legtöbb győzelem zsinórban
 • A félbehagyott játék később folytatható
 • Kérdések és statisztika mentése fájlba, és visszaállítása új telefonon
 • Sötét mód
 • Nincs reklám, nincs regisztráció, nem kell hozzá internet
+
+Legfeljebb 12 játékos, egyénileg vagy csapatokban.
 
 Ideális családi estékre, baráti összejövetelekre, utazáshoz vagy osztálykirándulásra.
 
