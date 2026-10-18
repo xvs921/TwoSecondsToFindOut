@@ -31,6 +31,9 @@ public class DatabaseTest {
 
     // a topic that has no questions in questions.txt, for the tests' own questions
     private static final int TEST_TOPIC = 9;
+    // the questions of the file per topic: Gyerek, Felnőtt, Bibliai, Sport, Földrajz, Történelem, Tudomány.
+    // The Felnőtt has its own questions and every Sport, Földrajz, Történelem and Tudomány question.
+    private static final int[] FILE_QUESTIONS = {500, 1324, 500, 300, 300, 300, 300};
 
     private Context context;
     private Database database;
@@ -51,11 +54,20 @@ public class DatabaseTest {
     //
 
     @Test
-    public void loadsTwoHundredQuestionsPerTopicFromFile() {
+    public void loadsQuestionsPerTopicFromFile() {
         assertEquals(7, Database.TOPICS.length);
         for (int topic = 1; topic <= Database.TOPICS.length; topic++) {
-            assertEquals(Database.TOPICS[topic - 1], 200, countQuestions(topic));
+            assertEquals(Database.TOPICS[topic - 1], FILE_QUESTIONS[topic - 1], countQuestions(topic));
         }
+    }
+
+    @Test
+    public void felnottHasEverySportFoldrajzTortenelemAndTudomanyQuestion() {
+        SQLiteDatabase db = database.getReadableDatabase();
+        Cursor missing = db.rawQuery("SELECT question_id FROM question_topics WHERE topic IN (4, 5, 6, 7) "
+                + "AND question_id NOT IN (SELECT question_id FROM question_topics WHERE topic = 2)", null);
+        assertEquals(0, missing.getCount());
+        missing.close();
     }
 
     @Test
@@ -367,7 +379,7 @@ public class DatabaseTest {
         questions.getJSONObject(5).remove("answer");
 
         assertImportFails(backup.toString());
-        assertEquals(200, countQuestions(1));
+        assertEquals(FILE_QUESTIONS[0], countQuestions(1));
     }
 
     //
@@ -392,7 +404,7 @@ public class DatabaseTest {
         database = new Database(context);
         assertEquals(1, countQuestions(TEST_TOPIC));
         // the new questions of the file are added too
-        assertEquals(200, countQuestions(1));
+        assertEquals(FILE_QUESTIONS[0], countQuestions(1));
         assertEquals(1, database.countPlayers());
         database.savePlayerAnswer(nextPlayerId(), 1, true);
         assertArrayEquals(new int[]{0, 1, 1}, database.selectTotals());
@@ -427,7 +439,7 @@ public class DatabaseTest {
         // the reworded question is renamed, not added again
         assertArrayEquals(new int[]{3}, database.selectQuestionTopics(findQuestionId("Melyik bibliai könyvnek van a legtöbb fejezete?")));
         for (int topic = 1; topic <= Database.TOPICS.length; topic++) {
-            assertEquals(200, countQuestions(topic));
+            assertEquals(FILE_QUESTIONS[topic - 1], countQuestions(topic));
         }
         assertEquals(1, database.selectTotals()[0]);
     }
@@ -873,7 +885,7 @@ public class DatabaseTest {
 
     @Test
     public void upgradeFromVersion9AddsFlashPassAndRecords() {
-        // a fresh database is version 10, an older one gets the columns: they work after the upgrade
+        // a fresh database is version 11, an older one gets the columns: they work after the upgrade
         database.close();
         context.deleteDatabase(Database.DATABASE_NAME);
         SQLiteDatabase old = SQLiteDatabase.openOrCreateDatabase(context.getDatabasePath(Database.DATABASE_NAME), null);
@@ -899,6 +911,42 @@ public class DatabaseTest {
         assertTrue(database.usePass(anna, 1));
         database.saveFlashAnswer(anna, 2);
         assertEquals(1, points("Anna"));
+    }
+
+    @Test
+    public void upgradeFromVersion10AddsTheNewQuestionsAndGivesFelnottTheSportFoldrajzTortenelemAndTudomanyQuestions() {
+        database.saveQuestion(-1, new int[]{4}, "Saját sport kérdés?", "Igen");
+        int own = findQuestionId("Saját sport kérdés?");
+        SQLiteDatabase db = database.getWritableDatabase();
+        // a version 10 database: the Felnőtt has only its own questions, and the new questions are not there
+        db.execSQL("DELETE FROM question_topics WHERE topic = 2 AND question_id IN (SELECT question_id FROM question_topics WHERE topic IN (4, 5, 6, 7))");
+        database.deleteQuestion(findQuestionId("Hogy hívják a kutya kicsinyét?"));
+        // an old question that was linked to the Gyerek in version 11
+        int strauss = findQuestionId("Melyik a legnagyobb madár?");
+        db.execSQL("DELETE FROM question_topics WHERE topic = 1 AND question_id = " + strauss);
+        // an old question that was deleted on the phone
+        database.deleteQuestion(findQuestionId("Mi a víz kémiai képlete?"));
+        // an old question as it was in version 10
+        db.execSQL("UPDATE questions SET question = 'Hány színe van a szivárványnak?', answer = '7' WHERE question = 'Milyen színű a szivárvány legkülső sávja?'");
+        db.setVersion(10);
+        database.close();
+
+        database = new Database(context);
+        // the deleted Felnőtt question is missing, the own Sport question is there
+        assertEquals(FILE_QUESTIONS[1], countQuestions(2));
+        assertArrayEquals(new int[]{2, 4}, database.selectQuestionTopics(own));
+        assertEquals(FILE_QUESTIONS[3] + 1, countQuestions(4));
+        assertArrayEquals(new int[]{1}, database.selectQuestionTopics(findQuestionId("Hogy hívják a kutya kicsinyét?")));
+        assertArrayEquals(new int[]{1, 2, 7}, database.selectQuestionTopics(strauss));
+        // the deleted question does not come back
+        assertFalse(questionExists("Mi a víz kémiai képlete?"));
+        // the reworded question gets its new answer
+        assertFalse(questionExists("Hány színe van a szivárványnak?"));
+        Cursor rainbow = database.getReadableDatabase().rawQuery(
+                "SELECT answer FROM questions WHERE question = 'Milyen színű a szivárvány legkülső sávja?'", null);
+        assertTrue(rainbow.moveToFirst());
+        assertEquals("Piros", rainbow.getString(0));
+        rainbow.close();
     }
 
     @Test
@@ -1201,6 +1249,14 @@ public class DatabaseTest {
         int id = cursor.getInt(0);
         cursor.close();
         return id;
+    }
+
+    private boolean questionExists(String question) {
+        Cursor cursor = database.getReadableDatabase().rawQuery(
+                "SELECT id FROM " + Database.TABLE_QUESTIONS + " WHERE question = ?", new String[]{question});
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
     }
 
     private int countAllQuestions() {
