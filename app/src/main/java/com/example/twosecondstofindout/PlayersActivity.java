@@ -23,7 +23,12 @@ import java.util.List;
 
 public class PlayersActivity extends AppCompatActivity {
 
-    private static final String[] LEVELS = Database.TOPICS;
+    private static final String[] LEVELS = new String[Database.TOPIC_ORDER.length];
+    static {
+        for (int i = 0; i < LEVELS.length; i++) {
+            LEVELS[i] = Database.TOPICS[Database.TOPIC_ORDER[i] - 1];
+        }
+    }
     // at most 12 people play, alone or together in the teams
     static final int MAX_PEOPLE = 12;
     private static final int MAX_PLAYERS = MAX_PEOPLE;
@@ -280,12 +285,12 @@ public class PlayersActivity extends AppCompatActivity {
     // the row as it is on the screen, with the empty member rows too
     private Database.Player readRow(int index) {
         Database.Player player = new Database.Player(Players[index].getText().toString(),
-                PlayerLevels[index].getSelectedItemPosition() + 1, ANSWER_MS[PlayerTimes[index].getSelectedItemPosition()]);
+                Database.TOPIC_ORDER[PlayerLevels[index].getSelectedItemPosition()], ANSWER_MS[PlayerTimes[index].getSelectedItemPosition()]);
         for (int i = 0; i < MemberLists[index].getChildCount(); i++) {
             View member = MemberLists[index].getChildAt(i);
             player.members.add(new Database.Member(
                     ((EditText) member.findViewById(R.id.MemberName)).getText().toString(),
-                    ((Spinner) member.findViewById(R.id.MemberLevel)).getSelectedItemPosition() + 1,
+                    Database.TOPIC_ORDER[((Spinner) member.findViewById(R.id.MemberLevel)).getSelectedItemPosition()],
                     ANSWER_MS[((Spinner) member.findViewById(R.id.MemberTime)).getSelectedItemPosition()]));
         }
         return player;
@@ -293,8 +298,7 @@ public class PlayersActivity extends AppCompatActivity {
 
     private void writeRow(int index, Database.Player player) {
         Players[index].setText(player.name);
-        // the topic ids are 1: Gyerek, 2: Felnőtt, 3: Bibliai, ...
-        PlayerLevels[index].setSelection(player.topic - 1);
+        PlayerLevels[index].setSelection(Database.topicPosition(player.topic));
         PlayerTimes[index].setSelection(timeIndex(player.answerMs));
         MemberLists[index].removeAllViews();
         for (Database.Member member : player.members) {
@@ -339,7 +343,7 @@ public class PlayersActivity extends AppCompatActivity {
             time.setSelection(PlayerTimes[index].getSelectedItemPosition());
         } else {
             ((EditText) row.findViewById(R.id.MemberName)).setText(member.name);
-            level.setSelection(member.topic - 1);
+            level.setSelection(Database.topicPosition(member.topic));
             time.setSelection(timeIndex(member.answerMs));
         }
         row.findViewById(R.id.MemberRemove).setOnClickListener(view -> {

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // Lists the questions of a topic, new ones can be added, existing ones edited or deleted
@@ -45,7 +46,7 @@ public class QuestionsActivity extends AppCompatActivity {
         ButtonBackQuestions.setOnClickListener(view -> finish());
         ButtonNewQuestion.setOnClickListener(view -> showEditDialog(-1, "", "", new int[]{topic}));
         for (int i = 0; i < TopicButtons.length; i++) {
-            int selectedTopic = i < Database.TOPICS.length ? i + 1 : FLAGGED;
+            int selectedTopic = i < Database.TOPICS.length ? Database.TOPIC_ORDER[i] : FLAGGED;
             TopicButtons[i].setOnClickListener(view -> selectTopic(selectedTopic));
         }
         QuestionList.setOnItemClickListener((parent, view, position, id) -> {
@@ -76,7 +77,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT, Math.round(48 * getResources().getDisplayMetrics().density));
             params.setMarginEnd(gap);
             button.setLayoutParams(params);
-            button.setText(i < Database.TOPICS.length ? Database.TOPICS[i] : "⚑ Megjelölt");
+            button.setText(i < Database.TOPICS.length ? Database.TOPICS[Database.TOPIC_ORDER[i] - 1] : "⚑ Megjelölt");
             TopicButtonRow.addView(button);
             TopicButtons[i] = button;
         }
@@ -92,7 +93,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private void selectTopic(int selectedTopic) {
         topic = selectedTopic;
         for (int i = 0; i < TopicButtons.length; i++) {
-            boolean selected = i < Database.TOPICS.length ? i + 1 == topic : topic == FLAGGED;
+            boolean selected = i < Database.TOPICS.length ? Database.TOPIC_ORDER[i] == topic : topic == FLAGGED;
             TopicButtons[i].setBackgroundResource(selected ? R.drawable.btn_primary : R.drawable.btn_secondary);
             TopicButtons[i].setTextColor(ContextCompat.getColor(this, selected ? R.color.onPrimary : R.color.colorPrimary));
         }
@@ -119,10 +120,11 @@ public class QuestionsActivity extends AppCompatActivity {
         CheckBox[] topicBoxes = new CheckBox[Database.TOPICS.length];
         for (int i = 0; i < topicBoxes.length; i++) {
             CheckBox box = new CheckBox(this);
-            box.setText(Database.TOPICS[i]);
+            int boxTopic = Database.TOPIC_ORDER[i];
+            box.setText(Database.TOPICS[boxTopic - 1]);
             box.setTextSize(18);
             for (int selected : topics) {
-                box.setChecked(box.isChecked() || selected == i + 1);
+                box.setChecked(box.isChecked() || selected == boxTopic);
             }
             topicInputs.addView(box);
             topicBoxes[i] = box;
@@ -153,9 +155,11 @@ public class QuestionsActivity extends AppCompatActivity {
             List<Integer> checked = new ArrayList<>();
             for (int i = 0; i < topicBoxes.length; i++) {
                 if (topicBoxes[i].isChecked()) {
-                    checked.add(i + 1);
+                    checked.add(Database.TOPIC_ORDER[i]);
                 }
             }
+            // the first (smallest) topic id is kept as questions.topic
+            Collections.sort(checked);
             if (newQuestion.isEmpty() || newAnswer.isEmpty() || checked.isEmpty()) {
                 Toast.makeText(this, "Add meg a kérdést, a választ és legalább egy kategóriát!", Toast.LENGTH_SHORT).show();
                 return;

@@ -52,12 +52,27 @@ public class Database extends SQLiteOpenHelper
 
     // the topic ids are the position + 1: 1: Gyerek, 2: Felnőtt, 3: Bibliai, 4: Sport, ...
     public static final String[] TOPICS = {"Gyerek", "Felnőtt", "Bibliai", "Sport", "Földrajz", "Történelem", "Tudomány"};
+    // the topic ids in the order they are listed on the screens, the Bibliai is the last
+    public static final int[] TOPIC_ORDER = {1, 2, 4, 5, 6, 7, 3};
+
+    // the position of the topic in TOPIC_ORDER
+    public static int topicPosition(int topic)
+    {
+        for (int i = 0; i < TOPIC_ORDER.length; i++)
+        {
+            if (TOPIC_ORDER[i] == topic)
+            {
+                return i;
+            }
+        }
+        return 0;
+    }
 
     private final Context context;
 
     public Database(Context context)
     {
-        super(context, DATABASE_NAME, null, 10);
+        super(context, DATABASE_NAME, null, 11);
         this.context = context;
     }
 
@@ -116,17 +131,27 @@ public class Database extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_GAMES + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, winner VARCHAR(200) NOT NULL, played_at INTEGER NOT NULL)");
     }
 
+    // the index of the first line of res/raw/questions.txt that was added in version 11
+    private static final int FIRST_LINE_OF_VERSION_11 = 1306;
+
     // Loads res/raw/questions.txt, one question per line: topics<TAB>question<TAB>answer,
     // where topics is a comma separated list, e.g. 2,7. Questions that are already there
     // (same text) only get the missing topics, so this can run again after an update.
     private void mergeQuestionsFromFile(SQLiteDatabase db)
+    {
+        mergeQuestionsFromFile(db, 0);
+    }
+
+    // The lines before firstNewLine were loaded already: they only give their topics to the
+    // questions that are still there, so the deleted or reworded questions do not come back.
+    private void mergeQuestionsFromFile(SQLiteDatabase db, int firstNewLine)
     {
         db.beginTransaction();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 context.getResources().openRawResource(R.raw.questions), StandardCharsets.UTF_8)))
         {
             String line;
-            while ((line = reader.readLine()) != null)
+            for (int lineIndex = 0; (line = reader.readLine()) != null; lineIndex++)
             {
                 String[] parts = line.split("\t");
                 if (parts.length != 3)
@@ -139,7 +164,18 @@ public class Database extends SQLiteOpenHelper
                 {
                     topics[i] = Integer.parseInt(topicTexts[i].trim());
                 }
-                addOrLinkQuestion(db, topics, parts[1].trim(), parts[2].trim());
+                if (lineIndex >= firstNewLine)
+                {
+                    addOrLinkQuestion(db, topics, parts[1].trim(), parts[2].trim());
+                }
+                else
+                {
+                    long questionId = findQuestion(db, parts[1].trim());
+                    if (questionId >= 0)
+                    {
+                        linkTopics(db, questionId, topics);
+                    }
+                }
             }
             db.setTransactionSuccessful();
         }
@@ -174,6 +210,12 @@ public class Database extends SQLiteOpenHelper
     private void renameQuestion(SQLiteDatabase db, String oldText, String newText)
     {
         db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET question = ? WHERE question = ?", new Object[]{newText, oldText});
+    }
+
+    // a reworded question that has a new answer too
+    private void renameQuestion(SQLiteDatabase db, String oldText, String newText, String newAnswer)
+    {
+        db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET question = ?, answer = ? WHERE question = ?", new Object[]{newText, newAnswer, oldText});
     }
 
     private long findQuestion(SQLiteDatabase db, String question)
@@ -251,6 +293,26 @@ public class Database extends SQLiteOpenHelper
         {
             // flash rounds, passes and records
             addFlashPassAndRecordColumns(db);
+        }
+        if (oldVersion < 11)
+        {
+            // questions of the old file that were reworded to be unambiguous, some with a new answer
+            renameQuestion(db, "Hány lába van a polipnak?", "Hány karja van a polipnak?");
+            renameQuestion(db, "Kb. hány nap alatt kerüli meg a Hold a Földet?", "Kb. hány nap alatt kerüli meg a Hold a Földet a csillagokhoz képest?");
+            renameQuestion(db, "Melyik vírus okozta a 2020-ban kitört világjárványt?", "Melyik vírus okozta a 2020-as világjárványt?");
+            renameQuestion(db, "Hány színe van a szivárványnak?", "Milyen színű a szivárvány legkülső sávja?", "Piros");
+            renameQuestion(db, "Miből lesz a pillangó?", "Mi lesz a hernyóból?", "Lepke (pillangó)");
+            renameQuestion(db, "Ki hozza a karácsonyi ajándékot a magyar hagyomány szerint?", "Mit teszünk ki az ablakba december 5-én este, hogy a Mikulás megtöltse?", "Csizmát");
+            renameQuestion(db, "Melyik alakzatnak nincs sarka?", "Hány sarka van a körnek?", "Egy sincs");
+            renameQuestion(db, "Melyik ország határos Magyarországgal nyugaton?", "Melyik német nyelvű ország határos Magyarországgal nyugaton?");
+            renameQuestion(db, "Melyik ország határos Magyarországgal keleten?", "Melyik keleti szomszédunkhoz tartozik ma Erdély?", "Romániához");
+            renameQuestion(db, "Hány törzs vett részt a honfoglalásban a hagyomány szerint?", "Hány vezér kötött vérszerződést a hagyomány szerint?");
+            renameQuestion(db, "Melyik eseménnyel kezdődött a francia forradalom?", "Melyik párizsi erődbörtön ostromára emlékeznek a franciák július 14-én?", "A Bastille");
+            // the new questions of the file, and the Felnőtt level gets every Sport, Földrajz,
+            // Történelem and Tudomány question, the own ones too
+            mergeQuestionsFromFile(db, FIRST_LINE_OF_VERSION_11);
+            db.execSQL("INSERT OR IGNORE INTO " + TABLE_QUESTION_TOPICS + "(question_id, topic) SELECT question_id, 2 FROM "
+                    + TABLE_QUESTION_TOPICS + " WHERE topic IN (4, 5, 6, 7)");
         }
     }
 

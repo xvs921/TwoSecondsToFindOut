@@ -24,14 +24,14 @@ Minden játékos saját témát és saját időt kap (1–5 másodperc), így a 
 Csapatjáték
 Csapat módban egy körben minden csapattag kap egy kérdést, mindenki a saját szintjén és a saját idejével. A pontot a csapat kapja.
 
-Több mint 1300 kérdés, 7 témában:
+Több mint 2200 kérdés, 7 témában:
 • Gyerek
 • Felnőtt
-• Bibliai
 • Sport
 • Földrajz
 • Történelem
 • Tudomány
+• Bibliai
 
 További funkciók:
 • Játék adott számú körig, vagy amíg valaki el nem éri a kitűzött pontszámot
