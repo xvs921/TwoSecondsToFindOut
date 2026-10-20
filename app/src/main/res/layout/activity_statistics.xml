@@ -32,9 +32,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- only if there is a record yet -->
+            <TextView
+                style="@style/SectionTitle"
+                android:id="@+id/RecordsTitle"
+                android:layout_marginTop="0dp"
+                android:text="Rekordok" />
+
+            <LinearLayout
+                style="@style/Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Records"
+                android:orientation="vertical" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -52,22 +67,9 @@
                     android:id="@+id/StatSuccess" />
             </LinearLayout>
 
-            <!-- only if there is a record yet -->
             <TextView
                 style="@style/SectionTitle"
-                android:id="@+id/RecordsTitle"
-                android:text="Rekordok" />
-
-            <LinearLayout
-                style="@style/Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/Records"
-                android:orientation="vertical" />
-
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Játékosok" />
+                android:text="Játékosok – normál játék" />
 
             <LinearLayout
                 style="@style/Card"
@@ -80,13 +82,38 @@
             <TextView
                 style="@style/SectionTitle"
                 android:id="@+id/TeamStatisticsTitle"
-                android:text="Csapatok" />
+                android:text="Csapatok – normál játék" />
 
             <LinearLayout
                 style="@style/Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/TeamStatistics"
+                android:orientation="vertical" />
+
+            <!-- only if there was a „Bárki válaszolhat” game -->
+            <TextView
+                style="@style/SectionTitle"
+                android:id="@+id/FlashPlayerStatisticsTitle"
+                android:text="Játékosok – villámjáték" />
+
+            <LinearLayout
+                style="@style/Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/FlashPlayerStatistics"
+                android:orientation="vertical" />
+
+            <TextView
+                style="@style/SectionTitle"
+                android:id="@+id/FlashTeamStatisticsTitle"
+                android:text="Csapatok – villámjáték" />
+
+            <LinearLayout
+                style="@style/Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/FlashTeamStatistics"
                 android:orientation="vertical" />
 
             <TextView

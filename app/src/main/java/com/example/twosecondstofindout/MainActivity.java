@@ -25,8 +25,8 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_EXPORT = 1;
-    private static final int REQUEST_RESTORE = 2;
-    private static final int REQUEST_ADD_QUESTIONS = 3;
+    private static final int REQUEST_IMPORT = 2;
+    private static final int REQUEST_EXPORT_QUESTIONS = 3;
 
     private Button ButtonStart;
     private Button ButtonContinue;
@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private Button ButtonQuestions;
     private Button ButtonBackup;
     private Database database;
+    private GameState gameState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ButtonStatistics.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, StatisticsActivity.class)));
         ButtonQuestions.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, QuestionsActivity.class)));
         ButtonBackup.setOnClickListener(view -> showBackupDialog());
+        findViewById(R.id.ButtonHelp).setOnClickListener(view -> showHelp());
         ButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -66,9 +68,37 @@ public class MainActivity extends AppCompatActivity {
         ButtonQuestions = findViewById(R.id.ButtonQuestions);
         ButtonBackup = findViewById(R.id.ButtonBackup);
         database = new Database(this);
+        gameState = new GameState(this);
         // a game that was left before the end can be continued
-        boolean canContinue = new GameState(this).isInProgress() && database.countPlayers() > 0;
+        boolean canContinue = gameState.isInProgress() && database.countPlayers() > 0;
         ButtonContinue.setVisibility(canContinue ? View.VISIBLE : View.GONE);
+        if (!gameState.isHelpShown()) {
+            showHelp();
+        } else if (gameState.isBackupDue(database.selectTotals()[0])) {
+            showBackupReminder();
+        }
+    }
+
+    private void showHelp() {
+        gameState.setHelpShown();
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.help_title)
+                // getText keeps the bold headings of the string resource
+                .setMessage(getText(R.string.help_text))
+                .setPositiveButton("Értem", null)
+                .show();
+    }
+
+    // every few games: the questions and the statistics are only on this phone
+    private void showBackupReminder() {
+        int games = database.selectTotals()[0];
+        new AlertDialog.Builder(this)
+                .setTitle("Mentsük el?")
+                .setMessage("Már " + games + " játékot játszottatok. A kérdések és a statisztika csak ezen a telefonon vannak meg: érdemes elmenteni őket egy fájlba, például a Google Drive-ra.")
+                .setPositiveButton("Mentés", (dialog, which) -> startExport())
+                .setNegativeButton("Később", (dialog, which) -> gameState.setBackupReminded(games))
+                .setCancelable(false)
+                .show();
     }
 
     //
@@ -76,37 +106,77 @@ public class MainActivity extends AppCompatActivity {
     //
 
     private void showBackupDialog() {
-        String[] options = {"Mentés fájlba", "Visszaállítás fájlból", "Kérdések hozzáadása fájlból"};
+        String[] options = {"💾 Mentés fájlba", "📂 Betöltés fájlból"};
         new AlertDialog.Builder(this)
-                .setTitle("Mentés és visszaállítás")
+                .setTitle("Mentés és betöltés")
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
-                        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
-                        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType("application/json");
-                        intent.putExtra(Intent.EXTRA_TITLE, "vagd-ra-" + date + ".json");
-                        startActivityForResult(intent, REQUEST_EXPORT);
-                    } else if (which == 1) {
-                        new AlertDialog.Builder(this)
-                                .setTitle("Visszaállítás")
-                                .setMessage("Az összes kérdés és a statisztika lecserélődik a mentésben lévőkre.")
-                                .setPositiveButton("Tovább", (d, w) -> openBackupFile(REQUEST_RESTORE))
-                                .setNegativeButton("Mégse", null)
-                                .show();
+                        askWhatToSave();
                     } else {
-                        openBackupFile(REQUEST_ADD_QUESTIONS);
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        // json files are not always marked as json, e.g. in Downloads
+                        intent.setType("*/*");
+                        startActivityForResult(intent, REQUEST_IMPORT);
                     }
                 })
                 .show();
     }
 
-    private void openBackupFile(int requestCode) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    // the statistics have the names of the players, so they are not in a file to share
+    private void askWhatToSave() {
+        String[] options = {"Kérdések és statisztika\n(biztonsági mentés, pl. új telefonhoz)", "Csak a kérdések\n(statisztika nélkül, megosztható)"};
+        new AlertDialog.Builder(this)
+                .setTitle("Mi kerüljön a fájlba?")
+                .setItems(options, (dialog, which) -> startExport(which == 0))
+                .show();
+    }
+
+    private void startExport() {
+        startExport(true);
+    }
+
+    // statistics: false saves only the questions
+    private void startExport(boolean statistics) {
+        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        // json files are not always marked as json, e.g. in Downloads
-        intent.setType("*/*");
-        startActivityForResult(intent, requestCode);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, (statistics ? "vagd-ra-" : "vagd-ra-kerdesek-") + date + ".json");
+        startActivityForResult(intent, statistics ? REQUEST_EXPORT : REQUEST_EXPORT_QUESTIONS);
+    }
+
+    // A file with statistics: everything can be restored from it, or only its new questions added.
+    // A file with only questions: its new questions are added.
+    private void askWhatToLoad(String json) {
+        String[] options = {"Kérdések és statisztika\n(a mostaniak lecserélődnek)", "Csak az új kérdések\n(a statisztikád marad)"};
+        new AlertDialog.Builder(this)
+                .setTitle("Ebben a fájlban statisztika is van. Mit töltsünk be?")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        new AlertDialog.Builder(this)
+                                .setTitle("Biztosan lecseréled?")
+                                .setMessage("Az összes kérdés és a statisztika lecserélődik a fájlban lévőkre.")
+                                .setPositiveButton("Lecserélés", (d, w) -> load(json, true))
+                                .setNegativeButton("Mégse", null)
+                                .show();
+                    } else {
+                        load(json, false);
+                    }
+                })
+                .show();
+    }
+
+    // replace: everything is replaced, otherwise only the new questions are added
+    private void load(String json, boolean replace) {
+        try {
+            int count = database.importJson(json, replace);
+            Toast.makeText(this, replace ? "Betöltve: " + count + " kérdés és a statisztika" : count + " új kérdés hozzáadva", Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            Toast.makeText(this, "Ez nem egy mentésfájl", Toast.LENGTH_LONG).show();
+        } catch (RuntimeException e) {
+            Toast.makeText(this, "Nem sikerült: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -117,17 +187,22 @@ public class MainActivity extends AppCompatActivity {
         }
         Uri uri = data.getData();
         try {
-            if (requestCode == REQUEST_EXPORT) {
+            if (requestCode == REQUEST_EXPORT || requestCode == REQUEST_EXPORT_QUESTIONS) {
+                boolean statistics = requestCode == REQUEST_EXPORT;
                 try (OutputStream output = getContentResolver().openOutputStream(uri, "wt")) {
-                    output.write(database.exportJson().getBytes(StandardCharsets.UTF_8));
+                    output.write(database.exportJson(statistics).getBytes(StandardCharsets.UTF_8));
                 }
-                Toast.makeText(this, "Mentve", Toast.LENGTH_SHORT).show();
-            } else if (requestCode == REQUEST_RESTORE) {
-                int count = database.importJson(readFile(uri), true);
-                Toast.makeText(this, "Visszaállítva: " + count + " kérdés", Toast.LENGTH_LONG).show();
-            } else if (requestCode == REQUEST_ADD_QUESTIONS) {
-                int count = database.importJson(readFile(uri), false);
-                Toast.makeText(this, count + " új kérdés hozzáadva", Toast.LENGTH_LONG).show();
+                if (statistics) {
+                    gameState.setBackupReminded(database.selectTotals()[0]);
+                }
+                Toast.makeText(this, statistics ? "Mentve" : "A kérdések mentve", Toast.LENGTH_SHORT).show();
+            } else if (requestCode == REQUEST_IMPORT) {
+                String json = readFile(uri);
+                if (Database.backupHasStatistics(json)) {
+                    askWhatToLoad(json);
+                } else {
+                    load(json, false);
+                }
             }
         } catch (JSONException e) {
             Toast.makeText(this, "Ez nem egy mentésfájl", Toast.LENGTH_LONG).show();

@@ -6,11 +6,26 @@
     android:gravity="center_horizontal"
     tools:context=".MainActivity">
 
-    <Button
-        style="@style/ButtonSmall"
-        android:id="@+id/ButtonBackup"
-        android:layout_gravity="end"
-        android:text="💾 Mentés" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonHelp"
+            android:text="❓ Hogyan játsszunk?" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            style="@style/ButtonSmall"
+            android:id="@+id/ButtonBackup"
+            android:text="💾 Mentés" />
+    </LinearLayout>
 
     <Space
         android:layout_width="match_parent"

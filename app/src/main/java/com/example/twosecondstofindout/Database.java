@@ -25,6 +25,7 @@ public class Database extends SQLiteOpenHelper
     public static final String TABLE_ANSWERS = "answers";
     public static final String TABLE_HISTORY = "history";
     public static final String TABLE_GAMES = "games";
+    public static final String TABLE_FLASH_HISTORY = "flash_history";
     public static final String TABLE_QUESTION_TOPICS = "question_topics";
     public static final String TABLE_TEAM_MEMBERS = "team_members";
 
@@ -72,7 +73,7 @@ public class Database extends SQLiteOpenHelper
 
     public Database(Context context)
     {
-        super(context, DATABASE_NAME, null, 11);
+        super(context, DATABASE_NAME, null, 14);
         this.context = context;
     }
 
@@ -88,6 +89,10 @@ public class Database extends SQLiteOpenHelper
         createStatisticsTables(db);
         addTeamStatisticsColumns(db);
         addFlashPassAndRecordColumns(db);
+        createFlashStatistics(db);
+        addFlashMembersColumn(db);
+        addFlashStreakColumn(db);
+        addTeamStreakColumn(db);
         createQuestionTopicsTable(db);
         mergeQuestionsFromFile(db);
     }
@@ -107,6 +112,35 @@ public class Database extends SQLiteOpenHelper
         db.execSQL("ALTER TABLE " + TABLE_PLAYERS + " ADD COLUMN passes INTEGER DEFAULT 0");
         db.execSQL("ALTER TABLE " + TABLE_HISTORY + " ADD COLUMN streak INTEGER DEFAULT 0");
         db.execSQL("ALTER TABLE " + TABLE_HISTORY + " ADD COLUMN elapsed_ms INTEGER DEFAULT 0");
+    }
+
+    // Every flash question for everybody who got it: name is a person, or a team if team is 1 (in a team
+    // game the team gets the point), success is 1 for the one who answered first. flash_id is the entry
+    // of the undo log. games.flash_only is 1 for the „Bárki válaszolhat” games.
+    private void createFlashStatistics(SQLiteDatabase db)
+    {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_FLASH_HISTORY + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, flash_id INTEGER NOT NULL, name VARCHAR(200) NOT NULL, team INTEGER NOT NULL, question_id INTEGER NOT NULL, success INTEGER NOT NULL, played_at INTEGER NOT NULL)");
+        db.execSQL("ALTER TABLE " + TABLE_GAMES + " ADD COLUMN flash_only INTEGER DEFAULT 0");
+    }
+
+    // flash_history.members: the members of the team who got the flash question, comma separated
+    private void addFlashMembersColumn(SQLiteDatabase db)
+    {
+        db.execSQL("ALTER TABLE " + TABLE_FLASH_HISTORY + " ADD COLUMN members TEXT DEFAULT ''");
+    }
+
+    // flash_history.streak: the flash questions in a row the player or team answered first with this
+    // one, in the game; only in the row of the one who answered first, 0 in the others
+    private void addFlashStreakColumn(SQLiteDatabase db)
+    {
+        db.execSQL("ALTER TABLE " + TABLE_FLASH_HISTORY + " ADD COLUMN streak INTEGER DEFAULT 0");
+    }
+
+    // history.team_streak: in a team game the correct answers in a row of the team with this one
+    // (the streak bonus counts these), 0 in a game without teams
+    private void addTeamStreakColumn(SQLiteDatabase db)
+    {
+        db.execSQL("ALTER TABLE " + TABLE_HISTORY + " ADD COLUMN team_streak INTEGER DEFAULT 0");
     }
 
     // history.player_name is the team member who answered and history.team their team,
@@ -313,6 +347,22 @@ public class Database extends SQLiteOpenHelper
             mergeQuestionsFromFile(db, FIRST_LINE_OF_VERSION_11);
             db.execSQL("INSERT OR IGNORE INTO " + TABLE_QUESTION_TOPICS + "(question_id, topic) SELECT question_id, 2 FROM "
                     + TABLE_QUESTION_TOPICS + " WHERE topic IN (4, 5, 6, 7)");
+        }
+        if (oldVersion < 12)
+        {
+            // statistics of the flash questions and of the „Bárki válaszolhat” games, the streaks of the teams
+            createFlashStatistics(db);
+            addTeamStreakColumn(db);
+        }
+        if (oldVersion < 13)
+        {
+            // the members of the teams in the flash statistics
+            addFlashMembersColumn(db);
+        }
+        if (oldVersion < 14)
+        {
+            // streaks and the streak bonus in the „Bárki válaszolhat” games
+            addFlashStreakColumn(db);
         }
     }
 
@@ -613,7 +663,9 @@ public class Database extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getWritableDatabase();
         int points = success ? 1 : 0;
-        if (success && streakBonus && (correctInARow(db, playerId) + 1) % STREAK_LENGTH == 0)
+        // the correct answers in a row of the player or team with this one
+        int inARow = success ? correctInARow(db, playerId) + 1 : 0;
+        if (success && streakBonus && inARow % STREAK_LENGTH == 0)
         {
             points = 2;
         }
@@ -631,6 +683,7 @@ public class Database extends SQLiteOpenHelper
             // a correct answer, whatever bonus it got
             history.put("success", success ? 1 : 0);
             history.put("streak", success ? personInARow(db, member == null ? player.getString(0) : member.name) + 1 : 0);
+            history.put("team_streak", member == null ? 0 : inARow);
             history.put("elapsed_ms", success ? elapsedMs : 0);
             history.put("played_at", System.currentTimeMillis());
             historyId = db.insert(TABLE_HISTORY, null, history);
@@ -670,14 +723,65 @@ public class Database extends SQLiteOpenHelper
         return count;
     }
 
-    // A flash round: the question for everybody, the one who answered first gets a point.
-    // playerId: 0 if nobody answered in time. It is in the undo log, but not in the statistics.
+    // A flash question of a „Bárki válaszolhat” game: the question for everybody, the one who answered first gets a point.
+    // playerId: 0 if nobody answered in time. It is in the undo log, and in the flash statistics,
+    // not in the answered questions.
     public void saveFlashAnswer(int playerId, int questionId)
     {
+        saveFlashAnswer(playerId, questionId, -1, false);
+    }
+
+    public void saveFlashAnswer(int playerId, int questionId, int askerId)
+    {
+        saveFlashAnswer(playerId, questionId, askerId, false);
+    }
+
+    // askerId: the player who asked and saw the answer, so they did not get the question; -1 if nobody.
+    // streakBonus: every 3rd flash question in a row answered first is worth 2 points; the questions
+    // the player did not get (they asked) do not break the streak. Returns the points given.
+    public int saveFlashAnswer(int playerId, int questionId, int askerId, boolean streakBonus)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
+        int inARow = playerId > 0 ? flashInARow(db, playerId) + 1 : 0;
         int points = playerId > 0 ? 1 : 0;
-        db.execSQL("UPDATE " + TABLE_PLAYERS + " SET points = points + ? WHERE id = ?", new Object[]{points, playerId});
-        insertLogEntry(db, playerId, questionId, points, FLASH);
+        if (streakBonus && inARow > 0 && inARow % STREAK_LENGTH == 0)
+        {
+            points = 2;
+        }
+        db.beginTransaction();
+        try
+        {
+            db.execSQL("UPDATE " + TABLE_PLAYERS + " SET points = points + ? WHERE id = ?", new Object[]{points, playerId});
+            long flashId = insertLogEntry(db, playerId, questionId, points, FLASH);
+            db.execSQL("INSERT INTO " + TABLE_FLASH_HISTORY + "(flash_id, name, team, members, question_id, success, played_at) "
+                    + "SELECT ?, p.name, EXISTS (SELECT 1 FROM " + TABLE_TEAM_MEMBERS + " t WHERE t.player_id = p.id), "
+                    + "IFNULL((SELECT GROUP_CONCAT(t.name, ', ') FROM " + TABLE_TEAM_MEMBERS + " t WHERE t.player_id = p.id), ''), ?, p.id = ?, ? "
+                    + "FROM " + TABLE_PLAYERS + " p WHERE p.active = 1 AND p.id != ?",
+                    new Object[]{flashId, questionId, playerId, System.currentTimeMillis(), askerId});
+            db.execSQL("UPDATE " + TABLE_FLASH_HISTORY + " SET streak = ? WHERE flash_id = ? AND success = 1", new Object[]{inARow, flashId});
+            db.setTransactionSuccessful();
+        }
+        finally
+        {
+            db.endTransaction();
+        }
+        return points;
+    }
+
+    // the flash questions of this game the player or team got and answered first, since the last one they missed
+    private int flashInARow(SQLiteDatabase db, int playerId)
+    {
+        Cursor rows = db.rawQuery("SELECT f.success FROM " + TABLE_FLASH_HISTORY + " f JOIN " + TABLE_ANSWERS + " a ON a.id = f.flash_id "
+                + "JOIN " + TABLE_PLAYERS + " p ON p.id = ? WHERE f.name = p.name "
+                + "AND f.team = EXISTS (SELECT 1 FROM " + TABLE_TEAM_MEMBERS + " t WHERE t.player_id = p.id) ORDER BY f.id DESC",
+                new String[]{String.valueOf(playerId)});
+        int count = 0;
+        while (rows.moveToNext() && rows.getInt(0) == 1)
+        {
+            count++;
+        }
+        rows.close();
+        return count;
     }
 
     // The player passes the question and gets another one, if they have a pass left.
@@ -703,14 +807,14 @@ public class Database extends SQLiteOpenHelper
         return result;
     }
 
-    private static void insertLogEntry(SQLiteDatabase db, int playerId, int questionId, int points, int kind)
+    private static long insertLogEntry(SQLiteDatabase db, int playerId, int questionId, int points, int kind)
     {
         ContentValues values = new ContentValues();
         values.put("player_id", playerId);
         values.put("question_id", questionId);
         values.put("points", points);
         values.put("kind", kind);
-        db.insert(TABLE_ANSWERS, null, values);
+        return db.insert(TABLE_ANSWERS, null, values);
     }
 
     // The most points of the active players, to see if the target was reached
@@ -850,6 +954,7 @@ public class Database extends SQLiteOpenHelper
         last.close();
 
         db.execSQL("DELETE FROM " + TABLE_HISTORY + " WHERE id = ?", new Object[]{historyId});
+        db.execSQL("DELETE FROM " + TABLE_FLASH_HISTORY + " WHERE flash_id = ?", new Object[]{answerId});
         if (deactivated != null && deactivated.length() > 1)
         {
             db.execSQL("UPDATE " + TABLE_PLAYERS + " SET active = 1 WHERE id IN (" + deactivated.substring(1) + ")");
@@ -1049,6 +1154,12 @@ public class Database extends SQLiteOpenHelper
     // Called when a game is over, the winner is the first on the scoreboard
     public void saveGameResult()
     {
+        saveGameResult(false);
+    }
+
+    // flashOnly: a „Bárki válaszolhat” game
+    public void saveGameResult(boolean flashOnly)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor winner = db.rawQuery("SELECT name, EXISTS (SELECT 1 FROM " + TABLE_TEAM_MEMBERS + " t WHERE t.player_id = p.id) FROM " + TABLE_PLAYERS + " p ORDER BY points DESC, active DESC, id LIMIT 1", null);
         if (winner.moveToFirst())
@@ -1056,6 +1167,7 @@ public class Database extends SQLiteOpenHelper
             ContentValues values = new ContentValues();
             values.put("winner", winner.getString(0));
             values.put("team", winner.getInt(1));
+            values.put("flash_only", flashOnly ? 1 : 0);
             values.put("played_at", System.currentTimeMillis());
             db.insert(TABLE_GAMES, null, values);
         }
@@ -1079,25 +1191,68 @@ public class Database extends SQLiteOpenHelper
         return result;
     }
 
-    // name, answered, successful, wins ordered by wins and success rate.
+    // STANDARD GAMES: name, answered, successful, wins, streaks ordered by wins and success rate.
+    // A streak is every 3rd correct answer in a row, like the streak bonus, also when it is off.
     // Every person, also the answers they gave in a team; wins only of their own games.
+    // The winners are added too: before version 12 a standard game could be won with the points
+    // of flash rounds, without an answered question.
     public Cursor selectPlayerStatistics()
     {
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT h.player_name, COUNT(*), SUM(h.success), "
-                + "(SELECT COUNT(*) FROM " + TABLE_GAMES + " g WHERE g.winner = h.player_name AND g.team = 0) AS wins "
-                + "FROM " + TABLE_HISTORY + " h GROUP BY h.player_name "
-                + "ORDER BY wins DESC, SUM(h.success) * 1.0 / COUNT(*) DESC", null);
+        return selectStatistics("SELECT player_name AS name, 1 AS answered, success, " + isStreak("streak") + " AS streaks FROM " + TABLE_HISTORY, 0, 0);
     }
 
-    // The same for the teams: name, answered, successful, wins
+    // The same for the teams: name, answered, successful, wins, streaks of the team
     public Cursor selectTeamStatistics()
     {
+        return selectStatistics("SELECT team AS name, 1 AS answered, success, " + isStreak("team_streak") + " AS streaks FROM " + TABLE_HISTORY + " WHERE team != ''", 1, 0);
+    }
+
+    // The members of the team who played in it, in the order they first played, e.g. "Anna, Béla".
+    // flash: in the „Bárki válaszolhat” games, otherwise in the standard games.
+    public String selectTeamMembers(String team, boolean flash)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT h.team, COUNT(*), SUM(h.success), "
-                + "(SELECT COUNT(*) FROM " + TABLE_GAMES + " g WHERE g.winner = h.team AND g.team = 1) AS wins "
-                + "FROM " + TABLE_HISTORY + " h WHERE h.team != '' GROUP BY h.team "
-                + "ORDER BY wins DESC, SUM(h.success) * 1.0 / COUNT(*) DESC", null);
+        Cursor rows = flash
+                ? db.rawQuery("SELECT members FROM " + TABLE_FLASH_HISTORY + " WHERE team = 1 AND name = ? AND members != '' ORDER BY id", new String[]{team})
+                : db.rawQuery("SELECT player_name FROM " + TABLE_HISTORY + " WHERE team = ? GROUP BY player_name ORDER BY MIN(id)", new String[]{team});
+        java.util.Set<String> members = new java.util.LinkedHashSet<>();
+        while (rows.moveToNext())
+        {
+            members.addAll(splitNames(rows.getString(0)));
+        }
+        rows.close();
+        return String.join(", ", members);
+    }
+
+    // 1 if the answer is the 3rd, 6th, … correct one in a row
+    private static String isStreak(String column)
+    {
+        return "(" + column + " > 0 AND " + column + " % " + STREAK_LENGTH + " = 0)";
+    }
+
+    // „BÁRKI VÁLASZOLHAT” GAMES: name, flash questions got, answered first, wins, streaks.
+    // In a team game the team got the question.
+    public Cursor selectFlashPlayerStatistics()
+    {
+        return selectStatistics("SELECT name, 1 AS answered, success, " + isStreak("streak") + " AS streaks FROM " + TABLE_FLASH_HISTORY + " WHERE team = 0", 0, 1);
+    }
+
+    public Cursor selectFlashTeamStatistics()
+    {
+        return selectStatistics("SELECT name, 1 AS answered, success, " + isStreak("streak") + " AS streaks FROM " + TABLE_FLASH_HISTORY + " WHERE team = 1", 1, 1);
+    }
+
+    // rows: name, answered (1), success, streaks (1 or 0). team: 1 for the team wins, 0 for the own wins of a person.
+    // flashOnly: 1 for the wins of the „Bárki válaszolhat” games, 0 for the standard games.
+    private Cursor selectStatistics(String rows, int team, int flashOnly)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String winners = "SELECT winner AS name, 0 AS answered, 0 AS success, 0 AS streaks FROM " + TABLE_GAMES
+                + " WHERE team = " + team + " AND flash_only = " + flashOnly;
+        return db.rawQuery("SELECT r.name, SUM(r.answered), SUM(r.success), "
+                + "(SELECT COUNT(*) FROM " + TABLE_GAMES + " g WHERE g.winner = r.name AND g.team = " + team + " AND g.flash_only = " + flashOnly + ") AS wins, SUM(r.streaks) "
+                + "FROM (" + rows + " UNION ALL " + winners + ") r GROUP BY r.name "
+                + "ORDER BY wins DESC, SUM(r.success) * 1.0 / SUM(r.answered) DESC", null);
     }
 
     // RECORDS: {name, value} or null if there is none yet
@@ -1106,6 +1261,12 @@ public class Database extends SQLiteOpenHelper
     public String[] selectLongestStreak()
     {
         return selectRecord("SELECT player_name, MAX(streak) FROM " + TABLE_HISTORY + " WHERE streak > 0 GROUP BY player_name ORDER BY MAX(streak) DESC, MIN(id) LIMIT 1");
+    }
+
+    // the most flash questions in a row answered first in a „Bárki válaszolhat” game, by a person or a team
+    public String[] selectLongestFlashStreak()
+    {
+        return selectRecord("SELECT name, MAX(streak) FROM " + TABLE_FLASH_HISTORY + " WHERE streak > 0 GROUP BY name, team ORDER BY MAX(streak) DESC, MIN(id) LIMIT 1");
     }
 
     // the fastest correct answer, in milliseconds until Siker was pressed
@@ -1147,6 +1308,50 @@ public class Database extends SQLiteOpenHelper
         return result;
     }
 
+    // THE GAME THAT IS OVER (its answers are kept until the next game): {title, name, value} for
+    // the fastest answer, the longest streak and the most correct answers of a person, and the
+    // longest flash streak. Only the ones that happened.
+    public List<String[]> selectGameHighlights()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        List<String[]> highlights = new ArrayList<>();
+        String answers = TABLE_ANSWERS + " a JOIN " + TABLE_HISTORY + " h ON h.id = a.history_id";
+        String[] fastest = selectRecord("SELECT h.player_name, h.elapsed_ms FROM " + answers
+                + " WHERE h.success = 1 AND h.elapsed_ms > 0 ORDER BY h.elapsed_ms, h.id LIMIT 1");
+        if (fastest != null)
+        {
+            highlights.add(new String[]{"⚡ Leggyorsabb válasz", fastest[0], formatMillis(Long.parseLong(fastest[1])) + " mp"});
+        }
+        String[] streak = selectRecord("SELECT h.player_name, MAX(h.streak) FROM " + answers
+                + " GROUP BY h.player_name HAVING MAX(h.streak) >= 2 ORDER BY MAX(h.streak) DESC, MIN(h.id) LIMIT 1");
+        if (streak != null)
+        {
+            highlights.add(new String[]{"🔥 Leghosszabb sorozat", streak[0], streak[1] + " találat"});
+        }
+        // only if one person has the most, at least 2
+        String[] most = selectRecord("SELECT h.player_name, SUM(h.success) FROM " + answers
+                + " GROUP BY h.player_name HAVING SUM(h.success) >= 2 ORDER BY SUM(h.success) DESC, MIN(h.id) LIMIT 1");
+        String[] second = selectRecord("SELECT h.player_name, SUM(h.success) FROM " + answers
+                + " GROUP BY h.player_name ORDER BY SUM(h.success) DESC, MIN(h.id) LIMIT 1 OFFSET 1");
+        if (most != null && (second == null || !second[1].equals(most[1])))
+        {
+            highlights.add(new String[]{"🎯 Legtöbb találat", most[0], most[1] + " találat"});
+        }
+        String[] flashStreak = selectRecord("SELECT f.name, MAX(f.streak) FROM " + TABLE_FLASH_HISTORY + " f JOIN " + TABLE_ANSWERS
+                + " a ON a.id = f.flash_id WHERE f.streak >= 2 GROUP BY f.name, f.team ORDER BY MAX(f.streak) DESC, MIN(f.id) LIMIT 1");
+        if (flashStreak != null)
+        {
+            highlights.add(new String[]{"🔥 Leghosszabb villámsorozat", flashStreak[0], flashStreak[1] + " elsőként"});
+        }
+        return highlights;
+    }
+
+    // e.g. 412 → "0,412", 1500 → "1,500"
+    public static String formatMillis(long ms)
+    {
+        return String.format(java.util.Locale.ROOT, "%d,%03d", ms / 1000, ms % 1000);
+    }
+
     // question, answer, asked, successful of the questions that were missed the most (asked at least twice)
     public Cursor selectHardestQuestions(int limit)
     {
@@ -1162,6 +1367,7 @@ public class Database extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_HISTORY);
         db.execSQL("DELETE FROM " + TABLE_GAMES);
+        db.execSQL("DELETE FROM " + TABLE_FLASH_HISTORY);
         db.execSQL("UPDATE " + TABLE_ANSWERS + " SET history_id = 0");
     }
 
@@ -1170,11 +1376,19 @@ public class Database extends SQLiteOpenHelper
     //
 
     // 1: one topic per question ("topic"), 2: more topics per question ("topics"),
-    // 3: the team of the answers and of the winners, 4: streak and time of the answers for the records
-    public static final int BACKUP_VERSION = 4;
+    // 3: the team of the answers and of the winners, 4: streak and time of the answers for the records,
+    // 5: the flash questions and the „Bárki válaszolhat” games, the streaks of the teams
+    public static final int BACKUP_VERSION = 5;
 
     // Every question (own ones too) and the statistics as JSON
     public String exportJson() throws JSONException
+    {
+        return exportJson(true);
+    }
+
+    // statistics: false for a file with only the questions, e.g. to share them with friends.
+    // Such a file cannot be restored, only its questions can be added.
+    public String exportJson(boolean statistics) throws JSONException
     {
         SQLiteDatabase db = this.getWritableDatabase();
         JSONObject backup = new JSONObject();
@@ -1193,8 +1407,14 @@ public class Database extends SQLiteOpenHelper
             question.put("topics", topics);
         }
         backup.put("questions", questions);
-        backup.put("history", exportTable(db, "SELECT id, player_name, team, topic, question_id, success, streak, elapsed_ms, played_at FROM " + TABLE_HISTORY + " ORDER BY id"));
-        backup.put("games", exportTable(db, "SELECT id, winner, team, played_at FROM " + TABLE_GAMES + " ORDER BY id"));
+        backup.put("statistics", statistics);
+        if (!statistics)
+        {
+            return backup.toString(2);
+        }
+        backup.put("history", exportTable(db, "SELECT id, player_name, team, topic, question_id, success, streak, team_streak, elapsed_ms, played_at FROM " + TABLE_HISTORY + " ORDER BY id"));
+        backup.put("games", exportTable(db, "SELECT id, winner, team, flash_only, played_at FROM " + TABLE_GAMES + " ORDER BY id"));
+        backup.put("flash_history", exportTable(db, "SELECT id, flash_id, name, team, members, question_id, success, streak, played_at FROM " + TABLE_FLASH_HISTORY + " ORDER BY id"));
         return backup.toString(2);
     }
 
@@ -1222,6 +1442,27 @@ public class Database extends SQLiteOpenHelper
         return rows;
     }
 
+    // true if the backup has statistics too, so it can replace everything (backups before version 5 always have).
+    // Throws JSONException if the file is not a backup of this app.
+    public static boolean backupHasStatistics(String json) throws JSONException
+    {
+        JSONObject backup = new JSONObject(json);
+        if (!"TwoSecondsToFindOut".equals(backup.optString("app")) || backup.getInt("version") > BACKUP_VERSION)
+        {
+            throw new JSONException("Not a backup of this app");
+        }
+        return backup.optBoolean("statistics", true) && backup.has("history");
+    }
+
+    // A file with only the questions cannot replace everything: the statistics would be lost
+    public static class QuestionsOnlyException extends JSONException
+    {
+        public QuestionsOnlyException()
+        {
+            super("The file has only questions");
+        }
+    }
+
     // replace: everything is replaced by the backup (restore).
     // otherwise only the questions that are not there yet are added (e.g. questions from a friend).
     // Returns the number of questions added. Throws JSONException if the file is not a backup of this app.
@@ -1231,6 +1472,10 @@ public class Database extends SQLiteOpenHelper
         if (!"TwoSecondsToFindOut".equals(backup.optString("app")) || backup.getInt("version") > BACKUP_VERSION)
         {
             throw new JSONException("Not a backup of this app");
+        }
+        if (replace && !backup.optBoolean("statistics", true))
+        {
+            throw new QuestionsOnlyException();
         }
         JSONArray questions = backup.getJSONArray("questions");
         SQLiteDatabase db = this.getWritableDatabase();
@@ -1244,6 +1489,7 @@ public class Database extends SQLiteOpenHelper
                 db.execSQL("DELETE FROM " + TABLE_QUESTION_TOPICS);
                 db.execSQL("DELETE FROM " + TABLE_HISTORY);
                 db.execSQL("DELETE FROM " + TABLE_GAMES);
+                db.execSQL("DELETE FROM " + TABLE_FLASH_HISTORY);
                 // the undo log points to the old questions and statistics
                 db.execSQL("DELETE FROM " + TABLE_ANSWERS);
             }
@@ -1276,9 +1522,11 @@ public class Database extends SQLiteOpenHelper
             if (replace)
             {
                 importTable(db, TABLE_HISTORY, backup.optJSONArray("history"),
-                        new String[]{"id", "player_name", "topic", "question_id", "success", "played_at"}, new String[]{"team", "streak", "elapsed_ms"});
+                        new String[]{"id", "player_name", "topic", "question_id", "success", "played_at"}, new String[]{"team", "streak", "team_streak", "elapsed_ms"});
                 importTable(db, TABLE_GAMES, backup.optJSONArray("games"),
-                        new String[]{"id", "winner", "played_at"}, new String[]{"team"});
+                        new String[]{"id", "winner", "played_at"}, new String[]{"team", "flash_only"});
+                importTable(db, TABLE_FLASH_HISTORY, backup.optJSONArray("flash_history"),
+                        new String[]{"id", "flash_id", "name", "team", "question_id", "success", "played_at"}, new String[]{"members", "streak"});
             }
             db.setTransactionSuccessful();
         }

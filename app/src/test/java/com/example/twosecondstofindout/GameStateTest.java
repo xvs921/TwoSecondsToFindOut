@@ -69,34 +69,45 @@ public class GameStateTest {
     }
 
     @Test
-    public void roundsFlashAndPassesByDefault() {
+    public void roundsAndPassesByDefault() {
         GameState gameState = new GameState(context);
         assertFalse(gameState.isByPoints());
         assertEquals(GameState.DEFAULT_TARGET_POINTS, gameState.getTargetPoints());
-        assertFalse(gameState.isFlash());
         assertEquals(0, gameState.getPasses());
     }
 
     @Test
-    public void goalFlashAndPassesAreKept() {
+    public void goalAndPassesAreKept() {
         GameState gameState = new GameState(context);
         gameState.setGoal(true, 15);
-        gameState.setFlash(true);
         gameState.setPasses(2);
 
         GameState later = new GameState(context);
         assertTrue(later.isByPoints());
         assertEquals(15, later.getTargetPoints());
-        assertTrue(later.isFlash());
         assertEquals(2, later.getPasses());
     }
 
     @Test
-    public void aNewGameDoesNotStartWithAFlashRound() {
+    public void theHelpIsShownOnlyOnce() {
+        assertFalse(new GameState(context).isHelpShown());
+        new GameState(context).setHelpShown();
+        assertTrue(new GameState(context).isHelpShown());
+    }
+
+    @Test
+    public void aBackupIsDueEveryTenGames() {
         GameState gameState = new GameState(context);
-        gameState.setFlashPending(true);
-        gameState.start(3, true);
-        assertFalse(new GameState(context).isFlashPending());
+        assertFalse(gameState.isBackupDue(9));
+        assertTrue(gameState.isBackupDue(10));
+        // later, or saved
+        gameState.setBackupReminded(10);
+        assertFalse(gameState.isBackupDue(19));
+        assertTrue(gameState.isBackupDue(20));
+        // the statistics were deleted: counting starts again
+        assertFalse(gameState.isBackupDue(3));
+        assertFalse(gameState.isBackupDue(12));
+        assertTrue(gameState.isBackupDue(13));
     }
 
     @Test
