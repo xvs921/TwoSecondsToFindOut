@@ -33,7 +33,6 @@ public class RoundActivity extends AppCompatActivity {
     private Button ButtonGoalRounds;
     private Button ButtonGoalPoints;
     private TextView RoundText;
-    private Button ButtonFlash;
     private Button[] PassButtons;
     private Button ButtonAnswerOne;
     private Button ButtonAnswerAnybody;
@@ -51,7 +50,6 @@ public class RoundActivity extends AppCompatActivity {
     private boolean byPoints;
     // the number of the other goal, while the number field shows one of them
     private int otherGoalNumber;
-    private boolean flash;
     private int passes;
     // anybody can answer: only flash questions, whoever answers first gets the point
     private boolean flashOnly;
@@ -101,7 +99,6 @@ public class RoundActivity extends AppCompatActivity {
         ButtonStreakBonus.setOnClickListener(view -> setStreakBonus(!streakBonus));
         ButtonGoalRounds.setOnClickListener(view -> setByPoints(false));
         ButtonGoalPoints.setOnClickListener(view -> setByPoints(true));
-        ButtonFlash.setOnClickListener(view -> setFlash(!flash));
         ButtonAnswerOne.setOnClickListener(view -> setFlashOnly(false));
         ButtonAnswerAnybody.setOnClickListener(view -> setFlashOnly(true));
         for (int i = 0; i < PassButtons.length; i++) {
@@ -120,7 +117,6 @@ public class RoundActivity extends AppCompatActivity {
                 gameState.setFlashOnly(flashOnly);
                 gameState.start(byPoints ? otherGoalNumber : getRoundNumber(), phoneReads);
                 gameState.setGoal(byPoints, byPoints ? getRoundNumber() : otherGoalNumber);
-                gameState.setFlash(flash);
                 gameState.setPasses(passes);
                 gameState.setSignals(beep, vibrate);
                 gameState.setStreakBonus(streakBonus);
@@ -150,13 +146,12 @@ public class RoundActivity extends AppCompatActivity {
         ButtonGoalRounds = findViewById(R.id.ButtonGoalRounds);
         ButtonGoalPoints = findViewById(R.id.ButtonGoalPoints);
         RoundText = findViewById(R.id.RoundText);
-        ButtonFlash = findViewById(R.id.ButtonFlash);
         PassButtons = new Button[]{findViewById(R.id.ButtonPass0), findViewById(R.id.ButtonPass1), findViewById(R.id.ButtonPass2)};
         ButtonAnswerOne = findViewById(R.id.ButtonAnswerOne);
         ButtonAnswerAnybody = findViewById(R.id.ButtonAnswerAnybody);
         AnswerHint = findViewById(R.id.AnswerHint);
-        TurnSettings = new View[]{findViewById(R.id.StreakTitle), ButtonStreakBonus, findViewById(R.id.FlashTitle), ButtonFlash,
-                findViewById(R.id.PassTitle), findViewById(R.id.PassRow), findViewById(R.id.PassHint)};
+        // the streak bonus is also for the „Bárki válaszolhat” games
+        TurnSettings = new View[]{findViewById(R.id.PassTitle), findViewById(R.id.PassRow), findViewById(R.id.PassHint)};
         database = new Database(this);
         gameState = new GameState(this);
         firstPlayer = database.selectFirstPlayerName();
@@ -168,9 +163,9 @@ public class RoundActivity extends AppCompatActivity {
         setPlayersAsk(gameState.isPlayersAsk());
         setSignals(gameState.isBeeping(), gameState.isVibrating());
         setStreakBonus(gameState.isStreakBonus());
-        setFlash(gameState.isFlash());
         setPasses(Math.min(gameState.getPasses(), PassButtons.length - 1));
-        // the number field shows the rounds first, the target points are the other number
+        // the number field shows the rounds first (as in the last game), the target points are the other number
+        RoundNumber.setText(String.valueOf(Math.max(1, gameState.getRounds())));
         otherGoalNumber = gameState.getTargetPoints();
         setByPoints(gameState.isByPoints());
         setFlashOnly(gameState.isFlashOnly());
@@ -207,11 +202,6 @@ public class RoundActivity extends AppCompatActivity {
         showSelected(ButtonGoalRounds, !byPoints);
         RoundText.setText(byPoints ? "Hány pontig?" : "Hány kör legyen?");
         showRoundTotal();
-    }
-
-    private void setFlash(boolean flash) {
-        this.flash = flash;
-        showSelected(ButtonFlash, flash);
     }
 
     private void setPasses(int passes) {

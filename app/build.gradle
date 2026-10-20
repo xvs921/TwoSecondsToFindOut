@@ -12,9 +12,10 @@ android {
 
     defaultConfig {
         applicationId = "io.github.xvs921.vagdra"
-        minSdk = 23
+        // Google Play's automatic protection needs Android 7.0
+        minSdk = 24
         targetSdk = 36
-        versionCode = 1
+        versionCode = 3
         versionName = "1.0"
     }
 

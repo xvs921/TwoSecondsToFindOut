@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.LeadingMarginSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.graphics.Typeface;
@@ -17,7 +19,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-// Statistics of all games: totals, players and the questions that were missed the most
+// Statistics of all games: records, totals, players and teams of the standard games and of the
+// flash questions, and the questions that were missed the most
 public class StatisticsActivity extends AppCompatActivity {
 
     private TextView StatGames;
@@ -28,6 +31,10 @@ public class StatisticsActivity extends AppCompatActivity {
     private LinearLayout Records;
     private TextView TeamStatisticsTitle;
     private LinearLayout TeamStatistics;
+    private TextView FlashPlayerStatisticsTitle;
+    private LinearLayout FlashPlayerStatistics;
+    private TextView FlashTeamStatisticsTitle;
+    private LinearLayout FlashTeamStatistics;
     private LinearLayout HardestQuestions;
     private Database database;
 
@@ -44,6 +51,10 @@ public class StatisticsActivity extends AppCompatActivity {
         Records = findViewById(R.id.Records);
         TeamStatisticsTitle = findViewById(R.id.TeamStatisticsTitle);
         TeamStatistics = findViewById(R.id.TeamStatistics);
+        FlashPlayerStatisticsTitle = findViewById(R.id.FlashPlayerStatisticsTitle);
+        FlashPlayerStatistics = findViewById(R.id.FlashPlayerStatistics);
+        FlashTeamStatisticsTitle = findViewById(R.id.FlashTeamStatisticsTitle);
+        FlashTeamStatistics = findViewById(R.id.FlashTeamStatistics);
         HardestQuestions = findViewById(R.id.HardestQuestions);
         database = new Database(this);
 
@@ -70,11 +81,11 @@ public class StatisticsActivity extends AppCompatActivity {
 
         Records.removeAllViews();
         addRecord("🔥 Leghosszabb sorozat", database.selectLongestStreak(), " találat");
+        addRecord("🔥 Leghosszabb villámsorozat", database.selectLongestFlashStreak(), " elsőként");
         String[] fastest = database.selectFastestAnswer();
         if (fastest != null) {
             // the time until Siker was pressed, e.g. 0,412 mp
-            long ms = Long.parseLong(fastest[1]);
-            fastest[1] = String.format(java.util.Locale.ROOT, "%d,%03d", ms / 1000, ms % 1000);
+            fastest[1] = Database.formatMillis(Long.parseLong(fastest[1]));
         }
         addRecord("⚡ Leggyorsabb válasz", fastest, " mp");
         addRecord("🏆 Legtöbb győzelem zsinórban", database.selectMostWinsInARow(), "");
@@ -82,13 +93,14 @@ public class StatisticsActivity extends AppCompatActivity {
         RecordsTitle.setVisibility(hasRecords ? View.VISIBLE : View.GONE);
         Records.setVisibility(hasRecords ? View.VISIBLE : View.GONE);
 
-        // everybody as if they played alone, also the answers they gave in a team
-        if (addStatisticsRows(PlayerStatistics, database.selectPlayerStatistics()) == 0) {
+        // standard games: everybody as if they played alone, also the answers they gave in a team
+        if (addStatisticsRows(PlayerStatistics, database.selectPlayerStatistics(), "✓", null) == 0) {
             addRow(PlayerStatistics, "Még nincs lejátszott kérdés.", "");
         }
-        boolean hasTeams = addStatisticsRows(TeamStatistics, database.selectTeamStatistics()) > 0;
-        TeamStatisticsTitle.setVisibility(hasTeams ? View.VISIBLE : View.GONE);
-        TeamStatistics.setVisibility(hasTeams ? View.VISIBLE : View.GONE);
+        showSection(TeamStatisticsTitle, TeamStatistics, database.selectTeamStatistics(), "✓", false);
+        // „Bárki válaszolhat” games: flash questions got, answered first, the wins and streaks
+        showSection(FlashPlayerStatisticsTitle, FlashPlayerStatistics, database.selectFlashPlayerStatistics(), "⚡", null);
+        showSection(FlashTeamStatisticsTitle, FlashTeamStatistics, database.selectFlashTeamStatistics(), "⚡", true);
 
         HardestQuestions.removeAllViews();
         Cursor questions = database.selectHardestQuestions(10);
@@ -102,22 +114,34 @@ public class StatisticsActivity extends AppCompatActivity {
         questions.close();
     }
 
-    // record: {name, value}, or null if there is none yet
+    // record: {name, value}, or null if there is none yet. The name is indented under the title.
     private void addRecord(String title, String[] record, String unit) {
         if (record != null) {
-            addRow(Records, title + "\n" + record[0], record[1] + unit);
+            addRow(Records, twoLines(title, record[0], 32, false), record[1] + unit);
         }
     }
 
-    // name, answered, successful, wins. Returns the number of rows.
-    private int addStatisticsRows(LinearLayout parent, Cursor rows) {
+    // a section that is shown only if it has rows
+    // flashTeams: null for players, otherwise the members of the teams are shown (of the
+    // „Bárki válaszolhat” games if true)
+    private void showSection(TextView title, LinearLayout parent, Cursor rows, String mark, Boolean flashTeams) {
+        boolean hasRows = addStatisticsRows(parent, rows, mark, flashTeams) > 0;
+        title.setVisibility(hasRows ? View.VISIBLE : View.GONE);
+        parent.setVisibility(hasRows ? View.VISIBLE : View.GONE);
+    }
+
+    // name, questions, successful, wins, streaks; the wins and streaks, and the questions under them.
+    // Returns the number of rows.
+    private int addStatisticsRows(LinearLayout parent, Cursor rows, String mark, Boolean flashTeams) {
         parent.removeAllViews();
         while (rows.moveToNext()) {
             int answered = rows.getInt(1);
             int successful = rows.getInt(2);
             int wins = rows.getInt(3);
-            addRow(parent, rows.getString(0),
-                    "🏆 " + wins + "   ✓ " + successful + "/" + answered + " (" + percent(successful, answered) + ")");
+            String name = rows.getString(0);
+            String members = flashTeams == null ? "" : database.selectTeamMembers(name, flashTeams);
+            addRow(parent, members.isEmpty() ? name : twoLines(name, members, 16, true),
+                    "🏆 " + wins + "   🔥 " + rows.getInt(4) + "\n" + mark + " " + successful + "/" + answered + " (" + percent(successful, answered) + ")");
         }
         int count = rows.getCount();
         rows.close();
@@ -136,7 +160,20 @@ public class StatisticsActivity extends AppCompatActivity {
         return whole == 0 ? "–" : Math.round(part * 100.0 / whole) + "%";
     }
 
-    private void addRow(LinearLayout parent, String left, String right) {
+    // a second line indented by indentDp under the first one; small: smaller and grey, e.g. the members of a team
+    private CharSequence twoLines(String first, String second, int indentDp, boolean small) {
+        SpannableString text = new SpannableString(first + "\n" + second);
+        int start = first.length() + 1;
+        int indent = Math.round(indentDp * getResources().getDisplayMetrics().density);
+        text.setSpan(new LeadingMarginSpan.Standard(indent), start, text.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        if (small) {
+            text.setSpan(new RelativeSizeSpan(0.85f), start, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.textSecondary)), start, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        return text;
+    }
+
+    private void addRow(LinearLayout parent, CharSequence left, String right) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
@@ -151,6 +188,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         TextView rightText = new TextView(this);
         rightText.setText(right);
+        rightText.setGravity(Gravity.END);
         rightText.setTextSize(15);
         rightText.setPadding(padding, 0, 0, 0);
         rightText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));

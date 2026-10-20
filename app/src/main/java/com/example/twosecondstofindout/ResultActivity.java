@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class ResultActivity extends AppCompatActivity {
 
     private TextView Scoreboard;
@@ -54,7 +56,19 @@ public class ResultActivity extends AppCompatActivity {
         ButtonUndoResult = findViewById(R.id.ButtonUndoResult);
         database = new Database(this);
 
-        Scoreboard.setText(database.selectScoreboardText());
+        // without the empty line after the last player
+        Scoreboard.setText(database.selectScoreboardText().trim());
+        // the best moments of this game
+        StringBuilder highlights = new StringBuilder();
+        List<String[]> rows = database.selectGameHighlights();
+        for (String[] row : rows) {
+            highlights.append(row[0]).append(": ").append(row[1]).append(" – ").append(row[2]).append('\n');
+        }
+        TextView highlightsText = findViewById(R.id.Highlights);
+        highlightsText.setText(highlights.toString().trim());
+        int visibility = rows.isEmpty() ? View.GONE : View.VISIBLE;
+        highlightsText.setVisibility(visibility);
+        findViewById(R.id.HighlightsTitle).setVisibility(visibility);
         ButtonUndoResult.setVisibility(database.hasAnswers() ? View.VISIBLE : View.GONE);
     }
 }

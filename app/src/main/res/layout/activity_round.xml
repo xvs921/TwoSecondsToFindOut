@@ -354,27 +354,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/FlashTitle"
-                    android:layout_marginTop="32dp"
-                    android:text="Villámkör"
-                    android:textColor="@color/textPrimary"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <!-- on / off: after every round a question for everybody, who answers first gets a point -->
-                <Button
-                    style="@style/ButtonSecondary"
-                    android:id="@+id/ButtonFlash"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="16dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="⚡ Minden kör után egy kérdés mindenkinek"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/PassTitle"
                     android:layout_marginTop="32dp"
                     android:text="Passz"

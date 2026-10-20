@@ -35,16 +35,18 @@ Több mint 2200 kérdés, 7 témában:
 
 További funkciók:
 • Játék adott számú körig, vagy amíg valaki el nem éri a kitűzött pontszámot
-• Villámkör minden kör után: egy kérdés mindenkinek, aki elsőként rávágja, pontot kap
 • „Bárki válaszolhat” mód: csak villámkérdések, aki elsőként rávágja, az nyer
 • Passz: fejenként 1 vagy 2 kérdést pontvesztés nélkül tovább lehet adni
 • Sorozat-bónusz: minden 3. egymás utáni találat +1 pontot ér
 • Hibás kérdés megjelölése játék közben, javítás később
 • Saját kérdések hozzáadása és szerkesztése
-• Statisztika játékosonként (a csapatban adott válaszokkal együtt) és csapatonként, és a legnehezebb kérdések listája
-• Rekordok: leghosszabb sorozat, leggyorsabb válasz, legtöbb győzelem zsinórban
+• Statisztika játékosonként (a csapatban adott válaszokkal együtt) és csapatonként, külön a normál és a villámjátékra, és a legnehezebb kérdések listája
+• Rekordok: leghosszabb sorozat, leghosszabb villámsorozat, leggyorsabb válasz, legtöbb győzelem zsinórban
+• Minden játék végén összefoglaló: ki volt a leggyorsabb, kinek volt a leghosszabb sorozata
 • A félbehagyott játék később folytatható
 • Kérdések és statisztika mentése fájlba, és visszaállítása új telefonon
+• A kérdések statisztika nélkül is menthetők, így megoszthatók a barátokkal
+• Beépített „Hogyan játsszunk?” súgó
 • Sötét mód
 • Nincs reklám, nincs regisztráció, nem kell hozzá internet
 
@@ -65,5 +67,5 @@ kvíz, családi játék, társasjáték, villámkérdés, partijáték, magyar k
   - kezdőképernyő, játékosok és szintek, kérdés a stopperrel, eredmények, statisztika
 
 ## Kapcsolat
-- E-mail: (kötelező, a Play Console-ban kell megadni)
-- Adatvédelmi irányelv URL: a `store/privacy-policy.html` közzétett címe
+- E-mail: vorakgeri@gmail.com
+- Adatvédelmi irányelv URL: https://xvs921.github.io/TwoSecondsToFindOut/privacy-policy.html

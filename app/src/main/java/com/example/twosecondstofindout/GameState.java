@@ -17,10 +17,13 @@ public class GameState
     private static final String KEY_PLAYERS_ASK = "playersAsk";
     private static final String KEY_BY_POINTS = "byPoints";
     private static final String KEY_TARGET_POINTS = "targetPoints";
-    private static final String KEY_FLASH = "flash";
-    private static final String KEY_FLASH_PENDING = "flashPending";
     private static final String KEY_PASSES = "passes";
     private static final String KEY_FLASH_ONLY = "flashOnly";
+    private static final String KEY_HELP_SHOWN = "helpShown";
+    private static final String KEY_BACKUP_REMINDED_AT = "backupRemindedAt";
+
+    // after this many finished games the main menu asks if everything should be saved to a file
+    public static final int GAMES_BETWEEN_BACKUP_REMINDERS = 10;
 
     // the game is played until somebody has this many points, unless it is set otherwise
     public static final int DEFAULT_TARGET_POINTS = 10;
@@ -39,7 +42,6 @@ public class GameState
                 .putInt(KEY_ROUNDS, rounds)
                 .putBoolean(KEY_PHONE_READS, phoneReads)
                 .putBoolean(KEY_IN_PROGRESS, true)
-                .putBoolean(KEY_FLASH_PENDING, false)
                 .apply();
     }
 
@@ -119,28 +121,6 @@ public class GameState
         return prefs.getInt(KEY_TARGET_POINTS, DEFAULT_TARGET_POINTS);
     }
 
-    // a question for everybody after every round, kept for the next games too
-    public void setFlash(boolean flash)
-    {
-        prefs.edit().putBoolean(KEY_FLASH, flash).apply();
-    }
-
-    public boolean isFlash()
-    {
-        return prefs.getBoolean(KEY_FLASH, false);
-    }
-
-    // the flash round is the next, so it comes back when the game is continued
-    public void setFlashPending(boolean flashPending)
-    {
-        prefs.edit().putBoolean(KEY_FLASH_PENDING, flashPending).apply();
-    }
-
-    public boolean isFlashPending()
-    {
-        return prefs.getBoolean(KEY_FLASH_PENDING, false);
-    }
-
     // how many passes everybody gets in a game (0: none), kept for the next games too
     public void setPasses(int passes)
     {
@@ -161,5 +141,36 @@ public class GameState
     public boolean isFlashOnly()
     {
         return prefs.getBoolean(KEY_FLASH_ONLY, false);
+    }
+
+    // the „Hogyan játsszunk?” help is shown by itself only at the first start
+    public boolean isHelpShown()
+    {
+        return prefs.getBoolean(KEY_HELP_SHOWN, false);
+    }
+
+    public void setHelpShown()
+    {
+        prefs.edit().putBoolean(KEY_HELP_SHOWN, true).apply();
+    }
+
+    // true if GAMES_BETWEEN_BACKUP_REMINDERS games were finished since the last save or reminder.
+    // finishedGames: all the finished games in the statistics.
+    public boolean isBackupDue(int finishedGames)
+    {
+        int remindedAt = prefs.getInt(KEY_BACKUP_REMINDED_AT, 0);
+        if (finishedGames < remindedAt)
+        {
+            // the statistics were deleted, counting starts again
+            setBackupReminded(finishedGames);
+            return false;
+        }
+        return finishedGames - remindedAt >= GAMES_BETWEEN_BACKUP_REMINDERS;
+    }
+
+    // after a save, or when the user said later
+    public void setBackupReminded(int finishedGames)
+    {
+        prefs.edit().putInt(KEY_BACKUP_REMINDED_AT, finishedGames).apply();
     }
 }

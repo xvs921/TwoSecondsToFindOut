@@ -366,6 +366,35 @@ public class DatabaseTest {
     }
 
     @Test
+    public void questionsCanBeSavedWithoutTheStatistics() throws JSONException {
+        startGame("Anna");
+        database.savePlayerAnswer(nextPlayerId(), drawQuestion(1), true);
+        database.saveGameResult();
+        database.saveQuestion(-1, new int[]{TEST_TOPIC}, "Saját kérdés?", "Igen");
+
+        assertTrue(Database.backupHasStatistics(database.exportJson()));
+        assertFalse(Database.backupHasStatistics(database.exportJson(false)));
+        JSONObject backup = new JSONObject(database.exportJson(false));
+        assertFalse(backup.has("history"));
+        assertFalse(backup.has("games"));
+        assertFalse(backup.has("flash_history"));
+        assertEquals(countAllQuestions(), backup.getJSONArray("questions").length());
+
+        // it cannot replace everything, the statistics stay
+        try {
+            database.importJson(backup.toString(), true);
+            org.junit.Assert.fail();
+        } catch (Database.QuestionsOnlyException expected) {
+            // the file has only questions
+        }
+        assertEquals(1, database.selectTotals()[0]);
+        // its questions can be added on another phone
+        database.deleteQuestion(findQuestionId("Saját kérdés?"));
+        assertEquals(1, database.importJson(backup.toString(), false));
+        assertEquals(1, database.selectTotals()[0]);
+    }
+
+    @Test
     public void foreignFileIsRejected() {
         assertImportFails("nem json");
         assertImportFails("{\"app\": \"Valami más\", \"version\": 1, \"questions\": []}");
@@ -608,6 +637,264 @@ public class DatabaseTest {
     }
 
     @Test
+    public void winnerWithOnlyFlashPointsIsInThePlayerStatistics() {
+        // before version 12: a standard game won with the point of a flash round, without an answered question
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(nextPlayerId(), drawQuestion(1));
+        database.saveGameResult();
+
+        Cursor players = database.selectPlayerStatistics();
+        assertTrue(players.moveToFirst());
+        assertEquals("Anna", players.getString(0));
+        assertEquals(0, players.getInt(1));
+        assertEquals(0, players.getInt(2));
+        assertEquals(1, players.getInt(3));
+        assertFalse(players.moveToNext());
+        players.close();
+    }
+
+    @Test
+    public void teamWinnerWithOnlyFlashPointsIsInTheTeamStatistics() {
+        database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
+                new String[]{"Anna", "Cili"}, new int[]{2000, 2000});
+        database.saveFlashAnswer(nextPlayerId(), drawQuestion(1));
+        database.saveGameResult();
+
+        Cursor teams = database.selectTeamStatistics();
+        assertTrue(teams.moveToFirst());
+        assertEquals("Pirosak", teams.getString(0));
+        assertEquals(0, teams.getInt(1));
+        assertEquals(1, teams.getInt(3));
+        assertFalse(teams.moveToNext());
+        teams.close();
+        // the team win is not a win of a person
+        Cursor players = database.selectPlayerStatistics();
+        assertEquals(0, players.getCount());
+        players.close();
+    }
+
+    @Test
+    public void flashQuestionsAreInTheFlashStatistics() {
+        // „Bárki válaszolhat”: Anna answers first, then nobody, then Béla while Cili asks
+        startGame("Anna", "Béla", "Cili");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.saveFlashAnswer(0, drawQuestion(1));
+        database.saveFlashAnswer(playerId("Béla"), drawQuestion(1), playerId("Cili"));
+        database.saveGameResult(true);
+
+        Cursor players = database.selectFlashPlayerStatistics();
+        // name, got, answered first, wins
+        assertTrue(players.moveToFirst());
+        assertRow(players, "Anna", 3, 1, 1);
+        assertTrue(players.moveToNext());
+        assertRow(players, "Béla", 3, 1, 0);
+        assertTrue(players.moveToNext());
+        // she asked the last one, so she did not get it
+        assertRow(players, "Cili", 2, 0, 0);
+        players.close();
+        // the flash questions and the „Bárki válaszolhat” win are not in the standard games
+        Cursor standard = database.selectPlayerStatistics();
+        assertEquals(0, standard.getCount());
+        standard.close();
+        assertEquals(0, database.selectTotals()[1]);
+    }
+
+    @Test
+    public void flashQuestionsOfATeamGameAreInTheFlashTeamStatistics() {
+        database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
+                new String[]{"Anna, Béla", "Cili"}, new int[]{2000, 2000});
+        database.saveFlashAnswer(playerId("Pirosak"), drawQuestion(1));
+        database.saveGameResult(true);
+
+        Cursor teams = database.selectFlashTeamStatistics();
+        assertTrue(teams.moveToFirst());
+        assertRow(teams, "Pirosak", 1, 1, 1);
+        assertTrue(teams.moveToNext());
+        assertRow(teams, "Kékek", 1, 0, 0);
+        teams.close();
+        // the team got the point, not a member
+        Cursor players = database.selectFlashPlayerStatistics();
+        assertEquals(0, players.getCount());
+        players.close();
+        Cursor standard = database.selectTeamStatistics();
+        assertEquals(0, standard.getCount());
+        standard.close();
+    }
+
+    @Test
+    public void theMembersOfATeamAreKeptForTheStatistics() {
+        database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
+                new String[]{"Anna, Béla", "Cili"}, new int[]{2000, 2000});
+        // a standard game: Anna and Béla answer for the Pirosak
+        database.savePlayerAnswer(playerId("Pirosak"), drawQuestion(1), true);
+        database.savePlayerAnswer(playerId("Kékek"), drawQuestion(1), true);
+        database.savePlayerAnswer(playerId("Pirosak"), drawQuestion(1), false);
+        assertEquals("Anna, Béla", database.selectTeamMembers("Pirosak", false));
+        assertEquals("Cili", database.selectTeamMembers("Kékek", false));
+        // „Bárki válaszolhat”: the team gets the question, its members are kept with it
+        database.saveFlashAnswer(playerId("Kékek"), drawQuestion(1));
+        assertEquals("Anna, Béla", database.selectTeamMembers("Pirosak", true));
+        assertEquals("Cili", database.selectTeamMembers("Kékek", true));
+        // another game of the Pirosak with Dani
+        database.insertPlayersForNewGame(new String[]{"Pirosak"}, new int[]{1},
+                new String[]{"Anna, Dani"}, new int[]{2000});
+        database.saveFlashAnswer(playerId("Pirosak"), drawQuestion(1));
+        assertEquals("Anna, Béla, Dani", database.selectTeamMembers("Pirosak", true));
+    }
+
+    @Test
+    public void everyThirdFlashQuestionInARowGivesABonus() {
+        startGame("Anna", "Béla");
+        int anna = playerId("Anna");
+        assertEquals(1, database.saveFlashAnswer(anna, drawQuestion(1), -1, true));
+        assertEquals(1, database.saveFlashAnswer(anna, drawQuestion(1), -1, true));
+        assertEquals(2, database.saveFlashAnswer(anna, drawQuestion(1), -1, true));
+        // the 4th is not a new streak
+        assertEquals(1, database.saveFlashAnswer(anna, drawQuestion(1), -1, true));
+        assertEquals(5, points("Anna"));
+        // without the bonus only the statistics count the streak
+        assertEquals(1, database.saveFlashAnswer(anna, drawQuestion(1), -1, false));
+        assertEquals(1, database.saveFlashAnswer(anna, drawQuestion(1), -1, false));
+        database.saveGameResult(true);
+        Cursor players = database.selectFlashPlayerStatistics();
+        assertTrue(players.moveToFirst());
+        assertEquals("Anna", players.getString(0));
+        assertEquals(2, players.getInt(4));
+        players.close();
+    }
+
+    @Test
+    public void anotherFirstOrNobodyBreaksTheFlashStreakButAskingDoesNot() {
+        startGame("Anna", "Béla", "Cili");
+        int anna = playerId("Anna");
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(playerId("Béla"), drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(0, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        // Anna asks, she does not get this one
+        database.saveFlashAnswer(playerId("Béla"), drawQuestion(1), anna, true);
+        assertEquals(2, database.saveFlashAnswer(anna, drawQuestion(1), -1, true));
+    }
+
+    @Test
+    public void undoTakesBackTheFlashBonus() {
+        startGame("Anna", "Béla");
+        int anna = playerId("Anna");
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        assertEquals(4, points("Anna"));
+        database.undoLastAnswer();
+        assertEquals(2, points("Anna"));
+        assertEquals(2, database.saveFlashAnswer(anna, drawQuestion(1), -1, true));
+    }
+
+    @Test
+    public void aFlashStreakDoesNotGoOnInTheNextGame() {
+        startGame("Anna", "Béla");
+        int anna = playerId("Anna");
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.saveFlashAnswer(anna, drawQuestion(1), -1, true);
+        database.resetScores(0);
+        assertEquals(1, database.saveFlashAnswer(anna, drawQuestion(1), -1, true));
+    }
+
+    @Test
+    public void theLongestFlashStreakIsARecord() {
+        assertNull(database.selectLongestFlashStreak());
+        startGame("Anna", "Béla");
+        for (int i = 0; i < 3; i++) {
+            database.saveFlashAnswer(playerId("Béla"), drawQuestion(1));
+        }
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        org.junit.Assert.assertArrayEquals(new String[]{"Béla", "3"}, database.selectLongestFlashStreak());
+    }
+
+    @Test
+    public void theHighlightsOfTheGame() {
+        startGame("Anna", "Béla");
+        int anna = playerId("Anna");
+        int bela = playerId("Béla");
+        database.savePlayerAnswer(anna, drawQuestion(1), true, false, 900);
+        database.savePlayerAnswer(bela, drawQuestion(1), true, false, 412);
+        database.savePlayerAnswer(anna, drawQuestion(1), true, false, 1500);
+        database.savePlayerAnswer(bela, drawQuestion(1), false, false, 0);
+        List<String[]> highlights = database.selectGameHighlights();
+        assertEquals(3, highlights.size());
+        org.junit.Assert.assertArrayEquals(new String[]{"⚡ Leggyorsabb válasz", "Béla", "0,412 mp"}, highlights.get(0));
+        org.junit.Assert.assertArrayEquals(new String[]{"🔥 Leghosszabb sorozat", "Anna", "2 találat"}, highlights.get(1));
+        org.junit.Assert.assertArrayEquals(new String[]{"🎯 Legtöbb találat", "Anna", "2 találat"}, highlights.get(2));
+        // a new game starts without highlights, the old game is only in the statistics
+        database.resetScores(0);
+        assertTrue(database.selectGameHighlights().isEmpty());
+    }
+
+    @Test
+    public void theMostCorrectAnswersAreOnlyAHighlightWithoutATie() {
+        startGame("Anna", "Béla");
+        int anna = playerId("Anna");
+        int bela = playerId("Béla");
+        database.savePlayerAnswer(anna, drawQuestion(1), true);
+        database.savePlayerAnswer(bela, drawQuestion(1), true);
+        database.savePlayerAnswer(anna, drawQuestion(1), true);
+        database.savePlayerAnswer(bela, drawQuestion(1), true);
+        for (String[] highlight : database.selectGameHighlights()) {
+            assertFalse(highlight[0].contains("Legtöbb találat"));
+        }
+    }
+
+    @Test
+    public void theFlashStreakOfTheGameIsAHighlight() {
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        List<String[]> highlights = database.selectGameHighlights();
+        assertEquals(1, highlights.size());
+        org.junit.Assert.assertArrayEquals(new String[]{"🔥 Leghosszabb villámsorozat", "Anna", "2 elsőként"}, highlights.get(0));
+    }
+
+    @Test
+    public void undoTakesBackTheFlashStatistics() {
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.undoLastAnswer();
+        Cursor players = database.selectFlashPlayerStatistics();
+        assertEquals(0, players.getCount());
+        players.close();
+    }
+
+    @Test
+    public void flashStatisticsCanBeDeleted() {
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.saveGameResult(true);
+        database.deleteStatistics();
+        Cursor players = database.selectFlashPlayerStatistics();
+        assertEquals(0, players.getCount());
+        players.close();
+    }
+
+    @Test
+    public void backupKeepsTheFlashStatistics() throws JSONException {
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.saveGameResult(true);
+
+        String backup = database.exportJson();
+        database.deleteStatistics();
+        database.importJson(backup, true);
+
+        Cursor players = database.selectFlashPlayerStatistics();
+        assertTrue(players.moveToFirst());
+        assertRow(players, "Anna", 1, 1, 1);
+        players.close();
+    }
+
+    @Test
     public void backupKeepsTheTeams() throws JSONException {
         database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
                 new String[]{"Anna", "Cili"}, new int[]{2000, 2000});
@@ -788,6 +1075,42 @@ public class DatabaseTest {
     }
 
     @Test
+    public void theStreaksAreInTheStatistics() {
+        // Anna: 4 in a row, Késő, 3 in a row: 2 streaks, the 4th is not a new one
+        startGame("Anna");
+        int anna = nextPlayerId();
+        boolean[] answers = {true, true, true, true, false, true, true, true};
+        for (boolean success : answers) {
+            database.savePlayerAnswer(anna, drawQuestion(1), success, false);
+        }
+        Cursor players = database.selectPlayerStatistics();
+        assertTrue(players.moveToFirst());
+        assertEquals(2, players.getInt(4));
+        players.close();
+    }
+
+    @Test
+    public void theStreaksOfATeamAreTheTeamAnswersInARow() {
+        // Pirosak: Anna, Béla, Anna correct one after the other: a streak of the team, not of a person
+        database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
+                new String[]{"Anna, Béla", "Cili"}, new int[]{2000, 2000});
+        int pirosak = playerId("Pirosak");
+        for (int i = 0; i < 3; i++) {
+            database.savePlayerAnswer(pirosak, drawQuestion(1), true, false);
+        }
+        Cursor teams = database.selectTeamStatistics();
+        assertTrue(teams.moveToFirst());
+        assertEquals("Pirosak", teams.getString(0));
+        assertEquals(1, teams.getInt(4));
+        teams.close();
+        Cursor players = database.selectPlayerStatistics();
+        while (players.moveToNext()) {
+            assertEquals(players.getString(0), 0, players.getInt(4));
+        }
+        players.close();
+    }
+
+    @Test
     public void undoTakesBackTheBonus() {
         startGame("Anna");
         int anna = nextPlayerId();
@@ -920,6 +1243,7 @@ public class DatabaseTest {
         SQLiteDatabase db = database.getWritableDatabase();
         // a version 10 database: the Felnőtt has only its own questions, and the new questions are not there
         db.execSQL("DELETE FROM question_topics WHERE topic = 2 AND question_id IN (SELECT question_id FROM question_topics WHERE topic IN (4, 5, 6, 7))");
+        removeVersion12Schema(db);
         database.deleteQuestion(findQuestionId("Hogy hívják a kutya kicsinyét?"));
         // an old question that was linked to the Gyerek in version 11
         int strauss = findQuestionId("Melyik a legnagyobb madár?");
@@ -947,6 +1271,57 @@ public class DatabaseTest {
         assertTrue(rainbow.moveToFirst());
         assertEquals("Piros", rainbow.getString(0));
         rainbow.close();
+    }
+
+    @Test
+    public void upgradeFromVersion12KeepsTheFlashStatisticsAndAddsTheMembers() {
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.saveGameResult(true);
+        SQLiteDatabase db = database.getWritableDatabase();
+        // a version 12 database: flash_history without members
+        db.execSQL("ALTER TABLE flash_history RENAME TO old_flash_history");
+        db.execSQL("CREATE TABLE flash_history(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, flash_id INTEGER NOT NULL, name VARCHAR(200) NOT NULL, team INTEGER NOT NULL, question_id INTEGER NOT NULL, success INTEGER NOT NULL, played_at INTEGER NOT NULL)");
+        db.execSQL("INSERT INTO flash_history(id, flash_id, name, team, question_id, success, played_at) "
+                + "SELECT id, flash_id, name, team, question_id, success, played_at FROM old_flash_history");
+        db.execSQL("DROP TABLE old_flash_history");
+        db.setVersion(12);
+        database.close();
+
+        database = new Database(context);
+        Cursor flash = database.selectFlashPlayerStatistics();
+        assertTrue(flash.moveToFirst());
+        assertRow(flash, "Anna", 1, 1, 1);
+        flash.close();
+        database.insertPlayersForNewGame(new String[]{"Pirosak", "Kékek"}, new int[]{1, 1},
+                new String[]{"Anna, Béla", "Cili"}, new int[]{2000, 2000});
+        database.saveFlashAnswer(playerId("Pirosak"), drawQuestion(1));
+        assertEquals("Anna, Béla", database.selectTeamMembers("Pirosak", true));
+    }
+
+    @Test
+    public void upgradeFromVersion11AddsTheFlashStatistics() {
+        startGame("Anna");
+        database.savePlayerAnswer(nextPlayerId(), drawQuestion(1), true);
+        database.saveGameResult();
+        SQLiteDatabase db = database.getWritableDatabase();
+        removeVersion12Schema(db);
+        db.setVersion(11);
+        database.close();
+
+        database = new Database(context);
+        // the old win counts as a standard game
+        Cursor players = database.selectPlayerStatistics();
+        assertTrue(players.moveToFirst());
+        assertRow(players, "Anna", 1, 1, 1);
+        players.close();
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.saveGameResult(true);
+        Cursor flash = database.selectFlashPlayerStatistics();
+        assertTrue(flash.moveToFirst());
+        assertRow(flash, "Anna", 1, 1, 1);
+        flash.close();
     }
 
     @Test
@@ -1214,6 +1589,37 @@ public class DatabaseTest {
         int points = cursor.getInt(0);
         cursor.close();
         return points;
+    }
+
+    // as before version 12: no flash statistics, games without flash_only, history without team_streak
+    private static void removeVersion12Schema(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE flash_history");
+        db.execSQL("ALTER TABLE history RENAME TO old_history");
+        db.execSQL("CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_name VARCHAR(200) NOT NULL, topic INTEGER NOT NULL, question_id INTEGER NOT NULL, success INTEGER NOT NULL, played_at INTEGER NOT NULL, team VARCHAR(200) DEFAULT '', streak INTEGER DEFAULT 0, elapsed_ms INTEGER DEFAULT 0)");
+        db.execSQL("INSERT INTO history(id, player_name, topic, question_id, success, played_at, team, streak, elapsed_ms) "
+                + "SELECT id, player_name, topic, question_id, success, played_at, team, streak, elapsed_ms FROM old_history");
+        db.execSQL("DROP TABLE old_history");
+        db.execSQL("ALTER TABLE games RENAME TO old_games");
+        db.execSQL("CREATE TABLE games(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, winner VARCHAR(200) NOT NULL, played_at INTEGER NOT NULL, team INTEGER DEFAULT 0)");
+        db.execSQL("INSERT INTO games(id, winner, played_at, team) SELECT id, winner, played_at, team FROM old_games");
+        db.execSQL("DROP TABLE old_games");
+    }
+
+    private int playerId(String name) {
+        Cursor cursor = database.getReadableDatabase().rawQuery(
+                "SELECT id FROM " + Database.TABLE_PLAYERS + " WHERE name = ?", new String[]{name});
+        assertTrue(name, cursor.moveToFirst());
+        int id = cursor.getInt(0);
+        cursor.close();
+        return id;
+    }
+
+    // a row of the statistics: name, questions, successful, wins
+    private static void assertRow(Cursor row, String name, int questions, int successful, int wins) {
+        assertEquals(name, row.getString(0));
+        assertEquals(name, questions, row.getInt(1));
+        assertEquals(name, successful, row.getInt(2));
+        assertEquals(name, wins, row.getInt(3));
     }
 
     private int nextPlayerId() {
