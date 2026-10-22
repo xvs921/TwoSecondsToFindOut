@@ -114,7 +114,23 @@ public class QuestionActivity extends AppCompatActivity {
         // after an undo on the results screen the undone question comes back
         int undoneQuestionId = getIntent().getIntExtra("questionId", -1);
         flashOnly = gameState.isFlashOnly();
-        if (flashOnly) {
+        if (savedInstanceState != null) {
+            // the screen was made again (e.g. the phone was turned): the same question stays,
+            // the phone is not passed on again
+            announcedAsker = savedInstanceState.getString(STATE_ANNOUNCED_ASKER);
+            if (savedInstanceState.getBoolean(STATE_ROUND_OVER)) {
+                // the standings are shown again
+                if (flashOnly) {
+                    nextFlash();
+                } else {
+                    nextTurn();
+                }
+            } else if (flashOnly) {
+                showFlash(savedInstanceState.getInt(STATE_QUESTION_ID, -1));
+            } else {
+                showTurn(savedInstanceState.getInt(STATE_QUESTION_ID, -1));
+            }
+        } else if (flashOnly) {
             if (undoneQuestionId >= 0) {
                 showFlash(undoneQuestionId);
             } else {
@@ -202,12 +218,36 @@ public class QuestionActivity extends AppCompatActivity {
         }
     };
 
+    private static final String STATE_QUESTION_ID = "questionId";
+    private static final String STATE_ROUND_OVER = "roundOver";
+    private static final String STATE_ANNOUNCED_ASKER = "announcedAsker";
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_QUESTION_ID, currentQuestionId);
+        outState.putBoolean(STATE_ROUND_OVER, RoundArea.getVisibility() == View.VISIBLE);
+        outState.putString(STATE_ANNOUNCED_ASKER, announcedAsker);
+    }
+
+    // e.g. a phone call or another app: the reading and the timer stop, Start can be pressed again later
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopTimer();
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Choreographer.getInstance().removeFrameCallback(timerFrame);
         handler.removeCallbacks(timeUp);
-        toneGenerator.release();
+        if (toneGenerator != null) {
+            toneGenerator.release();
+        }
         if (textToSpeech != null) {
             textToSpeech.shutdown();
         }
@@ -245,7 +285,12 @@ public class QuestionActivity extends AppCompatActivity {
         RoundStandings = findViewById(R.id.RoundStandings);
         ButtonNextRound = findViewById(R.id.ButtonNextRound);
         gameState = new GameState(this);
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
+        try {
+            toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
+        } catch (RuntimeException e) {
+            // some phones cannot make a tone generator (e.g. too many sounds are open), the game goes on without the beep
+            toneGenerator = null;
+        }
         database = new Database(this);
         defaultTimerColor = TimerText.getCurrentTextColor();
         timerStarted = false;
@@ -271,7 +316,8 @@ public class QuestionActivity extends AppCompatActivity {
         int room = height - button - Math.round(36 * density);
         boolean sideBySide = room < Math.round(96 * density);
         // even next to each other there is no room: a long question with many players, the question gets smaller
-        if (sideBySide && height < button + Math.round(8 * density) && Question.getTextSize() > 21 * getResources().getDisplayMetrics().scaledDensity) {
+        if (sideBySide && height < button + Math.round(8 * density)
+                && Question.getTextSize() > TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 21, getResources().getDisplayMetrics())) {
             Question.post(() -> Question.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20));
             return;
         }
@@ -444,14 +490,34 @@ public class QuestionActivity extends AppCompatActivity {
             finishGame();
             return;
         }
+        // also when nobody dropped out, e.g. everybody has the same points
+        database.startTieBreak();
         showRoundStandings("Holtverseny!", "Szétszavazó kör: " + database.selectActivePlayerNames() + "\n\n" + database.selectScoreboardText());
     }
 
     // Only flash questions: a round has a question for every player or team. After a round the
     // standings are shown, and the game is over like with the turns: after the rounds, or when
-    // somebody has the target points. The leaders play tie-break rounds.
+    // somebody has the target points. The leaders play a tie-break that decides their places one by one.
     private void nextFlash()
     {
+        // the one who answers first is placed and drops out, until one is left: 2 tied players
+        // need 1 question, 3 need 2, and so on (a question that nobody answered does not count)
+        if (database.isTieBreak())
+        {
+            if (database.countActivePlayers() <= 1)
+            {
+                finishGame();
+            }
+            else if (database.isTieBreakStarting())
+            {
+                showFlashTieBreakStandings();
+            }
+            else
+            {
+                showFlash(-1);
+            }
+            return;
+        }
         int asked = database.countFlashAnswers();
         int perRound = Math.max(1, database.countPlayers());
         if (asked == 0 || asked % perRound != 0)
@@ -473,7 +539,14 @@ public class QuestionActivity extends AppCompatActivity {
             finishGame();
             return;
         }
-        showRoundStandings("Holtverseny!", "Szétszavazó kör: " + database.selectActivePlayerNames() + "\n\n" + database.selectScoreboardText());
+        database.startTieBreak();
+        showFlashTieBreakStandings();
+    }
+
+    private void showFlashTieBreakStandings()
+    {
+        showRoundStandings("Holtverseny!", "Szétszavazó: " + database.selectActivePlayerNames()
+                + "\nAki elsőként jól válaszol, az kerül előre, a többiek folytatják.\n\n" + database.selectScoreboardText());
     }
 
     // the standings take the place of the timer, the game buttons are hidden until Tovább
@@ -524,7 +597,8 @@ public class QuestionActivity extends AppCompatActivity {
         }
         int round = answered / answersPerRound;
         boolean byPoints = gameState.isByPoints();
-        if (byPoints ? database.hasInactivePlayers() : round >= rounds)
+        // a game saved before the tie-break was marked is in it after its rounds too
+        if (database.isTieBreak() || (!byPoints && round >= rounds))
         {
             CurrentPlayer.setText(name + " (szétszavazó)");
         }
@@ -564,15 +638,16 @@ public class QuestionActivity extends AppCompatActivity {
     {
         setRoundAreaVisible(false);
         int asked = database.countFlashAnswers();
+        boolean tieBreak = database.isTieBreak();
         flashAskerId = -1;
-        String[] flashAsker = gameState.isPlayersAsk() ? database.selectFlashAsker(asked) : null;
+        String[] flashAsker = gameState.isPlayersAsk() ? database.selectFlashAsker(asked, tieBreak) : null;
         if (flashAsker != null) {
             flashAskerId = Integer.parseInt(flashAsker[2]);
         }
         int perRound = Math.max(1, database.countPlayers());
         int round = asked / perRound;
         boolean byPoints = gameState.isByPoints();
-        String progress = (byPoints ? database.hasInactivePlayers() : round >= rounds) ? "szétszavazó"
+        String progress = tieBreak ? "szétszavazó"
                 : byPoints ? (round + 1) + ". kör · " + gameState.getTargetPoints() + " pontig"
                 : (round + 1) + ". kör / " + rounds;
         CurrentPlayer.setText("⚡ Bárki válaszolhat! (" + progress + ")");
@@ -650,6 +725,14 @@ public class QuestionActivity extends AppCompatActivity {
                 return;
             }
             stopTimer();
+            if (database.isTieBreak()) {
+                int points = database.saveFlashTieBreakAnswer(playerId, currentQuestionId, flashAskerId);
+                if (playerId > 0) {
+                    Toast.makeText(this, "🏅 " + name + " előrébb végzett: +" + points + " pont", Toast.LENGTH_SHORT).show();
+                }
+                nextFlash();
+                return;
+            }
             int points = database.saveFlashAnswer(playerId, currentQuestionId, flashAskerId, gameState.isStreakBonus());
             if (points > 1) {
                 Toast.makeText(this, "🔥 " + name + ": " + Database.STREAK_LENGTH + " egymás után! +1 bónuszpont", Toast.LENGTH_LONG).show();
@@ -702,6 +785,7 @@ public class QuestionActivity extends AppCompatActivity {
             setQuestionText(question.getString(0));
             hideAnswer(question.getString(1));
             showFlag();
+            showRepeatButton(false);
         }
         question.close();
         return found;
@@ -711,13 +795,22 @@ public class QuestionActivity extends AppCompatActivity {
     public void kerdes(int topic)
     {
         Cursor question = database.selectRandomQuestion(topic);
+        if (question == null)
+        {
+            // e.g. every question of the level was deleted: a question of another level, so the game goes on
+            question = database.selectRandomQuestionOfAnyTopic();
+            if (question != null)
+            {
+                Toast.makeText(this, "Ezen a szinten nincs kérdés, ez egy másik szintről jön.", Toast.LENGTH_SHORT).show();
+            }
+        }
         if (question == null || !question.moveToFirst())
         {
             if (question != null)
             {
                 question.close();
             }
-            Question.setText("Ebben a témában nincs kérdés.");
+            setQuestionText("Nincs egy kérdés sem. Adj hozzá kérdéseket a Kérdések menüben!");
             hideAnswer("");
             ButtonStartStop.setVisibility(View.INVISIBLE);
             FlagQuestion.setVisibility(View.GONE);
@@ -729,6 +822,8 @@ public class QuestionActivity extends AppCompatActivity {
         hideAnswer(question.getString(2));
         question.close();
         showFlag();
+        // Start comes back if it was hidden because there was no question
+        showRepeatButton(false);
     }
 
     @SuppressLint("SetTextI18n")
@@ -757,7 +852,7 @@ public class QuestionActivity extends AppCompatActivity {
     private final Runnable timeUp = () -> {
         TimerText.setTextColor(ContextCompat.getColor(QuestionActivity.this, R.color.danger));
         // beep and/or vibrate once, so the game master can watch the player
-        if (gameState.isBeeping()) {
+        if (gameState.isBeeping() && toneGenerator != null) {
             toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 400);
         }
         if (gameState.isVibrating()) {

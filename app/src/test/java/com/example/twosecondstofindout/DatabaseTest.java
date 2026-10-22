@@ -121,6 +121,30 @@ public class DatabaseTest {
     }
 
     @Test
+    public void questionOfAnyTopicStartsOverWhenEveryQuestionWasUsed() {
+        database.getWritableDatabase().execSQL("DELETE FROM questions");
+        int id = addTestQuestion("Az egyetlen?", "Igen");
+        database.markQuestionUsed(id);
+        Cursor question = database.selectRandomQuestionOfAnyTopic();
+        assertTrue(question.moveToFirst());
+        assertEquals(id, question.getInt(0));
+        question.close();
+    }
+
+    @Test
+    public void existingQuestionIsFoundByItsText() {
+        int id = addTestQuestion("Megvan már?", "Igen");
+        assertEquals(id, database.findQuestionId("  Megvan már? "));
+        assertEquals(-1, database.findQuestionId("Nincs ilyen kérdés?"));
+    }
+
+    @Test
+    public void questionOfAnyTopicIsNullWithoutQuestions() {
+        database.getWritableDatabase().execSQL("DELETE FROM questions");
+        assertNull(database.selectRandomQuestionOfAnyTopic());
+    }
+
+    @Test
     public void questionCanBeAddedEditedAndDeleted() {
         database.saveQuestion(-1, new int[]{TEST_TOPIC}, "  Mi a kérdés?  ", " Válasz ");
         Cursor questions = database.selectQuestions(TEST_TOPIC);
@@ -671,6 +695,67 @@ public class DatabaseTest {
         Cursor players = database.selectPlayerStatistics();
         assertEquals(0, players.getCount());
         players.close();
+    }
+
+    // „Bárki válaszolhat”: Anna, Béla and Cili are tied for the first place after the last question
+    private void startFlashTieBreak() {
+        startGame("Anna", "Béla", "Cili");
+        database.saveFlashAnswer(0, drawQuestion(1));
+        assertEquals(3, database.keepLeadersActive());
+        database.startTieBreak();
+    }
+
+    @Test
+    public void flashTieBreakPlacesTheFirstToAnswerOneByOne() {
+        startFlashTieBreak();
+        assertTrue(database.isTieBreak());
+        assertTrue(database.isTieBreakStarting());
+        // 3 tied: the first one gets ahead of 2, nobody answering places nobody, the second one gets ahead of 1
+        assertEquals(2, database.saveFlashTieBreakAnswer(playerId("Anna"), drawQuestion(1), -1));
+        assertFalse(database.isTieBreakStarting());
+        assertEquals(0, database.saveFlashTieBreakAnswer(0, drawQuestion(1), -1));
+        assertEquals(2, database.countActivePlayers());
+        assertEquals(1, database.saveFlashTieBreakAnswer(playerId("Béla"), drawQuestion(1), -1));
+        assertEquals(1, database.countActivePlayers());
+        assertEquals("Cili", database.selectActivePlayerNames());
+        assertEquals(2, points("Anna"));
+        assertEquals(1, points("Béla"));
+        assertEquals(0, points("Cili"));
+        database.saveGameResult(true);
+        assertEquals("Anna", database.selectMostWinsInARow()[0]);
+    }
+
+    @Test
+    public void undoingAPlaceBringsThePlayerBackIntoTheTieBreak() {
+        startFlashTieBreak();
+        int question = drawQuestion(1);
+        database.saveFlashTieBreakAnswer(playerId("Anna"), question, -1);
+        assertEquals(question, database.undoLastAnswer());
+        assertEquals(3, database.countActivePlayers());
+        assertEquals(0, points("Anna"));
+        assertTrue(database.isTieBreakStarting());
+    }
+
+    @Test
+    public void undoingTheLastQuestionBeforeTheTieBreakEndsIt() {
+        startFlashTieBreak();
+        database.undoLastAnswer();
+        assertFalse(database.isTieBreak());
+    }
+
+    @Test
+    public void theOnesOutOfTheFlashTieBreakAsk() {
+        startGame("Anna", "Béla", "Cili");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        database.saveFlashAnswer(playerId("Béla"), drawQuestion(1));
+        // Anna and Béla are tied, Cili is out of the tie-break: she asks every question of it
+        assertEquals(2, database.keepLeadersActive());
+        database.startTieBreak();
+        for (int question = 2; question < 5; question++) {
+            assertEquals("Cili", database.selectFlashAsker(question, true)[0]);
+        }
+        // when everybody is in it, the phone goes on as before
+        assertEquals(database.selectFlashAsker(2)[0], database.selectFlashAsker(2, false)[0]);
     }
 
     @Test
@@ -1237,6 +1322,23 @@ public class DatabaseTest {
     }
 
     @Test
+    public void upgradeFromVersion14AddsTheTieBreakOfTheFlashGames() {
+        startGame("Anna", "Béla");
+        database.saveFlashAnswer(playerId("Anna"), drawQuestion(1));
+        SQLiteDatabase db = database.getWritableDatabase();
+        removeVersion15Schema(db);
+        db.setVersion(14);
+        database.close();
+
+        database = new Database(context);
+        // the game goes on, it is not in a tie-break
+        assertFalse(database.isTieBreak());
+        assertEquals(1, points("Anna"));
+        database.startTieBreak();
+        assertTrue(database.isTieBreak());
+    }
+
+    @Test
     public void upgradeFromVersion10AddsTheNewQuestionsAndGivesFelnottTheSportFoldrajzTortenelemAndTudomanyQuestions() {
         database.saveQuestion(-1, new int[]{4}, "Saját sport kérdés?", "Igen");
         int own = findQuestionId("Saját sport kérdés?");
@@ -1285,6 +1387,7 @@ public class DatabaseTest {
         db.execSQL("INSERT INTO flash_history(id, flash_id, name, team, question_id, success, played_at) "
                 + "SELECT id, flash_id, name, team, question_id, success, played_at FROM old_flash_history");
         db.execSQL("DROP TABLE old_flash_history");
+        removeVersion15Schema(db);
         db.setVersion(12);
         database.close();
 
@@ -1593,6 +1696,7 @@ public class DatabaseTest {
 
     // as before version 12: no flash statistics, games without flash_only, history without team_streak
     private static void removeVersion12Schema(SQLiteDatabase db) {
+        removeVersion15Schema(db);
         db.execSQL("DROP TABLE flash_history");
         db.execSQL("ALTER TABLE history RENAME TO old_history");
         db.execSQL("CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_name VARCHAR(200) NOT NULL, topic INTEGER NOT NULL, question_id INTEGER NOT NULL, success INTEGER NOT NULL, played_at INTEGER NOT NULL, team VARCHAR(200) DEFAULT '', streak INTEGER DEFAULT 0, elapsed_ms INTEGER DEFAULT 0)");
@@ -1603,6 +1707,14 @@ public class DatabaseTest {
         db.execSQL("CREATE TABLE games(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, winner VARCHAR(200) NOT NULL, played_at INTEGER NOT NULL, team INTEGER DEFAULT 0)");
         db.execSQL("INSERT INTO games(id, winner, played_at, team) SELECT id, winner, played_at, team FROM old_games");
         db.execSQL("DROP TABLE old_games");
+    }
+
+    private static void removeVersion15Schema(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE answers RENAME TO old_answers");
+        db.execSQL("CREATE TABLE answers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_id INTEGER NOT NULL, question_id INTEGER NOT NULL, points INTEGER NOT NULL, deactivated TEXT DEFAULT '', history_id INTEGER DEFAULT 0, kind INTEGER DEFAULT 0)");
+        db.execSQL("INSERT INTO answers(id, player_id, question_id, points, deactivated, history_id, kind) "
+                + "SELECT id, player_id, question_id, points, deactivated, history_id, kind FROM old_answers");
+        db.execSQL("DROP TABLE old_answers");
     }
 
     private int playerId(String name) {

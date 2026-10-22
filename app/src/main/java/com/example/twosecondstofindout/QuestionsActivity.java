@@ -53,7 +53,16 @@ public class QuestionsActivity extends AppCompatActivity {
             Cursor row = (Cursor) adapter.getItem(position);
             showEditDialog((int) id, row.getString(1), row.getString(2), database.selectQuestionTopics((int) id));
         });
-        selectTopic(1);
+        // the topic that was shown before the screen was made again (e.g. the phone was turned)
+        selectTopic(savedInstanceState == null ? 1 : savedInstanceState.getInt(STATE_TOPIC, 1));
+    }
+
+    private static final String STATE_TOPIC = "topic";
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_TOPIC, topic);
     }
 
     @Override
@@ -162,6 +171,12 @@ public class QuestionsActivity extends AppCompatActivity {
             Collections.sort(checked);
             if (newQuestion.isEmpty() || newAnswer.isEmpty() || checked.isEmpty()) {
                 Toast.makeText(this, "Add meg a kérdést, a választ és legalább egy kategóriát!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // the same question twice would be asked twice, and its statistics would be split
+            int existing = database.findQuestionId(newQuestion);
+            if (existing >= 0 && existing != questionId) {
+                Toast.makeText(this, "Ez a kérdés már megvan. Ha más szinten is kéne, ott pipáld be a szintet!", Toast.LENGTH_LONG).show();
                 return;
             }
             int[] newTopics = new int[checked.size()];

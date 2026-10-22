@@ -1,5 +1,6 @@
 package com.example.twosecondstofindout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -65,7 +66,14 @@ public class RoundActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SystemBars.setUp(this);
         setContentView(R.layout.activity_round);
-        init();
+        init(savedInstanceState);
+        // the previous screen was closed: the back gesture goes to the players like Vissza, instead of closing the app
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ButtonBackRound.performClick();
+            }
+        });
         ButtonBackRound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,7 +135,33 @@ public class RoundActivity extends AppCompatActivity {
             }
         });
     }
-    private void init() {
+    private static final String STATE_PHONE_READS = "phoneReads";
+    private static final String STATE_PLAYERS_ASK = "playersAsk";
+    private static final String STATE_BEEP = "beep";
+    private static final String STATE_VIBRATE = "vibrate";
+    private static final String STATE_STREAK_BONUS = "streakBonus";
+    private static final String STATE_BY_POINTS = "byPoints";
+    private static final String STATE_OTHER_GOAL_NUMBER = "otherGoalNumber";
+    private static final String STATE_PASSES = "passes";
+    private static final String STATE_FLASH_ONLY = "flashOnly";
+
+    // the choices are only saved for the game when it starts, until then they are kept here
+    // when the screen is made again (e.g. the phone was turned). The number field keeps its own text.
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_PHONE_READS, phoneReads);
+        outState.putBoolean(STATE_PLAYERS_ASK, playersAsk);
+        outState.putBoolean(STATE_BEEP, beep);
+        outState.putBoolean(STATE_VIBRATE, vibrate);
+        outState.putBoolean(STATE_STREAK_BONUS, streakBonus);
+        outState.putBoolean(STATE_BY_POINTS, byPoints);
+        outState.putInt(STATE_OTHER_GOAL_NUMBER, otherGoalNumber);
+        outState.putInt(STATE_PASSES, passes);
+        outState.putBoolean(STATE_FLASH_ONLY, flashOnly);
+    }
+
+    private void init(Bundle savedInstanceState) {
         ButtonBackRound = findViewById(R.id.ButtonBackRound);
         ButtonNextRound = findViewById(R.id.ButtonNextRound);
         FirstPlayer = findViewById(R.id.FirstPlayer);
@@ -169,6 +203,18 @@ public class RoundActivity extends AppCompatActivity {
         otherGoalNumber = gameState.getTargetPoints();
         setByPoints(gameState.isByPoints());
         setFlashOnly(gameState.isFlashOnly());
+        if (savedInstanceState != null) {
+            setPhoneReads(savedInstanceState.getBoolean(STATE_PHONE_READS));
+            setPlayersAsk(savedInstanceState.getBoolean(STATE_PLAYERS_ASK));
+            setSignals(savedInstanceState.getBoolean(STATE_BEEP), savedInstanceState.getBoolean(STATE_VIBRATE));
+            setStreakBonus(savedInstanceState.getBoolean(STATE_STREAK_BONUS));
+            setPasses(savedInstanceState.getInt(STATE_PASSES));
+            // not swapped: the number field gets back the number that was shown
+            byPoints = savedInstanceState.getBoolean(STATE_BY_POINTS);
+            otherGoalNumber = savedInstanceState.getInt(STATE_OTHER_GOAL_NUMBER);
+            setByPoints(byPoints);
+            setFlashOnly(savedInstanceState.getBoolean(STATE_FLASH_ONLY));
+        }
     }
 
     // without a game master the phone goes to the first asker before the game starts
