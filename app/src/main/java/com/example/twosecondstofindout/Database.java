@@ -73,7 +73,7 @@ public class Database extends SQLiteOpenHelper
 
     public Database(Context context)
     {
-        super(context, DATABASE_NAME, null, 14);
+        super(context, DATABASE_NAME, null, 15);
         this.context = context;
     }
 
@@ -93,6 +93,7 @@ public class Database extends SQLiteOpenHelper
         addFlashMembersColumn(db);
         addFlashStreakColumn(db);
         addTeamStreakColumn(db);
+        addTieBreakColumn(db);
         createQuestionTopicsTable(db);
         mergeQuestionsFromFile(db);
     }
@@ -141,6 +142,13 @@ public class Database extends SQLiteOpenHelper
     private void addTeamStreakColumn(SQLiteDatabase db)
     {
         db.execSQL("ALTER TABLE " + TABLE_HISTORY + " ADD COLUMN team_streak INTEGER DEFAULT 0");
+    }
+
+    // answers.tie_break: 1 on the answer after which a tie-break (round) started,
+    // so undoing that answer ends the tie-break too
+    private void addTieBreakColumn(SQLiteDatabase db)
+    {
+        db.execSQL("ALTER TABLE " + TABLE_ANSWERS + " ADD COLUMN tie_break INTEGER DEFAULT 0");
     }
 
     // history.player_name is the team member who answered and history.team their team,
@@ -250,6 +258,12 @@ public class Database extends SQLiteOpenHelper
     private void renameQuestion(SQLiteDatabase db, String oldText, String newText, String newAnswer)
     {
         db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET question = ?, answer = ? WHERE question = ?", new Object[]{newText, newAnswer, oldText});
+    }
+
+    // the id of the question with this text (spaces around it do not count), -1 if there is none
+    public int findQuestionId(String question)
+    {
+        return (int) findQuestion(this.getWritableDatabase(), question.trim());
     }
 
     private long findQuestion(SQLiteDatabase db, String question)
@@ -364,6 +378,11 @@ public class Database extends SQLiteOpenHelper
             // streaks and the streak bonus in the „Bárki válaszolhat” games
             addFlashStreakColumn(db);
         }
+        if (oldVersion < 15)
+        {
+            // the tie-break of the „Bárki válaszolhat” games decides the places one by one
+            addTieBreakColumn(db);
+        }
     }
 
     // Returns id, question, answer of a random question not used yet. When every
@@ -380,6 +399,28 @@ public class Database extends SQLiteOpenHelper
             question.close();
             db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET used = 0 WHERE id IN (SELECT question_id FROM " + TABLE_QUESTION_TOPICS + " WHERE topic = ?)", args);
             question = db.rawQuery(query, args);
+        }
+        if (question.getCount() == 0)
+        {
+            question.close();
+            return null;
+        }
+        return question;
+    }
+
+    // When the level of the player has no questions (e.g. they were deleted in the editor):
+    // id, question, answer of a random question of any topic not used yet. When every question
+    // was used, they all start over. Null if there are no questions at all.
+    public Cursor selectRandomQuestionOfAnyTopic()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT id, question, answer FROM " + TABLE_QUESTIONS + " WHERE used = 0 ORDER BY RANDOM() LIMIT 1";
+        Cursor question = db.rawQuery(query, null);
+        if (question.getCount() == 0)
+        {
+            question.close();
+            db.execSQL("UPDATE " + TABLE_QUESTIONS + " SET used = 0");
+            question = db.rawQuery(query, null);
         }
         if (question.getCount() == 0)
         {
@@ -670,33 +711,43 @@ public class Database extends SQLiteOpenHelper
             points = 2;
         }
         long historyId = 0;
-        Cursor player = db.rawQuery("SELECT name, topic, answered FROM " + TABLE_PLAYERS + " WHERE id = ?", new String[]{String.valueOf(playerId)});
-        if (player.moveToFirst())
+        // the statistics, the points and the undo log are saved together, or none of them
+        db.beginTransaction();
+        try
         {
-            // in a team game the statistics are kept for the member who answered too
-            Member member = memberOnTurn(selectMembers(db, playerId), player.getInt(2));
-            ContentValues history = new ContentValues();
-            history.put("player_name", member == null ? player.getString(0) : member.name);
-            history.put("team", member == null ? "" : player.getString(0));
-            history.put("topic", member == null ? player.getInt(1) : member.topic);
-            history.put("question_id", questionId);
-            // a correct answer, whatever bonus it got
-            history.put("success", success ? 1 : 0);
-            history.put("streak", success ? personInARow(db, member == null ? player.getString(0) : member.name) + 1 : 0);
-            history.put("team_streak", member == null ? 0 : inARow);
-            history.put("elapsed_ms", success ? elapsedMs : 0);
-            history.put("played_at", System.currentTimeMillis());
-            historyId = db.insert(TABLE_HISTORY, null, history);
-        }
-        player.close();
-        db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered + 1, points = points + ? WHERE id = ?", new Object[]{points, playerId});
+            Cursor player = db.rawQuery("SELECT name, topic, answered FROM " + TABLE_PLAYERS + " WHERE id = ?", new String[]{String.valueOf(playerId)});
+            if (player.moveToFirst())
+            {
+                // in a team game the statistics are kept for the member who answered too
+                Member member = memberOnTurn(selectMembers(db, playerId), player.getInt(2));
+                ContentValues history = new ContentValues();
+                history.put("player_name", member == null ? player.getString(0) : member.name);
+                history.put("team", member == null ? "" : player.getString(0));
+                history.put("topic", member == null ? player.getInt(1) : member.topic);
+                history.put("question_id", questionId);
+                // a correct answer, whatever bonus it got
+                history.put("success", success ? 1 : 0);
+                history.put("streak", success ? personInARow(db, member == null ? player.getString(0) : member.name) + 1 : 0);
+                history.put("team_streak", member == null ? 0 : inARow);
+                history.put("elapsed_ms", success ? elapsedMs : 0);
+                history.put("played_at", System.currentTimeMillis());
+                historyId = db.insert(TABLE_HISTORY, null, history);
+            }
+            player.close();
+            db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered + 1, points = points + ? WHERE id = ?", new Object[]{points, playerId});
 
-        ContentValues values = new ContentValues();
-        values.put("player_id", playerId);
-        values.put("question_id", questionId);
-        values.put("points", points);
-        values.put("history_id", historyId);
-        db.insert(TABLE_ANSWERS, null, values);
+            ContentValues values = new ContentValues();
+            values.put("player_id", playerId);
+            values.put("question_id", questionId);
+            values.put("points", points);
+            values.put("history_id", historyId);
+            db.insert(TABLE_ANSWERS, null, values);
+            db.setTransactionSuccessful();
+        }
+        finally
+        {
+            db.endTransaction();
+        }
         return points;
     }
 
@@ -748,6 +799,27 @@ public class Database extends SQLiteOpenHelper
         {
             points = 2;
         }
+        insertFlashAnswer(db, playerId, questionId, askerId, points, inARow, false);
+        return points;
+    }
+
+    // A flash question of the tie-break of a „Bárki válaszolhat” game: the one who answered first is
+    // placed before the others who are still in the tie-break, and drops out. They get a point for
+    // every player they got ahead of, e.g. of 3 tied players the first one gets 2, the second one 1,
+    // so the points show the places. playerId: 0 if nobody answered, then nobody is placed.
+    // Returns the points given.
+    public int saveFlashTieBreakAnswer(int playerId, int questionId, int askerId)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int points = playerId > 0 ? countActivePlayers() - 1 : 0;
+        int inARow = playerId > 0 ? flashInARow(db, playerId) + 1 : 0;
+        insertFlashAnswer(db, playerId, questionId, askerId, points, inARow, playerId > 0);
+        return points;
+    }
+
+    // placed: the player drops out of the tie-break, an undo brings them back
+    private void insertFlashAnswer(SQLiteDatabase db, int playerId, int questionId, int askerId, int points, int inARow, boolean placed)
+    {
         db.beginTransaction();
         try
         {
@@ -759,13 +831,17 @@ public class Database extends SQLiteOpenHelper
                     + "FROM " + TABLE_PLAYERS + " p WHERE p.active = 1 AND p.id != ?",
                     new Object[]{flashId, questionId, playerId, System.currentTimeMillis(), askerId});
             db.execSQL("UPDATE " + TABLE_FLASH_HISTORY + " SET streak = ? WHERE flash_id = ? AND success = 1", new Object[]{inARow, flashId});
+            if (placed)
+            {
+                db.execSQL("UPDATE " + TABLE_PLAYERS + " SET active = 0 WHERE id = ?", new Object[]{playerId});
+                db.execSQL("UPDATE " + TABLE_ANSWERS + " SET deactivated = ? WHERE id = ?", new Object[]{"," + playerId, flashId});
+            }
             db.setTransactionSuccessful();
         }
         finally
         {
             db.endTransaction();
         }
-        return points;
     }
 
     // the flash questions of this game the player or team got and answered first, since the last one they missed
@@ -793,8 +869,17 @@ public class Database extends SQLiteOpenHelper
         {
             return false;
         }
-        db.execSQL("UPDATE " + TABLE_PLAYERS + " SET passes = passes - 1 WHERE id = ?", new Object[]{playerId});
-        insertLogEntry(db, playerId, questionId, 0, PASS);
+        db.beginTransaction();
+        try
+        {
+            db.execSQL("UPDATE " + TABLE_PLAYERS + " SET passes = passes - 1 WHERE id = ?", new Object[]{playerId});
+            insertLogEntry(db, playerId, questionId, 0, PASS);
+            db.setTransactionSuccessful();
+        }
+        finally
+        {
+            db.endTransaction();
+        }
         return true;
     }
 
@@ -824,6 +909,43 @@ public class Database extends SQLiteOpenHelper
         Cursor most = db.rawQuery("SELECT IFNULL(MAX(points), 0) FROM " + TABLE_PLAYERS + " WHERE active = 1", null);
         int result = most.moveToFirst() ? most.getInt(0) : 0;
         most.close();
+        return result;
+    }
+
+    public int countActivePlayers()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor count = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_PLAYERS + " WHERE active = 1", null);
+        int result = count.moveToFirst() ? count.getInt(0) : 0;
+        count.close();
+        return result;
+    }
+
+    // A tie-break (round) starts after the last answer
+    public void startTieBreak()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE_ANSWERS + " SET tie_break = 1 WHERE id = (SELECT MAX(id) FROM " + TABLE_ANSWERS + ")");
+    }
+
+    // true during the tie-break
+    public boolean isTieBreak()
+    {
+        return countAnswers("tie_break = 1") > 0;
+    }
+
+    // true if the tie-break started after the last answer, and has no question yet
+    public boolean isTieBreakStarting()
+    {
+        return countAnswers("tie_break = 1 AND id = (SELECT MAX(id) FROM " + TABLE_ANSWERS + ")") > 0;
+    }
+
+    private int countAnswers(String where)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor count = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_ANSWERS + " WHERE " + where, null);
+        int result = count.moveToFirst() ? count.getInt(0) : 0;
+        count.close();
         return result;
     }
 
@@ -872,11 +994,20 @@ public class Database extends SQLiteOpenHelper
     // {asker, their team or empty, the id of the player or team}, or null with less than 2 players.
     public String[] selectFlashAsker(int question)
     {
+        return selectFlashAsker(question, false);
+    }
+
+    // tieBreak: in the tie-break the ones who are not in it ask, so everybody in it can answer.
+    // If everybody is in it, the phone goes on as before.
+    public String[] selectFlashAsker(int question, boolean tieBreak)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor players = db.rawQuery("SELECT id, name FROM " + TABLE_PLAYERS + " ORDER BY id", null);
+        String outOfTieBreak = tieBreak && hasInactivePlayers() ? " WHERE active = 0" : "";
+        Cursor players = db.rawQuery("SELECT id, name FROM " + TABLE_PLAYERS + outOfTieBreak + " ORDER BY id", null);
         int count = players.getCount();
         String[] asker = null;
-        if (count > 1)
+        // one who is out of the tie-break is enough, otherwise somebody else has to answer
+        if (count > (outOfTieBreak.isEmpty() ? 1 : 0))
         {
             players.moveToPosition(askerIndex(count, question));
             int playerId = players.getInt(0);
@@ -953,17 +1084,26 @@ public class Database extends SQLiteOpenHelper
         int kind = last.getInt(6);
         last.close();
 
-        db.execSQL("DELETE FROM " + TABLE_HISTORY + " WHERE id = ?", new Object[]{historyId});
-        db.execSQL("DELETE FROM " + TABLE_FLASH_HISTORY + " WHERE flash_id = ?", new Object[]{answerId});
-        if (deactivated != null && deactivated.length() > 1)
+        db.beginTransaction();
+        try
         {
-            db.execSQL("UPDATE " + TABLE_PLAYERS + " SET active = 1 WHERE id IN (" + deactivated.substring(1) + ")");
+            db.execSQL("DELETE FROM " + TABLE_HISTORY + " WHERE id = ?", new Object[]{historyId});
+            db.execSQL("DELETE FROM " + TABLE_FLASH_HISTORY + " WHERE flash_id = ?", new Object[]{answerId});
+            if (deactivated != null && deactivated.length() > 1)
+            {
+                db.execSQL("UPDATE " + TABLE_PLAYERS + " SET active = 1 WHERE id IN (" + deactivated.substring(1) + ")");
+            }
+            // a flash round or a pass did not count as the player's turn
+            int answered = kind == ANSWER ? 1 : 0;
+            int passes = kind == PASS ? 1 : 0;
+            db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered - ?, points = points - ?, passes = passes + ? WHERE id = ?", new Object[]{answered, points, passes, playerId});
+            db.execSQL("DELETE FROM " + TABLE_ANSWERS + " WHERE id = ?", new Object[]{answerId});
+            db.setTransactionSuccessful();
         }
-        // a flash round or a pass did not count as the player's turn
-        int answered = kind == ANSWER ? 1 : 0;
-        int passes = kind == PASS ? 1 : 0;
-        db.execSQL("UPDATE " + TABLE_PLAYERS + " SET answered = answered - ?, points = points - ?, passes = passes + ? WHERE id = ?", new Object[]{answered, points, passes, playerId});
-        db.execSQL("DELETE FROM " + TABLE_ANSWERS + " WHERE id = ?", new Object[]{answerId});
+        finally
+        {
+            db.endTransaction();
+        }
         return questionId;
     }
 

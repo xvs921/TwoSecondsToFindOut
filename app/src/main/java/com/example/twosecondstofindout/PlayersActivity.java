@@ -1,7 +1,9 @@
 package com.example.twosecondstofindout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.os.BundleCompat;
 import androidx.core.view.ViewCompat;
 
 import android.annotation.SuppressLint;
@@ -19,7 +21,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class PlayersActivity extends AppCompatActivity {
 
@@ -62,7 +67,14 @@ public class PlayersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SystemBars.setUp(this);
         setContentView(R.layout.activity_players);
-        init();
+        init(savedInstanceState);
+        // the previous screen was closed: the back gesture goes to the main menu like Vissza, instead of closing the app
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ButtonBackPlayers.performClick();
+            }
+        });
         ButtonModeSingle.setOnClickListener(view -> setTeams(false));
         ButtonModeTeams.setOnClickListener(view -> setTeams(true));
         ButtonNewPlayer.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +120,11 @@ public class PlayersActivity extends AppCompatActivity {
                     Toast.makeText(PlayersActivity.this, "Minden csapatban ugyanannyi ember legyen!", Toast.LENGTH_LONG).show();
                     return;
                 }
+                String duplicate = findDuplicateName(players);
+                if (duplicate != null) {
+                    Toast.makeText(PlayersActivity.this, "„" + duplicate + "” kétszer szerepel. Adj mindenkinek más nevet, különben a statisztikában összekeverednek!", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 database.insertPlayersForNewGame(players);
                 if(database.countPlayers() == 0){
                     Toast.makeText(PlayersActivity.this, teams ? "Adj meg legalább egy csapatot!" : "Adj meg legalább egy játékost!", Toast.LENGTH_SHORT).show();
@@ -121,8 +138,52 @@ public class PlayersActivity extends AppCompatActivity {
 
     }
 
+    private static final String STATE_TEAMS = "teams";
+    private static final String STATE_ROWS = "rows";
+
+    // The rows have the same view ids, so Android cannot keep what was typed in them when the
+    // screen is made again (e.g. the phone was turned): the rows are saved here instead.
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ArrayList<Bundle> rows = new ArrayList<>();
+        for (int i = 0; i < PlayerRows.length && PlayerRows[i].getVisibility() == View.VISIBLE; i++) {
+            rows.add(toBundle(readRow(i)));
+        }
+        outState.putParcelableArrayList(STATE_ROWS, rows);
+        outState.putBoolean(STATE_TEAMS, teams);
+    }
+
+    static Bundle toBundle(Database.Player player) {
+        Bundle bundle = new Bundle();
+        bundle.putString("name", player.name);
+        bundle.putInt("topic", player.topic);
+        bundle.putInt("answerMs", player.answerMs);
+        ArrayList<Bundle> members = new ArrayList<>();
+        for (Database.Member member : player.members) {
+            Bundle memberBundle = new Bundle();
+            memberBundle.putString("name", member.name);
+            memberBundle.putInt("topic", member.topic);
+            memberBundle.putInt("answerMs", member.answerMs);
+            members.add(memberBundle);
+        }
+        bundle.putParcelableArrayList("members", members);
+        return bundle;
+    }
+
+    static Database.Player fromBundle(Bundle bundle) {
+        Database.Player player = new Database.Player(bundle.getString("name", ""), bundle.getInt("topic"), bundle.getInt("answerMs"));
+        ArrayList<Bundle> members = BundleCompat.getParcelableArrayList(bundle, "members", Bundle.class);
+        if (members != null) {
+            for (Bundle member : members) {
+                player.members.add(new Database.Member(member.getString("name", ""), member.getInt("topic"), member.getInt("answerMs")));
+            }
+        }
+        return player;
+    }
+
     @SuppressLint("SetTextI18n")
-    private void init() {
+    private void init(Bundle savedInstanceState) {
         LinearLayout playerList = findViewById(R.id.PlayerList);
         Players = new EditText[MAX_PLAYERS];
         PlayerLevels = new Spinner[MAX_PLAYERS];
@@ -144,6 +205,8 @@ public class PlayersActivity extends AppCompatActivity {
             TextView number = row.findViewById(R.id.PlayerNumber);
             number.setText((i + 1) + ".");
             PlayerRows[i] = row;
+            // the rows are saved by onSaveInstanceState
+            row.setSaveFromParentEnabled(false);
             Players[i] = row.findViewById(R.id.PlayerName);
             PlayerLevels[i] = row.findViewById(R.id.PlayerLevel);
             PlayerLevels[i].setAdapter(levelAdapter);
@@ -172,12 +235,24 @@ public class PlayersActivity extends AppCompatActivity {
         ButtonModeTeams = findViewById(R.id.ButtonModeTeams);
         database = new Database(this);
 
-        // the players of the last game are filled in, at least two rows are shown
-        List<Database.Player> lastPlayers = database.selectPlayers();
+        // the players of the last game are filled in, at least two rows are shown.
+        // When the screen is made again, the rows as they were.
+        List<Database.Player> lastPlayers = new ArrayList<>();
+        ArrayList<Bundle> savedRows = savedInstanceState == null ? null : BundleCompat.getParcelableArrayList(savedInstanceState, STATE_ROWS, Bundle.class);
+        if (savedRows != null) {
+            for (Bundle row : savedRows) {
+                lastPlayers.add(fromBundle(row));
+            }
+        } else {
+            lastPlayers = database.selectPlayers();
+        }
         boolean lastGameHadTeams = false;
         for (int row = 0; row < lastPlayers.size() && row < Players.length; row++) {
             writeRow(row, lastPlayers.get(row));
             lastGameHadTeams |= !lastPlayers.get(row).members.isEmpty();
+        }
+        if (savedRows != null) {
+            lastGameHadTeams = savedInstanceState.getBoolean(STATE_TEAMS);
         }
         for (int i = Math.max(2, lastPlayers.size()); i < PlayerRows.length; i++) {
             PlayerRows[i].setVisibility(View.GONE);
@@ -452,6 +527,30 @@ public class PlayersActivity extends AppCompatActivity {
         for (View button : RemoveButtons) {
             button.setVisibility(shownRows > 1 ? View.VISIBLE : View.INVISIBLE);
         }
+    }
+
+    // The statistics and the streaks are kept by name: two players, two teams or two team members
+    // with the same name (also with other capitals) would be one person. Returns that name, or null.
+    static String findDuplicateName(List<Database.Player> players) {
+        Set<String> names = new HashSet<>();
+        Set<String> members = new HashSet<>();
+        Locale hungarian = new Locale("hu", "HU");
+        for (Database.Player player : players) {
+            String name = player.name.trim();
+            if (name.isEmpty()) {
+                continue;
+            }
+            if (!names.add(name.toLowerCase(hungarian))) {
+                return name;
+            }
+            for (Database.Member member : player.members) {
+                String memberName = member.name.trim();
+                if (!memberName.isEmpty() && !members.add(memberName.toLowerCase(hungarian))) {
+                    return memberName;
+                }
+            }
+        }
+        return null;
     }
 
     // the people who play: the players, or the members of the teams

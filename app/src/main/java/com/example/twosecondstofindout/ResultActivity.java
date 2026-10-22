@@ -1,5 +1,6 @@
 package com.example.twosecondstofindout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -24,6 +25,13 @@ public class ResultActivity extends AppCompatActivity {
         SystemBars.setUp(this);
         setContentView(R.layout.activity_result);
         init();
+        // the game screen was closed: the back gesture goes to the main menu, instead of closing the app
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ButtonMainMenu.performClick();
+            }
+        });
         ButtonNewGame.setOnClickListener(view -> {
             Intent intent = new Intent(ResultActivity.this, RoundActivity.class);
             startActivity(intent);

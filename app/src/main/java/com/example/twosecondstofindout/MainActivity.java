@@ -156,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
                     if (which == 0) {
                         new AlertDialog.Builder(this)
                                 .setTitle("Biztosan lecseréled?")
-                                .setMessage("Az összes kérdés és a statisztika lecserélődik a fájlban lévőkre.")
+                                .setMessage("Az összes kérdés és a statisztika lecserélődik a fájlban lévőkre."
+                                        + (gameState.isInProgress() ? " A félbehagyott játék véget ér, nem lehet folytatni." : ""))
                                 .setPositiveButton("Lecserélés", (d, w) -> load(json, true))
                                 .setNegativeButton("Mégse", null)
                                 .show();
@@ -171,6 +172,11 @@ public class MainActivity extends AppCompatActivity {
     private void load(String json, boolean replace) {
         try {
             int count = database.importJson(json, replace);
+            if (replace) {
+                // the undo log of the game was deleted with the old questions, the game cannot go on
+                gameState.setInProgress(false);
+                ButtonContinue.setVisibility(View.GONE);
+            }
             Toast.makeText(this, replace ? "Betöltve: " + count + " kérdés és a statisztika" : count + " új kérdés hozzáadva", Toast.LENGTH_LONG).show();
         } catch (JSONException e) {
             Toast.makeText(this, "Ez nem egy mentésfájl", Toast.LENGTH_LONG).show();
